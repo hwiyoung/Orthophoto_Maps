@@ -5,8 +5,7 @@ import ProcessFunction as Func
 
 if __name__ == '__main__':
     ground_height = 0
-    pixel_size = 0.00157424E-3  # unit: m(mm * 10 ^ -3)
-    focal_length = 4.73E-3      # unit: m(mm * 10 ^ -3)
+    pixel_size = 0.00157424E-3  # unit: m/px (mm/px * 10 ^ -3)
 
     for root, dirs, files in os.walk('./Data'):
         for file in files:
@@ -19,7 +18,7 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path)
 
                 # 0. Extract Interior orientation paramters from the image
-                pixel_size, focal_length = Func.ExtractIOP(file_path)
+                focal_length = Func.GetFocalLength(file_path) # unit: m
 
                 # 1. Restore the image based on orientation information
                 restored_image = Func.Restore(image, file_path)
@@ -32,7 +31,7 @@ if __name__ == '__main__':
                 bbox = Func.Boundary(restored_image, eo, ground_height)
 
                 #gsd = (pixel_size * (eo_line['Height'] - ground_height)) / focal_length
-                gsd = (pixel_size * (eo[2] - ground_height)) / focal_length
+                gsd = (pixel_size * (eo[2] - ground_height)) / focal_length # unit: m/px
                 rows = restored_image.shape[0]
                 cols = restored_image.shape[1]
 

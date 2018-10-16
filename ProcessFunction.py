@@ -4,15 +4,17 @@ import cv2
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 
-def ExtractIOP(path):
-    print('ExtractIOP')
+def GetFocalLength(path):
+    print('GetFocalLength')
     src_image = Image.open(path)
 
     info = src_image._getexif()
     pixel_size = 0
     focal_length = info[37386]
+    result = focal_length[0] / focal_length[1] # unit: mm
+    result = result * pow(10, -3) # unit: m
 
-    return pixel_size, focal_length
+    return result
 
 def Restore(image, path):
     print('Restore')
