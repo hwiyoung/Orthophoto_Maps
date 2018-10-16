@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import math
 import cv2
 import ProcessFunction as Func
 
@@ -13,29 +12,21 @@ if __name__ == '__main__':
         for file in files:
             filename = os.path.splitext(file)[0]
             extension = os.path.splitext(file)[1]
+
+            file_path = root + '/' + file
             if extension == '.JPG':
-                image = cv2.imread(root + '/' + file)
-                print(root + '/' + file)
-            else:
-                print(root + '/' + file)
-                #eo = np.loadtxt(root + '/' + file, delimiter="\t",
-                #                dtype={'names' : ('Image', 'Latitude', 'Longitude', 'Height', 'Omega', 'Phi', 'Kappa'),
-                #                       'formats' : ('U15', np.float, np.float, np.float, np.float, np.float, np.float, np.float)})
-                eo_line = np.genfromtxt(root + '/' + file, delimiter='\t',
-                                   dtype={'names' : ('Image', 'Latitude', 'Longitude', 'Height', 'Omega', 'Phi', 'Kappa'),
-                                          'formats' : ('U15', '<f8', '<f8', '<f8', '<f8', '<f8', '<f8')})
-                eo_line['Omega'] = eo_line['Omega'] * math.pi / 180
-                eo_line['Phi'] = eo_line['Phi'] * math.pi / 180
-                eo_line['Kappa'] = eo_line['Kappa'] * math.pi / 180
+                print(file_path)
+                image = cv2.imread(file_path)
 
-                eo = [eo_line['Latitude'], eo_line['Longitude'], eo_line['Height'],
-                   eo_line['Omega'], eo_line['Phi'], eo_line['Kappa']]
-
-                print(eo_line['Kappa'])
-                print(eo[5])
+                # 0. Extract Interior orientation paramters from the image
+                pixel_size, focal_length = Func.ExtractIOP(file_path)
 
                 # 1. Restore the image based on orientation information
-                restored_image = Func.Restore(image)
+                restored_image = Func.Restore(image, file_path)
+                #cv2.imshow('test', restored_image)
+            else:
+                print(file_path)
+                eo = Func.ReadEO(file_path)
 
                 # 2. Extract a projected boundary of the image
                 bbox = Func.Boundary(restored_image, eo, ground_height)
