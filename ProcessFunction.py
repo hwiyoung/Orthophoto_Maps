@@ -7,14 +7,14 @@ from PIL.ExifTags import TAGS, GPSTAGS
 def GetFocalLength(path):
     print('GetFocalLength')
     src_image = Image.open(path)
-
     info = src_image._getexif()
-    pixel_size = 0
-    focal_length = info[37386]
-    result = focal_length[0] / focal_length[1] # unit: mm
-    result = result * pow(10, -3) # unit: m
 
-    return result
+    # Focal Length
+    FocalLength = info[37386]
+    focal_length = FocalLength[0] / FocalLength[1] # unit: mm
+    focal_length = focal_length * pow(10, -3) # unit: m
+
+    return focal_length
 
 def Restore(image, path):
     print('Restore')
@@ -68,6 +68,7 @@ def Rotate(image, angle):
     return rotated_mat
 
 def ReadEO(path):
+    print('ReadEO')
     eo_line = np.genfromtxt(path, delimiter='\t',
                             dtype={'names': ('Image', 'Latitude', 'Longitude', 'Height', 'Omega', 'Phi', 'Kappa'),
                                    'formats': ('U15', '<f8', '<f8', '<f8', '<f8', '<f8', '<f8')})
@@ -79,13 +80,54 @@ def ReadEO(path):
     eo = [eo_line['Latitude'], eo_line['Longitude'], eo_line['Height'],
           eo_line['Omega'], eo_line['Phi'], eo_line['Kappa']]
 
-    # print(eo_line['Kappa'])
-    # print(eo[5])
-
     return eo
 
-def Boundary(image, eo, dem):
+def Boundary(image, eo, dem, pixel_size, focal_length):
     print('Boundary')
+    rows = image.shape[0]
+    cols = image.shape[1]
+
+    R = Rot3D(eo)
+
+    image_vertex = GetVertices(image, rows, cols, pixel_size, focal_length)
+
+    proj_coordinates = np.zeros(shape=(4, 2))
+    for i in range(len(image_vertex)):
+        proj_coordinates[i, :] = ComputeCoordinates(image_vertex, eo, R, dem)
+
+    bbox = np.zeros(shape=(4, 1))
+    bbox[0] = min(proj_coordinates[:, 0])
+    bbox[1] = max(proj_coordinates[:, 0])
+    bbox[2] = min(proj_coordinates[:, 1])
+    bbox[3] = max(proj_coordinates[:, 1])
+
+    return bbox
+
+def Rot3D(eo):
+    pass
+
+def GetVertices(image, rows, cols, pixel_size, focal_length):
+    vertices = np.zeros(shape=(4, 3))
+
+    vertices[0][0] = -cols * pixel_size / 2
+    vertices[0][1] = rows * pixel_size / 2
+
+    vertices[1][0] = cols * pixel_size / 2
+    vertices[1][1] = rows * pixel_size / 2
+
+    vertices[2][0] = cols * pixel_size / 2
+    vertices[2][1] = -rows * pixel_size / 2
+
+    vertices[3][0] = -cols * pixel_size / 2
+    vertices[3][1] = -rows * pixel_size / 2
+
+    vertices[:, 2] = -focal_length
+
+    return vertices
+
+def ComputeCoordinates(vertices, eo, rotation_matrix, ground_height):
+    pass
+
 
 def Projection(row, col, eo, dem):
     print('Projection')

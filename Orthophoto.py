@@ -11,10 +11,10 @@ if __name__ == '__main__':
         for file in files:
             filename = os.path.splitext(file)[0]
             extension = os.path.splitext(file)[1]
-
             file_path = root + '/' + file
+
             if extension == '.JPG':
-                print(file_path)
+                print('Read the image - ' + file)
                 image = cv2.imread(file_path)
 
                 # 0. Extract Interior orientation paramters from the image
@@ -22,13 +22,14 @@ if __name__ == '__main__':
 
                 # 1. Restore the image based on orientation information
                 restored_image = Func.Restore(image, file_path)
-                #cv2.imshow('test', restored_image)
+
             else:
-                print(file_path)
+                print('Read EOP - ' + file)
+                print('Latitude | Longitude | Height | Omega | Phi | Kappa')
                 eo = Func.ReadEO(file_path)
 
                 # 2. Extract a projected boundary of the image
-                bbox = Func.Boundary(restored_image, eo, ground_height)
+                bbox = Func.Boundary(restored_image, eo, ground_height, pixel_size, focal_length)
 
                 #gsd = (pixel_size * (eo_line['Height'] - ground_height)) / focal_length
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length # unit: m/px
