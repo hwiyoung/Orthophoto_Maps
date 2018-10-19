@@ -32,9 +32,7 @@ def Restore(image, path):
     return restored_image
 
 def GetOrientation(path):
-    #print('GetOrientation')
     src_image = Image.open(path)
-
     info = src_image._getexif()
     ori = info[274]
 
@@ -42,7 +40,6 @@ def GetOrientation(path):
 
 def Rotate(image, angle):
     # https://www.pyimagesearch.com/2017/01/02/rotate-images-correctly-with-opencv-and-python/
-    #print('Rotate')
 
     height = image.shape[0]
     width = image.shape[1]
@@ -84,12 +81,10 @@ def ReadEO(path):
 
 def Boundary(image, eo, dem, pixel_size, focal_length):
     print('Boundary')
-    rows = image.shape[0]
-    cols = image.shape[1]
 
     R = Rot3D(eo)
 
-    image_vertex = GetVertices(image, rows, cols, pixel_size, focal_length)
+    image_vertex = GetVertices(image, pixel_size, focal_length)
 
     proj_coordinates = np.zeros(shape=(4, 2))
     for i in range(len(image_vertex)):
@@ -104,22 +99,77 @@ def Boundary(image, eo, dem, pixel_size, focal_length):
     return bbox
 
 def Rot3D(eo):
-    pass
+    om = eo[3]
+    ph = eo[4]
+    kp = eo[5]
 
-def GetVertices(image, rows, cols, pixel_size, focal_length):
+    #      | 1       0        0    |
+    # Rx = | 0    cos(om)  sin(om) |
+    #      | 0   -sin(om)  cos(om) |
+
+    Rx = np.zeros(shape=(3, 3))
+    cos, sin = np.cos(om), np.sin(om)
+
+    Rx[0, 0] = 1
+    Rx[1, 1] = cos
+    Rx[1, 2] = sin
+    Rx[2, 1] = -sin
+    Rx[2, 2] = cos
+
+    #      | cos(ph)   0  -sin(ph) |
+    # Ry = |    0      1      0    |
+    #      | sin(ph)   0   cos(ph) |
+
+    Ry = np.zeros(shape=(3, 3))
+    cos, sin = np.cos(ph), np.sin(ph)
+
+    Ry[0, 0] = cos
+    Ry[0, 2] = -sin
+    Ry[1, 1] = 1
+    Ry[2, 0] = sin
+    Ry[2, 2] = cos
+
+    #      | cos(kp)   sin(kp)   0 |
+    # Rz = | -sin(kp)  cos(kp)   0 |
+    #      |    0         0      1 |
+
+    Rz = np.zeros(shape=(3, 3))
+    cos, sin = np.cos(kp), np.sin(kp)
+
+    Rz[0, 0] = cos
+    Rz[1, 1] = sin
+    Rz[1, 0] = -sin
+    Rz[1, 1] = cos
+    Rz[2, 2] = 1
+
+    # R = Rz * Ry * Rx
+
+    R = Rz * Ry * Rx
+
+    return R
+
+def GetVertices(image, pixel_size, focal_length):
+    rows = image.shape[0]
+    cols = image.shape[1]
+
+    # (1) ------------ (2)
+    #  |                |
+    #  |                |
+    # (4) ------------ (3)
+
     vertices = np.zeros(shape=(4, 3))
 
-    vertices[0][0] = -cols * pixel_size / 2
-    vertices[0][1] = rows * pixel_size / 2
+    vertices[0, 0] = -cols * pixel_size / 2
+    vertices[0, 1] = rows * pixel_size / 2
 
-    vertices[1][0] = cols * pixel_size / 2
-    vertices[1][1] = rows * pixel_size / 2
+    vertices[1, 0] = cols * pixel_size / 2
+    vertices[1, 1] = rows * pixel_size / 2
 
-    vertices[2][0] = cols * pixel_size / 2
-    vertices[2][1] = -rows * pixel_size / 2
+    vertices[2, 0] = cols * pixel_size / 2
+    vertices[2, 1] = -rows * pixel_size / 2
 
-    vertices[3][0] = -cols * pixel_size / 2
-    vertices[3][1] = -rows * pixel_size / 2
+    vertices[3, 0] = -cols * pixel_size / 2
+    vertices[3, 1] = -rows * pixel_size / 2
 
     vertices[:, 2] = -focal_length
 
