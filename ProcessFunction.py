@@ -79,15 +79,15 @@ def readEO(path):
     return eo
 
 def boundary(image, eo, dem, pixel_size, focal_length):
-    print('Boundary')
+    print('boundary')
 
-    R = Rot3D(eo)
+    R = Rot3D(eo)  # type -  matrix
 
-    image_vertex = getVertices(image, pixel_size, focal_length)
+    image_vertex = getVertices(image, pixel_size, focal_length)  # type - array
 
     proj_coordinates = np.zeros(shape=(4, 2))
     for i in range(len(image_vertex)):
-        proj_coordinates[i, :] = computeProjCoords(image_vertex, eo, R, dem)
+        proj_coordinates[i, :] = projection(image_vertex[i, :], eo, R, dem)
 
     bbox = np.zeros(shape=(4, 1))
     bbox[0] = min(proj_coordinates[:, 0])
@@ -142,6 +142,9 @@ def Rot3D(eo):
     Rz[2, 2] = 1
 
     # R = Rz * Ry * Rx
+    Rx = np.asmatrix(Rx)
+    Ry = np.asmatrix(Ry)
+    Rz = np.asmatrix(Rz)
 
     R = Rz * Ry * Rx
 
@@ -152,7 +155,7 @@ def getVertices(image, pixel_size, focal_length):
     cols = image.shape[1]
 
     # (1) ------------ (2)
-    #  |                |
+    #  |     image      |
     #  |                |
     # (4) ------------ (3)
 
@@ -174,15 +177,22 @@ def getVertices(image, pixel_size, focal_length):
 
     return vertices
 
-def computeProjCoords(vertices, eo, rotation_matrix, ground_height):
-    pass
+def projection(vertices, eo, rotation_matrix, ground_height):
+    print('projection')
+    rotation_matrix.transpose()
+    vertices.transpose()
 
+    coord_GCS = rotation_matrix * vertices
+    scale = (ground_height - eo[2]) / (rotation_matrix[2, 0] * vertices[0] +
+                                       rotation_matrix[2, 1] * vertices[1] +
+                                       rotation_matrix[2, 2] * vertices[2])
 
-def projection(row, col, eo, dem):
-    print('Projection')
+    plane_coord_GCS = scale * coord_GCS[0:2] + eo[0:2]
 
-def backProjection(coord, eo, dem):
-    print('Backprojection')
+    return plane_coord_GCS
+
+def backProjection(coord, eo, image_size, pixel_size, focal_length):
+    print('backProjection')
 
 def resample(coord, image):
-    print('Resample')
+    print('resample')

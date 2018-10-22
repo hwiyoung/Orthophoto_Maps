@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import cv2
 import ProcessFunction as Func
 
@@ -21,6 +22,8 @@ if __name__ == '__main__':
 
                 # 1. Restore the image based on orientation information
                 restored_image = Func.restoreOrientation(image, file_path)
+                imageRows = restored_image.shape[0]
+                imageCols = restored_image.shape[1]
 
             else:
                 print('Read EOP - ' + file)
@@ -30,21 +33,23 @@ if __name__ == '__main__':
                 # 2. Extract a projected boundary of the image
                 bbox = Func.boundary(restored_image, eo, ground_height, pixel_size, focal_length)
 
-                #gsd = (pixel_size * (eo_line['Height'] - ground_height)) / focal_length
-                gsd = (pixel_size * (eo[2] - ground_height)) / focal_length # unit: m/px
-                rows = restored_image.shape[0]
-                cols = restored_image.shape[1]
+                gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
+                projRows = (bbox[1] - bbox[0]) / gsd
+                projCols = (bbox[3] - bbox[2]) / gsd
 
-                for row in range(rows):
-                    for col in range(cols):
-                        # 3. Image projection
-                        coord1 = Func.projection(row, col, eo, ground_height)
+                coord1 = np.zeros(shape=(3, 1))
 
-                        # 4. Backprojection
-                        coord2 = Func.backProjection(coord1, eo, ground_height)
+                for row in range(int(projRows)):
+                    for col in range(int(projCols)):
+                        coord1[0] = bbox[0] + col * gsd
+                        coord1[1] = bbox[3] - row * gsd
+                        coord1[2] = ground_height
 
-                        # 5. Resampling
+                        # 3. Backprojection
+                        coord2 = Func.backProjection(coord1, eo, [imageRows, imageCols], pixel_size, focal_length)
+
+                        # 4. Resampling
                         pixel = Func.resample(coord2, restored_image)
-                        bbox[row][col] = pixel
+                        bbox[row, col] = pixel
 
                 #cv2.imwrite(root + '/' + file, bbox)
