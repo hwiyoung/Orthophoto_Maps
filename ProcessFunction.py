@@ -4,41 +4,41 @@ import cv2
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 
-def GetFocalLength(path):
+def getFocalLength(path):
     print('GetFocalLength')
     src_image = Image.open(path)
     info = src_image._getexif()
 
     # Focal Length
-    FocalLength = info[37386]
-    focal_length = FocalLength[0] / FocalLength[1] # unit: mm
+    focalLength = info[37386]
+    focal_length = focalLength[0] / focalLength[1] # unit: mm
     focal_length = focal_length * pow(10, -3) # unit: m
 
     return focal_length
 
-def Restore(image, path):
+def restoreOrientation(image, path):
     print('Restore')
-    ori = GetOrientation(path)
+    orientation = getOrientation(path)
 
-    if ori == 8:
-        restored_image = Rotate(image, -90)
-    elif ori == 6:
-        restored_image = Rotate(image, 90)
-    elif ori == 3:
-        restored_image = Rotate(image, 180)
+    if orientation == 8:
+        restored_image = rotate(image, -90)
+    elif orientation == 6:
+        restored_image = rotate(image, 90)
+    elif orientation == 3:
+        restored_image = rotate(image, 180)
     else:
         restored_image = image
 
     return restored_image
 
-def GetOrientation(path):
+def getOrientation(path):
     src_image = Image.open(path)
     info = src_image._getexif()
     ori = info[274]
 
     return ori
 
-def Rotate(image, angle):
+def rotate(image, angle):
     # https://www.pyimagesearch.com/2017/01/02/rotate-images-correctly-with-opencv-and-python/
 
     height = image.shape[0]
@@ -64,8 +64,7 @@ def Rotate(image, angle):
     rotated_mat = cv2.warpAffine(image, rotation_mat, (bound_w, bound_h))
     return rotated_mat
 
-def ReadEO(path):
-    print('ReadEO')
+def readEO(path):
     eo_line = np.genfromtxt(path, delimiter='\t',
                             dtype={'names': ('Image', 'Latitude', 'Longitude', 'Height', 'Omega', 'Phi', 'Kappa'),
                                    'formats': ('U15', '<f8', '<f8', '<f8', '<f8', '<f8', '<f8')})
@@ -79,16 +78,16 @@ def ReadEO(path):
 
     return eo
 
-def Boundary(image, eo, dem, pixel_size, focal_length):
+def boundary(image, eo, dem, pixel_size, focal_length):
     print('Boundary')
 
     R = Rot3D(eo)
 
-    image_vertex = GetVertices(image, pixel_size, focal_length)
+    image_vertex = getVertices(image, pixel_size, focal_length)
 
     proj_coordinates = np.zeros(shape=(4, 2))
     for i in range(len(image_vertex)):
-        proj_coordinates[i, :] = ComputeCoordinates(image_vertex, eo, R, dem)
+        proj_coordinates[i, :] = computeProjCoords(image_vertex, eo, R, dem)
 
     bbox = np.zeros(shape=(4, 1))
     bbox[0] = min(proj_coordinates[:, 0])
@@ -148,7 +147,7 @@ def Rot3D(eo):
 
     return R
 
-def GetVertices(image, pixel_size, focal_length):
+def getVertices(image, pixel_size, focal_length):
     rows = image.shape[0]
     cols = image.shape[1]
 
@@ -175,15 +174,15 @@ def GetVertices(image, pixel_size, focal_length):
 
     return vertices
 
-def ComputeCoordinates(vertices, eo, rotation_matrix, ground_height):
+def computeProjCoords(vertices, eo, rotation_matrix, ground_height):
     pass
 
 
-def Projection(row, col, eo, dem):
+def projection(row, col, eo, dem):
     print('Projection')
 
-def Backprojection(coord, eo, dem):
+def backProjection(coord, eo, dem):
     print('Backprojection')
 
-def Resample(coord, image):
+def resample(coord, image):
     print('Resample')

@@ -1,5 +1,4 @@
 import os
-import numpy as np
 import cv2
 import ProcessFunction as Func
 
@@ -18,18 +17,18 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path)
 
                 # 0. Extract Interior orientation paramters from the image
-                focal_length = Func.GetFocalLength(file_path) # unit: m
+                focal_length = Func.getFocalLength(file_path) # unit: m
 
                 # 1. Restore the image based on orientation information
-                restored_image = Func.Restore(image, file_path)
+                restored_image = Func.restoreOrientation(image, file_path)
 
             else:
                 print('Read EOP - ' + file)
                 print('Latitude | Longitude | Height | Omega | Phi | Kappa')
-                eo = Func.ReadEO(file_path)
+                eo = Func.readEO(file_path)
 
                 # 2. Extract a projected boundary of the image
-                bbox = Func.Boundary(restored_image, eo, ground_height, pixel_size, focal_length)
+                bbox = Func.boundary(restored_image, eo, ground_height, pixel_size, focal_length)
 
                 #gsd = (pixel_size * (eo_line['Height'] - ground_height)) / focal_length
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length # unit: m/px
@@ -39,13 +38,13 @@ if __name__ == '__main__':
                 for row in range(rows):
                     for col in range(cols):
                         # 3. Image projection
-                        coord1 = Func.Projection(row, col, eo, ground_height)
+                        coord1 = Func.projection(row, col, eo, ground_height)
 
                         # 4. Backprojection
-                        coord2 = Func.Backprojection(coord1, eo, ground_height)
+                        coord2 = Func.backProjection(coord1, eo, ground_height)
 
                         # 5. Resampling
-                        pixel = Func.Resample(coord2, restored_image)
+                        pixel = Func.resample(coord2, restored_image)
                         bbox[row][col] = pixel
 
                 #cv2.imwrite(root + '/' + file, bbox)
