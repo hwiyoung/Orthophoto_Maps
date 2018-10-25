@@ -86,14 +86,14 @@ def boundary(image, eo, dem, pixel_size, focal_length):
     image_vertex = getVertices(image, pixel_size, focal_length)  # type - array
 
     proj_coordinates = np.zeros(shape=(4, 2))
-    for i in range(len(image_vertex)):
-        proj_coordinates[i, :] = projection(image_vertex[i, :], eo, R, dem)
+    for i in range(len(image_vertex[0])):
+        proj_coordinates[i, :] = projection(image_vertex[:, i], eo, R, dem)
 
     bbox = np.zeros(shape=(4, 1))
-    bbox[0] = min(proj_coordinates[:, 0])
-    bbox[1] = max(proj_coordinates[:, 0])
-    bbox[2] = min(proj_coordinates[:, 1])
-    bbox[3] = max(proj_coordinates[:, 1])
+    bbox[0] = min(proj_coordinates[:, 0])  # X min
+    bbox[1] = max(proj_coordinates[:, 0])  # X max
+    bbox[2] = min(proj_coordinates[:, 1])  # Y min
+    bbox[3] = max(proj_coordinates[:, 1])  # Y max
 
     return bbox
 
@@ -142,11 +142,8 @@ def Rot3D(eo):
     Rz[2, 2] = 1
 
     # R = Rz * Ry * Rx
-    Rx = np.asmatrix(Rx)
-    Ry = np.asmatrix(Ry)
-    Rz = np.asmatrix(Rz)
-
-    R = Rz * Ry * Rx
+    Rzy = np.dot(Rz, Ry)
+    R = np.dot(Rzy, Rx)
 
     return R
 
@@ -159,33 +156,32 @@ def getVertices(image, pixel_size, focal_length):
     #  |                |
     # (4) ------------ (3)
 
-    vertices = np.zeros(shape=(4, 3))
+    vertices = np.zeros(shape=(3, 4))
 
     vertices[0, 0] = -cols * pixel_size / 2
-    vertices[0, 1] = rows * pixel_size / 2
+    vertices[1, 0] = rows * pixel_size / 2
 
-    vertices[1, 0] = cols * pixel_size / 2
+    vertices[0, 1] = cols * pixel_size / 2
     vertices[1, 1] = rows * pixel_size / 2
 
-    vertices[2, 0] = cols * pixel_size / 2
-    vertices[2, 1] = -rows * pixel_size / 2
+    vertices[0, 2] = cols * pixel_size / 2
+    vertices[1, 2] = -rows * pixel_size / 2
 
-    vertices[3, 0] = -cols * pixel_size / 2
-    vertices[3, 1] = -rows * pixel_size / 2
+    vertices[0, 3] = -cols * pixel_size / 2
+    vertices[1, 3] = -rows * pixel_size / 2
 
-    vertices[:, 2] = -focal_length
+    vertices[2, :] = -focal_length
 
     return vertices
 
-def projection(vertices, eo, rotation_matrix, ground_height):
+def projection(vertices, eo, rotation_matrix, dem):
     print('projection')
-    rotation_matrix.transpose()
-    vertices.transpose()
+    inverse_rotation_matrix = rotation_matrix.transpose()
 
-    coord_GCS = rotation_matrix * vertices
-    scale = (ground_height - eo[2]) / (rotation_matrix[2, 0] * vertices[0] +
-                                       rotation_matrix[2, 1] * vertices[1] +
-                                       rotation_matrix[2, 2] * vertices[2])
+    coord_GCS = np.dot(inverse_rotation_matrix, vertices)
+    scale = (dem - eo[2]) / (inverse_rotation_matrix[2, 0] * vertices[0] +
+                             inverse_rotation_matrix[2, 1] * vertices[1] +
+                             inverse_rotation_matrix[2, 2] * vertices[2])
 
     plane_coord_GCS = scale * coord_GCS[0:2] + eo[0:2]
 
