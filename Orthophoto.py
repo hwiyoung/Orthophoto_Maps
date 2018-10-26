@@ -4,8 +4,8 @@ import cv2
 import ProcessFunction as Func
 
 if __name__ == '__main__':
-    ground_height = 0
-    pixel_size = 0.00157424E-3  # unit: m/px (mm/px * 10 ^ -3)
+    ground_height = 0  # unit: m
+    sensor_width = 6.3  # unit: mm
 
     for root, dirs, files in os.walk('./Data'):
         for file in files:
@@ -24,6 +24,9 @@ if __name__ == '__main__':
                 restored_image = Func.restoreOrientation(image, file_path)
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
+
+                pixel_size = sensor_width / image_cols  # unit: mm/px
+                pixel_size = pixel_size / 1000  # unit: m/px
 
             else:
                 print('Read EOP - ' + file)
