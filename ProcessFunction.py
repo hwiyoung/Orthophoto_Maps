@@ -3,6 +3,7 @@ import math
 import cv2
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
+from osgeo.osr import SpatialReference, CoordinateTransformation
 
 def getFocalLength(path):
     print('GetFocalLength')
@@ -73,8 +74,26 @@ def readEO(path):
     eo_line['Phi'] = eo_line['Phi'] * math.pi / 180
     eo_line['Kappa'] = eo_line['Kappa'] * math.pi / 180
 
-    eo = [eo_line['Latitude'], eo_line['Longitude'], eo_line['Height'],
-          eo_line['Omega'], eo_line['Phi'], eo_line['Kappa']]
+    eo = [float(eo_line['Latitude']), float(eo_line['Longitude']), float(eo_line['Height']),
+          float(eo_line['Omega']), float(eo_line['Phi']), float(eo_line['Kappa'])]
+
+    return eo
+
+def convertCoordinateSystem(eo):
+    # Define the TM central coordinate system (EPSG 5186)
+    epsg5186 = SpatialReference()
+    epsg5186.ImportFromEPSG(5186)
+
+    # Define the wgs84 system (EPSG 4326)
+    epsg4326 = SpatialReference()
+    epsg4326.ImportFromEPSG(4326)
+
+    tm2latlon = CoordinateTransformation(epsg5186, epsg4326)
+    latlon2tm = CoordinateTransformation(epsg4326, epsg5186)
+
+    # Check the transformation for a point close to the centre of the projected grid
+    xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))
+    eo[0:2] = xy[0:2]
 
     return eo
 

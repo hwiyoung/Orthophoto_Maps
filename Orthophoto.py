@@ -17,7 +17,7 @@ if __name__ == '__main__':
                 print('Read the image - ' + file)
                 image = cv2.imread(file_path)
 
-                # 0. Extract Interior orientation paramters from the image
+                # 0. Extract Interior orientation parameters from the image
                 focal_length = Func.getFocalLength(file_path) # unit: m
 
                 # 1. Restore the image based on orientation information
@@ -29,6 +29,7 @@ if __name__ == '__main__':
                 print('Read EOP - ' + file)
                 print('Latitude | Longitude | Height | Omega | Phi | Kappa')
                 eo = Func.readEO(file_path)
+                eo = Func.convertCoordinateSystem(eo)
 
                 # 2. Extract a projected boundary of the image
                 bbox = Func.boundary(restored_image, eo, ground_height, pixel_size, focal_length)
