@@ -41,8 +41,10 @@ if __name__ == '__main__':
                 projected_rows = (bbox[1] - bbox[0]) / gsd
                 projected_cols = (bbox[3] - bbox[2]) / gsd
 
-                coord1 = np.zeros(shape=(3, 1))
+                # Define the orthophoto
+                output_image = np.zeros(shape=(projected_rows, projected_cols), dtype='float32')
 
+                coord1 = np.zeros(shape=(3, 1))
                 for row in range(int(projected_rows)):
                     for col in range(int(projected_cols)):
                         coord1[0] = bbox[0] + col * gsd
@@ -54,6 +56,6 @@ if __name__ == '__main__':
 
                         # 4. Resampling
                         pixel = Func.resample(coord2, restored_image)
-                        bbox[row, col] = pixel
+                        output_image[row, col] = pixel
 
-                #cv2.imwrite(root + '/' + file, bbox)
+                #cv2.imwrite(root + '/' + file, output_image)
