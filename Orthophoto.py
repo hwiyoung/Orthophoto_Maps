@@ -38,8 +38,8 @@ if __name__ == '__main__':
                 bbox = Func.boundary(restored_image, eo, ground_height, pixel_size, focal_length)
 
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
-                projected_rows = (bbox[1] - bbox[0]) / gsd
-                projected_cols = (bbox[3] - bbox[2]) / gsd
+                projected_cols = (bbox[1] - bbox[0]) / gsd
+                projected_rows = (bbox[3] - bbox[2]) / gsd
 
                 # Define the orthophoto
                 output_image = np.zeros(shape=(projected_rows, projected_cols), dtype='float32')

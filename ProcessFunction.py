@@ -155,7 +155,7 @@ def Rot3D(eo):
     cos, sin = np.cos(kp), np.sin(kp)
 
     Rz[0, 0] = cos
-    Rz[1, 1] = sin
+    Rz[0, 1] = sin
     Rz[1, 0] = -sin
     Rz[1, 1] = cos
     Rz[2, 2] = 1
@@ -198,9 +198,7 @@ def projection(vertices, eo, rotation_matrix, dem):
     inverse_rotation_matrix = rotation_matrix.transpose()
 
     coord_GCS = np.dot(inverse_rotation_matrix, vertices)
-    scale = (dem - eo[2]) / (inverse_rotation_matrix[2, 0] * vertices[0] +
-                             inverse_rotation_matrix[2, 1] * vertices[1] +
-                             inverse_rotation_matrix[2, 2] * vertices[2])
+    scale = (dem - eo[2]) / coord_GCS[2]
 
     plane_coord_GCS = scale * coord_GCS[0:2] + eo[0:2]
 
