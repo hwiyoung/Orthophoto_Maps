@@ -42,7 +42,7 @@ if __name__ == '__main__':
                 projected_rows = (bbox[3] - bbox[2]) / gsd
 
                 # Define the orthophoto
-                output_image = np.zeros(shape=(projected_rows, projected_cols), dtype='float32')
+                output_image = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
 
                 coord1 = np.zeros(shape=(3, 1))
                 for row in range(int(projected_rows)):
@@ -52,7 +52,7 @@ if __name__ == '__main__':
                         coord1[2] = ground_height
 
                         # 3. Backprojection
-                        coord2 = Func.backProjection(coord1, eo, [image_rows, image_cols], pixel_size, focal_length)
+                        coord2 = Func.backProjection(coord1, eo, focal_length, pixel_size, [image_rows, image_cols])
 
                         # 4. Resampling
                         pixel = Func.resample(coord2, restored_image)

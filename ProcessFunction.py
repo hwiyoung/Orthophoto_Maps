@@ -100,9 +100,9 @@ def convertCoordinateSystem(eo):
 def boundary(image, eo, dem, pixel_size, focal_length):
     print('boundary')
 
-    R = Rot3D(eo)  # type -  matrix
+    R = Rot3D(eo)
 
-    image_vertex = getVertices(image, pixel_size, focal_length)  # type - array
+    image_vertex = getVertices(image, pixel_size, focal_length)
 
     proj_coordinates = np.zeros(shape=(4, 2))
     for i in range(len(image_vertex[0])):
@@ -204,8 +204,24 @@ def projection(vertices, eo, rotation_matrix, dem):
 
     return plane_coord_GCS
 
-def backProjection(coord, eo, image_size, pixel_size, focal_length):
+def backProjection(coord, eo, focal_length, pixel_size, image_size):
     print('backProjection')
+
+    R = Rot3D(eo)
+    ground_vector = coord - np.array([[eo[0]], [eo[1]], [eo[2]]])
+
+    coord_CCS_m = np.dot(R, ground_vector)  # unit: m
+    scale = (coord_CCS_m[2]) / (-focal_length)
+    plane_coord_CCS = coord_CCS_m[0:2] / scale
+
+    # Convert CCS to Pixel Coordinate System
+    coord_CCS_px = plane_coord_CCS / pixel_size  # unit: px
+
+    coord_out = np.zeros(shape=(2, 1), dtype='float32')
+    coord_out[0] = image_size[0] / 2 + coord_CCS_px[1]
+    coord_out[1] = image_size[1] / 2 - coord_CCS_px[0]
+
+    return coord_out
 
 def resample(coord, image):
     print('resample')
