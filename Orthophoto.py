@@ -42,7 +42,10 @@ if __name__ == '__main__':
                 projected_rows = (bbox[3] - bbox[2]) / gsd
 
                 # Define the orthophoto
-                output_image = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
+                output_image_b = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
+                output_image_g = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
+                output_image_r = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
+                output_image_a = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
 
                 coord1 = np.zeros(shape=(3, 1))
                 for row in range(int(projected_rows)):
@@ -56,6 +59,12 @@ if __name__ == '__main__':
 
                         # 4. Resampling
                         pixel = Func.resample(coord2, restored_image)
-                        output_image[row, col] = pixel
+
+                        output_image_b[row, col] = pixel[0]
+                        output_image_g[row, col] = pixel[1]
+                        output_image_r[row, col] = pixel[2]
+                        output_image_a[row, col] = pixel[3]
+
+                output_image = cv2.merge(output_image_b, output_image_g, output_image_r, output_image_a)
 
                 #cv2.imwrite(root + '/' + file, output_image)
