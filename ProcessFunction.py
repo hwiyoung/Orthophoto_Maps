@@ -225,3 +225,15 @@ def backProjection(coord, eo, focal_length, pixel_size, image_size):
 
 def resample(coord, image):
     print('resample')
+
+    if int(coord[0]) < 0 or int(coord[0]) > image.shape[0]:
+        pixel = [0, 0, 0, 255]
+    elif int(coord[1]) < 0 or int(coord[1]) > image.shape[1]:
+        pixel = [0, 0, 0, 255]
+    else:
+        b = image[int(coord[0]), int(coord[1])][0]
+        g = image[int(coord[0]), int(coord[1])][1]
+        r = image[int(coord[0]), int(coord[1])][2]
+        pixel = [b, g, r, 255]
+
+    return pixel
