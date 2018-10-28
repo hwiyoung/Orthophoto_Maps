@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 import ProcessFunction as Func
+import time
 
 if __name__ == '__main__':
     ground_height = 0  # unit: m
@@ -9,6 +10,8 @@ if __name__ == '__main__':
 
     for root, dirs, files in os.walk('./Data'):
         for file in files:
+            start_time = time.time()
+
             filename = os.path.splitext(file)[0]
             extension = os.path.splitext(file)[1]
             file_path = root + '/' + file
@@ -65,6 +68,10 @@ if __name__ == '__main__':
                         output_image_r[row, col] = pixel[2]
                         output_image_a[row, col] = pixel[3]
 
-                output_image = cv2.merge(output_image_b, output_image_g, output_image_r, output_image_a)
+                print('Merge channels')
+                output_image = cv2.merge((output_image_b, output_image_g, output_image_r, output_image_a))
 
-                #cv2.imwrite(root + '/' + file, output_image)
+                print('Save the image')
+                cv2.imwrite('./' + filename + '.png', output_image)
+
+                print("--- %s seconds ---" % (time.time() - start_time))
