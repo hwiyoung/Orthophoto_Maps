@@ -212,14 +212,14 @@ def backProjection(coord, eo, focal_length, pixel_size, image_size):
     scale = (coord_CCS_m[2]) / (-focal_length)
     plane_coord_CCS = coord_CCS_m[0:2] / scale
 
-    # Convert CCS to Pixel Coordinate System
+    # Convert CCS to Image Coordinate System
     coord_CCS_px = plane_coord_CCS / pixel_size  # unit: px
 
-    coord_out = np.zeros(shape=(2, 1), dtype='float32')
-    coord_out[0] = image_size[0] / 2 + coord_CCS_px[1]
-    coord_out[1] = image_size[1] / 2 - coord_CCS_px[0]
+    coord_ICS = np.zeros(shape=(2, 1), dtype='float32')
+    coord_ICS[0] = image_size[1] / 2 + coord_CCS_px[0]
+    coord_ICS[1] = image_size[0] / 2 - coord_CCS_px[1]
 
-    return coord_out
+    return coord_ICS
 
 def resample(coord, image):
     if int(coord[0]) < 0 or int(coord[0]) >= image.shape[0]:
