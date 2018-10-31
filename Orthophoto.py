@@ -23,8 +23,10 @@ if __name__ == '__main__':
                 # 0. Extract Interior orientation parameters from the image
                 focal_length = Func.getFocalLength(file_path) # unit: m
 
-                # 1. Restore the image based on orientation information
+                # 1. Restore a image based on orientation information
+                print('Restore a image')
                 restored_image = Func.restoreOrientation(image, file_path)
+                print("--- %s seconds ---" % (time.time() - start_time))
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
 
@@ -40,18 +42,23 @@ if __name__ == '__main__':
                 # 2. Extract a projected boundary of the image
                 print('Extract a boundary')
                 bbox = Func.boundary(restored_image, eo, ground_height, pixel_size, focal_length)
+                print("--- %s seconds ---" % (time.time() - start_time))
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
 
                 # 3. Backprojection & resample
                 print('Backprojection & resample')
+                start_time = time.time()
                 channel_b, channel_g, channel_r, channel_a = Func.backprojection_resample(bbox, gsd, eo,
                                                                                           ground_height, focal_length,
                                                                                           pixel_size, restored_image)
+                print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('Merge channels')
+                start_time = time.time()
                 output_image = cv2.merge((channel_b, channel_g, channel_r, channel_a))
+                print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('Save the image')
+                start_time = time.time()
                 cv2.imwrite('./' + filename + '.png', output_image)
-
                 print("--- %s seconds ---" % (time.time() - start_time))

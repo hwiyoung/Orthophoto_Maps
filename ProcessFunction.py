@@ -6,7 +6,6 @@ from PIL.ExifTags import TAGS, GPSTAGS
 from osgeo.osr import SpatialReference, CoordinateTransformation
 
 def getFocalLength(path):
-    print('Focal Length')
     src_image = Image.open(path)
     info = src_image._getexif()
 
@@ -18,7 +17,6 @@ def getFocalLength(path):
     return focal_length
 
 def restoreOrientation(image, path):
-    print('Restore')
     orientation = getOrientation(path)
 
     if orientation == 8:
@@ -98,8 +96,6 @@ def convertCoordinateSystem(eo):
     return eo
 
 def boundary(image, eo, dem, pixel_size, focal_length):
-    print('boundary')
-
     R = Rot3D(eo)
 
     image_vertex = getVertices(image, pixel_size, focal_length)
