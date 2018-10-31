@@ -6,7 +6,7 @@ from PIL.ExifTags import TAGS, GPSTAGS
 from osgeo.osr import SpatialReference, CoordinateTransformation
 
 def getFocalLength(path):
-    print('GetFocalLength')
+    print('Focal Length')
     src_image = Image.open(path)
     info = src_image._getexif()
 
@@ -194,7 +194,6 @@ def getVertices(image, pixel_size, focal_length):
     return vertices
 
 def projection(vertices, eo, rotation_matrix, dem):
-    print('projection')
     inverse_rotation_matrix = rotation_matrix.transpose()
 
     coord_GCS = np.dot(inverse_rotation_matrix, vertices)
@@ -233,3 +232,38 @@ def resample(coord, image):
         pixel = [b, g, r, 255]
 
     return pixel
+
+def backprojection_resample(boundary, gsd, eo, ground_height, focal_length, pixel_size, image):
+    # Boundary size
+    boundary_cols = int((boundary[1] - boundary[0]) / gsd)
+    boundary_rows = int((boundary[3] - boundary[2]) / gsd)
+
+    # Image size
+    image_rows = image.shape[0]
+    image_cols = image.shape[1]
+
+    # Define the orthophoto
+    output_image_b = np.zeros(shape=(boundary_rows, boundary_cols), dtype='float32')
+    output_image_g = np.zeros(shape=(boundary_rows, boundary_cols), dtype='float32')
+    output_image_r = np.zeros(shape=(boundary_rows, boundary_cols), dtype='float32')
+    output_image_a = np.zeros(shape=(boundary_rows, boundary_cols), dtype='float32')
+
+    coord1 = np.zeros(shape=(3, 1))
+    for row in range(boundary_rows):
+        for col in range(boundary_cols):
+            coord1[0] = boundary[0] + col * gsd
+            coord1[1] = boundary[3] - row * gsd
+            coord1[2] = ground_height
+
+            # 3. Backprojection
+            coord2 = backProjection(coord1, eo, focal_length, pixel_size, [image_rows, image_cols])
+
+            # 4. Resampling
+            pixel = resample(coord2, image)
+
+            output_image_b[row, col] = pixel[0]
+            output_image_g[row, col] = pixel[1]
+            output_image_r[row, col] = pixel[2]
+            output_image_a[row, col] = pixel[3]
+
+    return output_image_b, output_image_g, output_image_r, output_image_a

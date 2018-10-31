@@ -33,43 +33,23 @@ if __name__ == '__main__':
 
             else:
                 print('Read EOP - ' + file)
-                print('Latitude | Longitude | Height | Omega | Phi | Kappa')
+                print('Longitude | Latitude | Height | Omega | Phi | Kappa')
                 eo = Func.readEO(file_path)
                 eo = Func.convertCoordinateSystem(eo)
 
                 # 2. Extract a projected boundary of the image
+                print('Extract a boundary')
                 bbox = Func.boundary(restored_image, eo, ground_height, pixel_size, focal_length)
-
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
-                projected_cols = (bbox[1] - bbox[0]) / gsd
-                projected_rows = (bbox[3] - bbox[2]) / gsd
 
-                # Define the orthophoto
-                output_image_b = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
-                output_image_g = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
-                output_image_r = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
-                output_image_a = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
-
-                coord1 = np.zeros(shape=(3, 1))
-                for row in range(int(projected_rows)):
-                    for col in range(int(projected_cols)):
-                        coord1[0] = bbox[0] + col * gsd
-                        coord1[1] = bbox[3] - row * gsd
-                        coord1[2] = ground_height
-
-                        # 3. Backprojection
-                        coord2 = Func.backProjection(coord1, eo, focal_length, pixel_size, [image_rows, image_cols])
-
-                        # 4. Resampling
-                        pixel = Func.resample(coord2, restored_image)
-
-                        output_image_b[row, col] = pixel[0]
-                        output_image_g[row, col] = pixel[1]
-                        output_image_r[row, col] = pixel[2]
-                        output_image_a[row, col] = pixel[3]
+                # 3. Backprojection & resample
+                print('Backprojection & resample')
+                channel_b, channel_g, channel_r, channel_a = Func.backprojection_resample(bbox, gsd, eo,
+                                                                                          ground_height, focal_length,
+                                                                                          pixel_size, restored_image)
 
                 print('Merge channels')
-                output_image = cv2.merge((output_image_b, output_image_g, output_image_r, output_image_a))
+                output_image = cv2.merge((channel_b, channel_g, channel_r, channel_a))
 
                 print('Save the image')
                 cv2.imwrite('./' + filename + '.png', output_image)
