@@ -1,5 +1,4 @@
 import os
-import numpy as np
 import cv2
 import ProcessFunction as Func
 import time

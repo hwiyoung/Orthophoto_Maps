@@ -4,6 +4,7 @@ import cv2
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 from osgeo.osr import SpatialReference, CoordinateTransformation
+from numba import jit
 
 def getFocalLength(path):
     src_image = Image.open(path)
@@ -112,6 +113,7 @@ def boundary(image, eo, dem, pixel_size, focal_length):
 
     return bbox
 
+@jit(nopython=True)
 def Rot3D(eo):
     om = eo[3]
     ph = eo[4]
@@ -199,6 +201,7 @@ def projection(vertices, eo, rotation_matrix, dem):
 
     return plane_coord_GCS
 
+@jit(nopython=True)
 def backProjection(coord, eo, focal_length, pixel_size, image_size):
     R = Rot3D(eo)
     ground_vector = coord - np.array([[eo[0]], [eo[1]], [eo[2]]])
@@ -210,39 +213,44 @@ def backProjection(coord, eo, focal_length, pixel_size, image_size):
     # Convert CCS to Image Coordinate System
     coord_CCS_px = plane_coord_CCS / pixel_size  # unit: px
 
-    coord_ICS = np.zeros(shape=(2, 1), dtype='float32')
+    coord_ICS = np.zeros(shape=(2, 1))
     coord_ICS[0] = image_size[1] / 2 + coord_CCS_px[0]
     coord_ICS[1] = image_size[0] / 2 - coord_CCS_px[1]
 
     return coord_ICS
 
+@jit(nopython=True)
 def resample(coord, image):
-    if int(coord[0]) < 0 or int(coord[0]) >= image.shape[1]:  # x - column
+    row = int(coord[0, 1])
+    col = int(coord[0, 0])
+
+    if col < 0 or col >= image.shape[1]:  # x - column
         pixel = [0, 0, 0, 0]
-    elif int(coord[1]) < 0 or int(coord[1]) >= image.shape[0]:  # y - row
+    elif row < 0 or row >= image.shape[0]:  # y - row
         pixel = [0, 0, 0, 0]
     else:
-        b = image[int(coord[1]), int(coord[0])][0]
-        g = image[int(coord[1]), int(coord[0])][1]
-        r = image[int(coord[1]), int(coord[0])][2]
+        b = image[row, col][0]
+        g = image[row, col][1]
+        r = image[row, col][2]
         pixel = [b, g, r, 255]
 
     return pixel
 
+@jit(nopython=True)
 def backprojection_resample(boundary, gsd, eo, ground_height, focal_length, pixel_size, image):
     # Boundary size
-    boundary_cols = int((boundary[1] - boundary[0]) / gsd)
-    boundary_rows = int((boundary[3] - boundary[2]) / gsd)
+    boundary_cols = int((boundary[0, 1] - boundary[0, 0]) / gsd)
+    boundary_rows = int((boundary[0, 3] - boundary[0, 2]) / gsd)
 
     # Image size
     image_rows = image.shape[0]
     image_cols = image.shape[1]
 
     # Define the orthophoto
-    output_image_b = np.zeros(shape=(boundary_rows, boundary_cols), dtype='float32')
-    output_image_g = np.zeros(shape=(boundary_rows, boundary_cols), dtype='float32')
-    output_image_r = np.zeros(shape=(boundary_rows, boundary_cols), dtype='float32')
-    output_image_a = np.zeros(shape=(boundary_rows, boundary_cols), dtype='float32')
+    output_image_b = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    output_image_g = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    output_image_r = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    output_image_a = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
 
     coord1 = np.zeros(shape=(3, 1))
     for row in range(boundary_rows):
