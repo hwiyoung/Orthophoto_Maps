@@ -200,6 +200,7 @@ def projection(vertices, eo, rotation_matrix, dem):
 
     return plane_coord_GCS
 
+#@profile
 def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
     #R = Rot3D(eo)
     #ground_vector = coord - np.array([[eo[0]], [eo[1]], [eo[2]]])
@@ -215,16 +216,16 @@ def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
     coord_out[0] = image_size[1] / 2 + coord_CCS_px[0]
     coord_out[1] = image_size[0] / 2 - coord_CCS_px[1]
 
-
+#@profile
 def resample(coord, image):
     if int(coord[0]) < 0 or int(coord[0]) >= image.shape[1]:
-        pixel = [0, 0, 0, 0]
+        pixel = (0, 0, 0, 0)
     elif int(coord[1]) < 0 or int(coord[1]) >= image.shape[0]:
-        pixel = [0, 0, 0, 0]
+        pixel = (0, 0, 0, 0)
     else:
         b = image[int(coord[1]), int(coord[0])][0]
         g = image[int(coord[1]), int(coord[0])][1]
         r = image[int(coord[1]), int(coord[0])][2]
-        pixel = [b, g, r, 255]
+        pixel = (b, g, r, 255)
 
     return pixel

@@ -41,10 +41,6 @@ if __name__ == '__main__':
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
                 projected_cols = (bbox[1] - bbox[0]) / gsd
                 projected_rows = (bbox[3] - bbox[2]) / gsd
-                print(projected_cols)
-                print(projected_rows)
-                print(int(projected_cols))
-                print(int(projected_rows))
 
                 # Define the orthophoto
                 output_image_b = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
