@@ -4,7 +4,6 @@ import cv2
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 from osgeo.osr import SpatialReference, CoordinateTransformation
-from numba import jit
 
 def getFocalLength(path):
     src_image = Image.open(path)
@@ -96,14 +95,15 @@ def convertCoordinateSystem(eo):
 
     return eo
 
-def boundary(image, eo, dem, pixel_size, focal_length):
-    R = Rot3D(eo)
+def boundary(image, eo, R, dem, pixel_size, focal_length):
+    #R = Rot3D(eo)
+    inverse_R = R.transpose()
 
     image_vertex = getVertices(image, pixel_size, focal_length)
 
     proj_coordinates = np.zeros(shape=(4, 2))
     for i in range(len(image_vertex[0])):
-        proj_coordinates[i, :] = projection(image_vertex[:, i], eo, R, dem)
+        proj_coordinates[i, :] = projection(image_vertex[:, i], eo, inverse_R, dem)
 
     bbox = np.zeros(shape=(4, 1))
     bbox[0] = min(proj_coordinates[:, 0])  # X min
@@ -113,7 +113,6 @@ def boundary(image, eo, dem, pixel_size, focal_length):
 
     return bbox
 
-@jit(nopython=True)
 def Rot3D(eo):
     om = eo[3]
     ph = eo[4]
@@ -192,82 +191,40 @@ def getVertices(image, pixel_size, focal_length):
     return vertices
 
 def projection(vertices, eo, rotation_matrix, dem):
-    inverse_rotation_matrix = rotation_matrix.transpose()
+    #inverse_rotation_matrix = rotation_matrix.transpose()
 
-    coord_GCS = np.dot(inverse_rotation_matrix, vertices)
+    coord_GCS = np.dot(rotation_matrix, vertices)
     scale = (dem - eo[2]) / coord_GCS[2]
 
     plane_coord_GCS = scale * coord_GCS[0:2] + eo[0:2]
 
     return plane_coord_GCS
 
-@jit(nopython=True)
-def backProjection(coord, eo, focal_length, pixel_size, image_size):
-    R = Rot3D(eo)
-    ground_vector = coord - np.array([[eo[0]], [eo[1]], [eo[2]]])
+def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
+    #R = Rot3D(eo)
+    #ground_vector = coord - np.array([[eo[0]], [eo[1]], [eo[2]]])
 
-    coord_CCS_m = np.dot(R, ground_vector)  # unit: m
+    #coord_CCS_m = np.dot(R, ground_vector)  # unit: m
+    coord_CCS_m = np.dot(R, coord)  # unit: m
     scale = (coord_CCS_m[2]) / (-focal_length)
     plane_coord_CCS = coord_CCS_m[0:2] / scale
 
-    # Convert CCS to Image Coordinate System
+    # Convert CCS to Pixel Coordinate System
     coord_CCS_px = plane_coord_CCS / pixel_size  # unit: px
 
-    coord_ICS = np.zeros(shape=(2, 1))
-    coord_ICS[0] = image_size[1] / 2 + coord_CCS_px[0]
-    coord_ICS[1] = image_size[0] / 2 - coord_CCS_px[1]
+    coord_out[0] = image_size[1] / 2 + coord_CCS_px[0]
+    coord_out[1] = image_size[0] / 2 - coord_CCS_px[1]
 
-    return coord_ICS
 
-@jit(nopython=True)
 def resample(coord, image):
-    row = int(coord[0, 1])
-    col = int(coord[0, 0])
-
-    if col < 0 or col >= image.shape[1]:  # x - column
+    if int(coord[0]) < 0 or int(coord[0]) >= image.shape[1]:
         pixel = [0, 0, 0, 0]
-    elif row < 0 or row >= image.shape[0]:  # y - row
+    elif int(coord[1]) < 0 or int(coord[1]) >= image.shape[0]:
         pixel = [0, 0, 0, 0]
     else:
-        b = image[row, col][0]
-        g = image[row, col][1]
-        r = image[row, col][2]
+        b = image[int(coord[1]), int(coord[0])][0]
+        g = image[int(coord[1]), int(coord[0])][1]
+        r = image[int(coord[1]), int(coord[0])][2]
         pixel = [b, g, r, 255]
 
     return pixel
-
-@jit(nopython=True)
-def backprojection_resample(boundary, gsd, eo, ground_height, focal_length, pixel_size, image):
-    # Boundary size
-    boundary_cols = int((boundary[0, 1] - boundary[0, 0]) / gsd)
-    boundary_rows = int((boundary[0, 3] - boundary[0, 2]) / gsd)
-
-    # Image size
-    image_rows = image.shape[0]
-    image_cols = image.shape[1]
-
-    # Define the orthophoto
-    output_image_b = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-    output_image_g = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-    output_image_r = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-    output_image_a = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-
-    coord1 = np.zeros(shape=(3, 1))
-    for row in range(boundary_rows):
-        for col in range(boundary_cols):
-            coord1[0] = boundary[0] + col * gsd
-            coord1[1] = boundary[3] - row * gsd
-            coord1[2] = ground_height
-
-            # 3. Backprojection
-            coord2 = backProjection(coord1, eo, focal_length, pixel_size, [image_rows, image_cols])
-
-            # 4. Resampling
-            pixel = resample(coord2, image)
-
-            output_image_b[row, col] = pixel[0]
-            output_image_g[row, col] = pixel[1]
-            output_image_r[row, col] = pixel[2]
-            output_image_a[row, col] = pixel[3]
-
-    return output_image_b, output_image_g, output_image_r, output_image_a
