@@ -41,34 +41,29 @@ if __name__ == '__main__':
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
                 projected_cols = (bbox[1] - bbox[0]) / gsd
                 projected_rows = (bbox[3] - bbox[2]) / gsd
+                projected_rows, projected_cols = int(projected_rows), int(projected_cols)
 
                 # Define the orthophoto
-                output_image_b = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
-                output_image_g = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
-                output_image_r = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
-                output_image_a = np.zeros(shape=(int(projected_rows), int(projected_cols)), dtype='float32')
+                output_b = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
+                output_g = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
+                output_r = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
+                output_a = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
 
                 print('backProjection_resample')
                 coord1 = np.zeros(shape=(3, 1))
                 coord2 = np.zeros(shape=(2, 1))
-                for row in range(int(projected_rows)):
-                    for col in range(int(projected_cols)):
+                for row in range(projected_rows):
+                    for col in range(projected_cols):
                         coord1[0] = bbox[0] + col * gsd - eo[0]
                         coord1[1] = bbox[3] - row * gsd - eo[1]
                         coord1[2] = ground_height - eo[2]
 
                         # 3. Backprojection
-                        #Func.backProjection(coord1, eo, R, focal_length, pixel_size, [image_rows, image_cols], coord2)
-                        Func.backProjection(coord1, R, focal_length, pixel_size, [image_rows, image_cols], coord2)
+                        Func.backProjection(coord1, R, focal_length, pixel_size, (image_rows, image_cols), coord2)
 
                         # 4. Resampling
-                        pixel = Func.resample(coord2, restored_image)
+                        Func.resample(coord2, restored_image, output_b, output_g, output_r, output_a, (row, col))
 
-                        output_image_b[row, col] = pixel[0]
-                        output_image_g[row, col] = pixel[1]
-                        output_image_r[row, col] = pixel[2]
-                        output_image_a[row, col] = pixel[3]
-
-                output_image = cv2.merge((output_image_b, output_image_g, output_image_r, output_image_a))
+                output_image = cv2.merge((output_b, output_g, output_r, output_a))
 
                 cv2.imwrite('./' + filename + '.png', output_image)

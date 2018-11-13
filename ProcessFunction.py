@@ -96,7 +96,6 @@ def convertCoordinateSystem(eo):
     return eo
 
 def boundary(image, eo, R, dem, pixel_size, focal_length):
-    #R = Rot3D(eo)
     inverse_R = R.transpose()
 
     image_vertex = getVertices(image, pixel_size, focal_length)
@@ -191,8 +190,6 @@ def getVertices(image, pixel_size, focal_length):
     return vertices
 
 def projection(vertices, eo, rotation_matrix, dem):
-    #inverse_rotation_matrix = rotation_matrix.transpose()
-
     coord_GCS = np.dot(rotation_matrix, vertices)
     scale = (dem - eo[2]) / coord_GCS[2]
 
@@ -202,10 +199,6 @@ def projection(vertices, eo, rotation_matrix, dem):
 
 #@profile
 def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
-    #R = Rot3D(eo)
-    #ground_vector = coord - np.array([[eo[0]], [eo[1]], [eo[2]]])
-
-    #coord_CCS_m = np.dot(R, ground_vector)  # unit: m
     coord_CCS_m = np.dot(R, coord)  # unit: m
     scale = (coord_CCS_m[2]) / (-focal_length)
     plane_coord_CCS = coord_CCS_m[0:2] / scale
@@ -217,15 +210,15 @@ def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
     coord_out[1] = image_size[0] / 2 - coord_CCS_px[1]
 
 #@profile
-def resample(coord, image):
-    if int(coord[0]) < 0 or int(coord[0]) >= image.shape[1]:
-        pixel = (0, 0, 0, 0)
-    elif int(coord[1]) < 0 or int(coord[1]) >= image.shape[0]:
-        pixel = (0, 0, 0, 0)
-    else:
-        b = image[int(coord[1]), int(coord[0])][0]
-        g = image[int(coord[1]), int(coord[0])][1]
-        r = image[int(coord[1]), int(coord[0])][2]
-        pixel = (b, g, r, 255)
+def resample(coord, image, b, g, r, a, row_col):
+    # row_col: row, column in for loop
+    proj_col = int(coord[0])  # projected column
+    proj_row = int(coord[1])  # projected row
 
-    return pixel
+    if proj_col < 0 or proj_col >= image.shape[1]:
+        return
+    elif proj_row < 0 or proj_row >= image.shape[0]:
+        return
+    else:
+        b[row_col[0], row_col[1]], g[row_col[0], row_col[1]], r[row_col[0], row_col[1]], a[row_col[0], row_col[1]] = \
+            image[proj_row, proj_col][0], image[proj_row, proj_col][1], image[proj_row, proj_col][2], 255
