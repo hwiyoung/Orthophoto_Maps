@@ -17,11 +17,11 @@ if __name__ == '__main__':
                 print('Read the image - ' + file)
                 image = cv2.imread(file_path)
 
-                # 0. Extract Interior orientation parameters from the image
-                focal_length = Func.getFocalLength(file_path) # unit: m
+                # 0. Extract EXIF data from a image
+                focal_length, orientation = Func.getExif(file_path) # unit: m
 
                 # 1. Restore the image based on orientation information
-                restored_image = Func.restoreOrientation(image, file_path)
+                restored_image = Func.restoreOrientation(image, orientation)
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
 

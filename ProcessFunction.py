@@ -5,7 +5,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 from osgeo.osr import SpatialReference, CoordinateTransformation
 
-def getFocalLength(path):
+def getExif(path):
     src_image = Image.open(path)
     info = src_image._getexif()
 
@@ -14,11 +14,12 @@ def getFocalLength(path):
     focal_length = focalLength[0] / focalLength[1] # unit: mm
     focal_length = focal_length * pow(10, -3) # unit: m
 
-    return focal_length
+    # Orientation
+    orientation = info[274]
 
-def restoreOrientation(image, path):
-    orientation = getOrientation(path)
+    return focal_length, orientation
 
+def restoreOrientation(image, orientation):
     if orientation == 8:
         restored_image = rotate(image, -90)
     elif orientation == 6:
@@ -29,13 +30,6 @@ def restoreOrientation(image, path):
         restored_image = image
 
     return restored_image
-
-def getOrientation(path):
-    src_image = Image.open(path)
-    info = src_image._getexif()
-    ori = info[274]
-
-    return ori
 
 def rotate(image, angle):
     # https://www.pyimagesearch.com/2017/01/02/rotate-images-correctly-with-opencv-and-python/
