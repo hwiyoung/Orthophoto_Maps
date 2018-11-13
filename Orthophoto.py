@@ -44,36 +44,16 @@ if __name__ == '__main__':
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
-                projected_cols = (bbox[1] - bbox[0]) / gsd
-                projected_rows = (bbox[3] - bbox[2]) / gsd
-                projected_rows, projected_cols = int(projected_rows), int(projected_cols)
-
-                # Define the orthophoto
-                output_b = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
-                output_g = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
-                output_r = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
-                output_a = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
 
                 print('backProjection_resample')
                 start_time = time.time()
-                coord1 = np.zeros(shape=(3, 1))
-                coord2 = np.zeros(shape=(2, 1))
-                for row in range(projected_rows):
-                    for col in range(projected_cols):
-                        coord1[0] = bbox[0] + col * gsd - eo[0]
-                        coord1[1] = bbox[3] - row * gsd - eo[1]
-                        coord1[2] = ground_height - eo[2]
-
-                        # 3. Backprojection
-                        Func.backProjection(coord1, R, focal_length, pixel_size, (image_rows, image_cols), coord2)
-
-                        # 4. Resampling
-                        Func.resample(coord2, restored_image, output_b, output_g, output_r, output_a, (row, col))
+                b, g, r, a = Func.backprojection_resample(bbox, gsd, eo, R, ground_height,
+                                                          focal_length, pixel_size, restored_image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('Merge channels')
                 start_time = time.time()
-                output_image = cv2.merge((output_b, output_g, output_r, output_a))
+                output_image = cv2.merge((b, g, r, a))
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('Save the image')
