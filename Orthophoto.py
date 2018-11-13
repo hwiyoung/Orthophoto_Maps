@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 import ProcessFunction as Func
+import time
 
 if __name__ == '__main__':
     ground_height = 0  # unit: m
@@ -9,6 +10,8 @@ if __name__ == '__main__':
 
     for root, dirs, files in os.walk('./Data'):
         for file in files:
+            start_time = time.time()
+
             filename = os.path.splitext(file)[0]
             extension = os.path.splitext(file)[1]
             file_path = root + '/' + file
@@ -22,6 +25,7 @@ if __name__ == '__main__':
 
                 # 1. Restore the image based on orientation information
                 restored_image = Func.restoreOrientation(image, orientation)
+                print("--- %s seconds ---" % (time.time() - start_time))
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
 
@@ -37,6 +41,7 @@ if __name__ == '__main__':
 
                 # 2. Extract a projected boundary of the image
                 bbox = Func.boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
+                print("--- %s seconds ---" % (time.time() - start_time))
 
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
                 projected_cols = (bbox[1] - bbox[0]) / gsd
@@ -50,6 +55,7 @@ if __name__ == '__main__':
                 output_a = np.zeros(shape=(projected_rows, projected_cols), dtype=np.uint8)
 
                 print('backProjection_resample')
+                start_time = time.time()
                 coord1 = np.zeros(shape=(3, 1))
                 coord2 = np.zeros(shape=(2, 1))
                 for row in range(projected_rows):
@@ -63,7 +69,14 @@ if __name__ == '__main__':
 
                         # 4. Resampling
                         Func.resample(coord2, restored_image, output_b, output_g, output_r, output_a, (row, col))
+                print("--- %s seconds ---" % (time.time() - start_time))
 
+                print('Merge channels')
+                start_time = time.time()
                 output_image = cv2.merge((output_b, output_g, output_r, output_a))
+                print("--- %s seconds ---" % (time.time() - start_time))
 
+                print('Save the image')
+                start_time = time.time()
                 cv2.imwrite('./' + filename + '.png', output_image)
+                print("--- %s seconds ---" % (time.time() - start_time))
