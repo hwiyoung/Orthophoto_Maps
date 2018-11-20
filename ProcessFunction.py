@@ -4,7 +4,7 @@ import cv2
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 from osgeo.osr import SpatialReference, CoordinateTransformation
-from numba import jit
+from numba import jit, prange
 
 def getExif(path):
     src_image = Image.open(path)
@@ -99,7 +99,7 @@ def boundary(image, eo, R, dem, pixel_size, focal_length):
     for i in range(len(image_vertex[0])):
         proj_coordinates[i, :] = projection(image_vertex[:, i], eo, inverse_R, dem)
 
-    bbox = np.zeros(shape=(4, 1))
+    bbox = np.empty(shape=(4, 1))
     bbox[0] = min(proj_coordinates[:, 0])  # X min
     bbox[1] = max(proj_coordinates[:, 0])  # X max
     bbox[2] = min(proj_coordinates[:, 1])  # Y min
@@ -166,7 +166,7 @@ def getVertices(image, pixel_size, focal_length):
     #  |                |
     # (4) ------------ (3)
 
-    vertices = np.zeros(shape=(3, 4))
+    vertices = np.empty(shape=(3, 4))
 
     vertices[0, 0] = -cols * pixel_size / 2
     vertices[1, 0] = rows * pixel_size / 2
@@ -192,6 +192,7 @@ def projection(vertices, eo, rotation_matrix, dem):
 
     return plane_coord_GCS
 
+#@profile
 @jit(nopython=True)
 def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
     coord_CCS_m = np.dot(R, coord)  # unit: m
@@ -204,11 +205,12 @@ def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
     coord_out[0] = image_size[1] / 2 + coord_CCS_px[0]
     coord_out[1] = image_size[0] / 2 - coord_CCS_px[1]
 
+#@profile
 @jit(nopython=True)
 def resample(coord, image, b, g, r, a, row_col):
     # row_col: row, column in for loop
     proj_col = int(coord[0, 0])  # projected column
-    proj_row = int(coord[0, 1])  # projected row
+    proj_row = int(coord[1, 0])  # projected row
 
     if proj_col < 0 or proj_col >= image.shape[1]:
         return
@@ -218,7 +220,7 @@ def resample(coord, image, b, g, r, a, row_col):
         b[row_col[0], row_col[1]], g[row_col[0], row_col[1]], r[row_col[0], row_col[1]], a[row_col[0], row_col[1]] = \
             image[proj_row, proj_col][0], image[proj_row, proj_col][1], image[proj_row, proj_col][2], 255
 
-@jit(nopython=True)
+@jit(nopython=True, nogil=True)
 def backprojection_resample(boundary, gsd, eo, R, ground_height, focal_length, pixel_size, image):
     # Boundary size
     boundary_cols = int((boundary[1, 0] - boundary[0, 0]) / gsd)
@@ -234,10 +236,10 @@ def backprojection_resample(boundary, gsd, eo, R, ground_height, focal_length, p
     output_r = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
     output_a = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
 
-    coord1 = np.zeros(shape=(3, 1))
-    coord2 = np.zeros(shape=(2, 1))
-    for row in range(boundary_rows):
-        for col in range(boundary_cols):
+    coord1 = np.empty(shape=(3, 1))
+    coord2 = np.empty(shape=(2, 1))
+    for row in prange(boundary_rows):
+        for col in prange(boundary_cols):
             coord1[0] = boundary[0] + col * gsd - eo[0]
             coord1[1] = boundary[3] - row * gsd - eo[1]
             coord1[2] = ground_height - eo[2]
@@ -246,6 +248,6 @@ def backprojection_resample(boundary, gsd, eo, R, ground_height, focal_length, p
             backProjection(coord1, R, focal_length, pixel_size, (image_rows, image_cols), coord2)
 
             # 4. Resampling
-            pixel = resample(coord2, image, output_b, output_g, output_r, output_a, (row, col))
+            resample(coord2, image, output_b, output_g, output_r, output_a, (row, col))
 
     return output_b, output_g, output_r, output_a
