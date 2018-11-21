@@ -95,7 +95,7 @@ def boundary(image, eo, R, dem, pixel_size, focal_length):
 
     image_vertex = getVertices(image, pixel_size, focal_length)
 
-    proj_coordinates = np.zeros(shape=(4, 2))
+    proj_coordinates = np.empty(shape=(4, 2))
     for i in range(len(image_vertex[0])):
         proj_coordinates[i, :] = projection(image_vertex[:, i], eo, inverse_R, dem)
 
