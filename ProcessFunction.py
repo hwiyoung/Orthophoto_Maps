@@ -98,10 +98,10 @@ def boundary(image, eo, R, dem, pixel_size, focal_length):
     proj_coordinates = projection(image_vertex, eo, inverse_R, dem)
 
     bbox = np.empty(shape=(4, 1))
-    bbox[0] = min(proj_coordinates[:, 0])  # X min
-    bbox[1] = max(proj_coordinates[:, 0])  # X max
-    bbox[2] = min(proj_coordinates[:, 1])  # Y min
-    bbox[3] = max(proj_coordinates[:, 1])  # Y max
+    bbox[0] = min(proj_coordinates[0, :])  # X min
+    bbox[1] = max(proj_coordinates[0, :])  # X max
+    bbox[2] = min(proj_coordinates[1, :])  # Y min
+    bbox[3] = max(proj_coordinates[1, :])  # Y max
 
     return bbox
 
