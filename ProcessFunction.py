@@ -93,11 +93,9 @@ def convertCoordinateSystem(eo):
 def boundary(image, eo, R, dem, pixel_size, focal_length):
     inverse_R = R.transpose()
 
-    image_vertex = getVertices(image, pixel_size, focal_length)
+    image_vertex = getVertices(image, pixel_size, focal_length)  # shape: 3 x 4
 
-    proj_coordinates = np.empty(shape=(4, 2))
-    for i in range(len(image_vertex[0])):
-        proj_coordinates[i, :] = projection(image_vertex[:, i], eo, inverse_R, dem)
+    proj_coordinates = projection(image_vertex, eo, inverse_R, dem)
 
     bbox = np.empty(shape=(4, 1))
     bbox[0] = min(proj_coordinates[:, 0])  # X min
@@ -188,7 +186,7 @@ def projection(vertices, eo, rotation_matrix, dem):
     coord_GCS = np.dot(rotation_matrix, vertices)
     scale = (dem - eo[2]) / coord_GCS[2]
 
-    plane_coord_GCS = scale * coord_GCS[0:2] + eo[0:2]
+    plane_coord_GCS = scale * coord_GCS[0:2] + [[eo[0]], [eo[1]]]
 
     return plane_coord_GCS
 
@@ -220,7 +218,7 @@ def resample(coord, image, b, g, r, a, row_col):
         b[row_col[0], row_col[1]], g[row_col[0], row_col[1]], r[row_col[0], row_col[1]], a[row_col[0], row_col[1]] = \
             image[proj_row, proj_col][0], image[proj_row, proj_col][1], image[proj_row, proj_col][2], 255
 
-@jit(nopython=True, nogil=True)
+@jit(nopython=True, parallel=True)
 def backprojection_resample(boundary, gsd, eo, R, ground_height, focal_length, pixel_size, image):
     # Boundary size
     boundary_cols = int((boundary[1, 0] - boundary[0, 0]) / gsd)
