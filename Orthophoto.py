@@ -3,6 +3,10 @@ import numpy as np
 import cv2
 import ProcessFunction as Func
 import time
+from ExifData import getExif, restoreOrientation
+from EoData import readEO, convertCoordinateSystem, Rot3D
+from Boundary import boundary
+from BackprojectionResample import backprojection_resample
 
 if __name__ == '__main__':
     ground_height = 0  # unit: m
@@ -21,10 +25,10 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path)
 
                 # 0. Extract EXIF data from a image
-                focal_length, orientation = Func.getExif(file_path) # unit: m
+                focal_length, orientation = getExif(file_path) # unit: m
 
                 # 1. Restore the image based on orientation information
-                restored_image = Func.restoreOrientation(image, orientation)
+                restored_image = restoreOrientation(image, orientation)
                 print("--- %s seconds ---" % (time.time() - start_time))
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
@@ -35,20 +39,20 @@ if __name__ == '__main__':
             else:
                 print('Read EOP - ' + file)
                 print('Latitude | Longitude | Height | Omega | Phi | Kappa')
-                eo = Func.readEO(file_path)
-                eo = Func.convertCoordinateSystem(eo)
-                R = Func.Rot3D(eo)
+                eo = readEO(file_path)
+                eo = convertCoordinateSystem(eo)
+                R = Rot3D(eo)
 
                 # 2. Extract a projected boundary of the image
-                bbox = Func.boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
+                bbox = boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
 
                 print('backProjection_resample')
                 start_time = time.time()
-                b, g, r, a = Func.backprojection_resample(bbox, gsd, eo, R, ground_height,
-                                                          focal_length, pixel_size, restored_image)
+                b, g, r, a = backprojection_resample(bbox, gsd, eo, R, ground_height,
+                                                     focal_length, pixel_size, restored_image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('Merge channels')
