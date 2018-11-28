@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import cv2
-import ProcessFunction as Func
 import time
 from ExifData import getExif, restoreOrientation
 from EoData import readEO, convertCoordinateSystem, Rot3D

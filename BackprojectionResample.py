@@ -1,6 +1,21 @@
 import numpy as np
 from numba import jit, prange
 
+@jit
+def projectedCoord(boundary, gsd, eo, ground_height):
+    boundary_cols = int((boundary[1] - boundary[0]) / gsd)
+    boundary_rows = int((boundary[3] - boundary[2]) / gsd)
+
+    proj_coords = np.empty(shape=(3, boundary_rows * boundary_cols))
+    i = 0
+    for row in prange(boundary_rows):
+        for col in prange(boundary_cols):
+            proj_coords[0, i] = boundary[0] + col * gsd - eo[0]
+            proj_coords[1, i] = boundary[3] - row * gsd - eo[1]
+            i += 1
+    proj_coords[2, :] = ground_height - eo[2]
+    return proj_coords
+
 #@profile
 @jit(nopython=True)
 def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
