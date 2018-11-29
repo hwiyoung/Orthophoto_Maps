@@ -3,8 +3,8 @@ from numba import jit, prange
 
 @jit(nopython=True)
 def projectedCoord(boundary, gsd, eo, ground_height):
-    boundary_cols = int((boundary[1] - boundary[0]) / gsd)
-    boundary_rows = int((boundary[3] - boundary[2]) / gsd)
+    boundary_cols = int((boundary[1, 0] - boundary[0, 0]) / gsd)
+    boundary_rows = int((boundary[3, 0] - boundary[2, 0]) / gsd)
 
     proj_coords = np.empty(shape=(3, boundary_rows * boundary_cols))
     i = 0
