@@ -1,7 +1,7 @@
 import numpy as np
 from numba import jit, prange
 
-@jit
+@jit(nopython=True)
 def projectedCoord(boundary, gsd, eo, ground_height):
     boundary_cols = int((boundary[1] - boundary[0]) / gsd)
     boundary_rows = int((boundary[3] - boundary[2]) / gsd)
@@ -10,8 +10,8 @@ def projectedCoord(boundary, gsd, eo, ground_height):
     i = 0
     for row in prange(boundary_rows):
         for col in prange(boundary_cols):
-            proj_coords[0, i] = boundary[0] + col * gsd - eo[0]
-            proj_coords[1, i] = boundary[3] - row * gsd - eo[1]
+            proj_coords[0, i] = boundary[0, 0] + col * gsd - eo[0]
+            proj_coords[1, i] = boundary[3, 0] - row * gsd - eo[1]
             i += 1
     proj_coords[2, :] = ground_height - eo[2]
     return proj_coords
