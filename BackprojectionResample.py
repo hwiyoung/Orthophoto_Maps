@@ -2,10 +2,7 @@ import numpy as np
 from numba import jit, prange
 
 @jit(nopython=True)
-def projectedCoord(boundary, gsd, eo, ground_height):
-    boundary_cols = int((boundary[1, 0] - boundary[0, 0]) / gsd)
-    boundary_rows = int((boundary[3, 0] - boundary[2, 0]) / gsd)
-
+def projectedCoord(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height):
     proj_coords = np.empty(shape=(3, boundary_rows * boundary_cols))
     i = 0
     for row in prange(boundary_rows):
@@ -49,6 +46,8 @@ def backprojection_resample(boundary, gsd, eo, R, ground_height, focal_length, p
     # Boundary size
     boundary_cols = int((boundary[1, 0] - boundary[0, 0]) / gsd)
     boundary_rows = int((boundary[3, 0] - boundary[2, 0]) / gsd)
+
+    proj_coords = projectedCoord(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height)
 
     # Image size
     image_rows = image.shape[0]
