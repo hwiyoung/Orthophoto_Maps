@@ -13,6 +13,7 @@ if __name__ == '__main__':
 
     for root, dirs, files in os.walk('./Data'):
         for file in files:
+            image_start_time = time.time()
             start_time = time.time()
 
             filename = os.path.splitext(file)[0]
@@ -28,12 +29,17 @@ if __name__ == '__main__':
 
                 # 1. Restore the image based on orientation information
                 restored_image = restoreOrientation(image, orientation)
-                print("--- %s seconds ---" % (time.time() - start_time))
+
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
 
                 pixel_size = sensor_width / image_cols  # unit: mm/px
                 pixel_size = pixel_size / 1000  # unit: m/px
+
+                end_time = time.time()
+                print("--- %s seconds ---" % (time.time() - start_time))
+
+                read_time = end_time - start_time
 
             else:
                 print('Read EOP - ' + file)
@@ -63,3 +69,6 @@ if __name__ == '__main__':
                 start_time = time.time()
                 cv2.imwrite('./' + filename + '.png', output_image)
                 print("--- %s seconds ---" % (time.time() - start_time))
+
+                print('Processing time per each image')
+                print("--- %s seconds ---" % (time.time() - image_start_time + read_time))
