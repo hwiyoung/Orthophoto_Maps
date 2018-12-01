@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
                 print('backProjection')
                 start_time = time.time()
-                backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)                
+                backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('resample')

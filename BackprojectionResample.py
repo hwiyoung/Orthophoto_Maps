@@ -13,18 +13,18 @@ def projectedCoord(boundary, boundary_rows, boundary_cols, gsd, eo, ground_heigh
     proj_coords[2, :] = ground_height - eo[2]
     return proj_coords
 
-#@profile
-@jit(nopython=True)
-def backProjection(coord, R, focal_length, pixel_size, image_size, coord_out):
-    coord_CCS_m = np.dot(R, coord)  # unit: m
-    scale = (coord_CCS_m[2]) / (-focal_length)
-    plane_coord_CCS = coord_CCS_m[0:2] / scale
+def backProjection(coord, R, focal_length, pixel_size, image_size):
+    coord_CCS_m = np.dot(R, coord)  # unit: m     3 x (row x col)
+    scale = (coord_CCS_m[2]) / (-focal_length)  # 1 x (row x col)
+    plane_coord_CCS = coord_CCS_m[0:2] / scale  # 2 x (row x col)
 
     # Convert CCS to Pixel Coordinate System
     coord_CCS_px = plane_coord_CCS / pixel_size  # unit: px
+    coord_CCS_px[1] = -coord_CCS_px[1]
 
-    coord_out[0] = image_size[1] / 2 + coord_CCS_px[0]
-    coord_out[1] = image_size[0] / 2 - coord_CCS_px[1]
+    coord_out = image_size[::-1] / 2 + coord_CCS_px  # 2 x (row x col)
+
+    return coord_out
 
 #@profile
 @jit(nopython=True)
