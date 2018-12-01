@@ -1,12 +1,12 @@
 import numpy as np
-from numba import jit, prange
+from numba import jit
 
 @jit(nopython=True)
 def projectedCoord(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height):
     proj_coords = np.empty(shape=(3, boundary_rows * boundary_cols))
     i = 0
-    for row in prange(boundary_rows):
-        for col in prange(boundary_cols):
+    for row in range(boundary_rows):
+        for col in range(boundary_cols):
             proj_coords[0, i] = boundary[0, 0] + col * gsd - eo[0]
             proj_coords[1, i] = boundary[3, 0] - row * gsd - eo[1]
             i += 1
@@ -40,37 +40,3 @@ def resample(coord, image, b, g, r, a, row_col):
     else:
         b[row_col[0], row_col[1]], g[row_col[0], row_col[1]], r[row_col[0], row_col[1]], a[row_col[0], row_col[1]] = \
             image[proj_row, proj_col][0], image[proj_row, proj_col][1], image[proj_row, proj_col][2], 255
-
-@jit(nopython=True)
-def backprojection_resample(boundary, gsd, eo, R, ground_height, focal_length, pixel_size, image):
-    # Boundary size
-    boundary_cols = int((boundary[1, 0] - boundary[0, 0]) / gsd)
-    boundary_rows = int((boundary[3, 0] - boundary[2, 0]) / gsd)
-
-    proj_coords = projectedCoord(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height)
-
-    # Image size
-    image_rows = image.shape[0]
-    image_cols = image.shape[1]
-
-    # Define the orthophoto
-    output_b = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-    output_g = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-    output_r = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-    output_a = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-
-    coord1 = np.empty(shape=(3, 1))
-    coord2 = np.empty(shape=(2, 1))
-    for row in prange(boundary_rows):
-        for col in prange(boundary_cols):
-            coord1[0] = boundary[0] + col * gsd - eo[0]
-            coord1[1] = boundary[3] - row * gsd - eo[1]
-            coord1[2] = ground_height - eo[2]
-
-            # 3. Backprojection
-            backProjection(coord1, R, focal_length, pixel_size, (image_rows, image_cols), coord2)
-
-            # 4. Resampling
-            resample(coord2, image, output_b, output_g, output_r, output_a, (row, col))
-
-    return output_b, output_g, output_r, output_a

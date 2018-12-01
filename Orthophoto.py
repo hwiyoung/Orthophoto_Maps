@@ -5,7 +5,7 @@ import time
 from ExifData import getExif, restoreOrientation
 from EoData import readEO, convertCoordinateSystem, Rot3D
 from Boundary import boundary
-from BackprojectionResample import backprojection_resample
+from BackprojectionResample import projectedCoord, backProjection, resample
 
 if __name__ == '__main__':
     ground_height = 0  # unit: m
@@ -54,10 +54,26 @@ if __name__ == '__main__':
 
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
 
-                print('backProjection_resample')
+                # Boundary size
+                boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
+                boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
+
+                print('projectedCoord')
                 start_time = time.time()
-                b, g, r, a = backprojection_resample(bbox, gsd, eo, R, ground_height,
-                                                     focal_length, pixel_size, restored_image)
+                proj_coords = projectedCoord(bbox, boundary_rows, boundary_cols, gsd, eo, ground_height)
+                print("--- %s seconds ---" % (time.time() - start_time))
+
+                # Image size
+                image_size = np.reshape(restored_image.shape[0:2], (2, 1))
+
+                print('backProjection')
+                start_time = time.time()
+                backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)                
+                print("--- %s seconds ---" % (time.time() - start_time))
+
+                print('resample')
+                start_time = time.time()
+                b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('Merge channels')
