@@ -1,5 +1,6 @@
 import numpy as np
 from numba import jit
+from osgeo import gdal, osr
 
 @jit(nopython=True)
 def projectedCoord(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height):
@@ -26,7 +27,6 @@ def backProjection(coord, R, focal_length, pixel_size, image_size):
 
     return coord_out
 
-#@profile
 @jit(nopython=True)
 def resample(coord, image, b, g, r, a, row_col):
     # row_col: row, column in for loop
@@ -40,3 +40,28 @@ def resample(coord, image, b, g, r, a, row_col):
     else:
         b[row_col[0], row_col[1]], g[row_col[0], row_col[1]], r[row_col[0], row_col[1]], a[row_col[0], row_col[1]] = \
             image[proj_row, proj_col][0], image[proj_row, proj_col][1], image[proj_row, proj_col][2], 255
+
+def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
+
+    geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
+
+    # create the 3-band raster file
+    #dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', rows, cols, 4, gdal.GDT_Byte)
+    dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 4, gdal.GDT_Byte)
+    dst_ds.SetGeoTransform(geotransform)  # specify coords
+
+    # Define the TM central coordinate system (EPSG 5186)
+    srs = osr.SpatialReference()  # establish encoding
+    srs.ImportFromEPSG(5186)
+
+    dst_ds.SetProjection(srs.ExportToWkt())  # export coords to file
+    dst_ds.GetRasterBand(1).WriteArray(r)  # write r-band to the raster
+    dst_ds.GetRasterBand(2).WriteArray(g)  # write g-band to the raster
+    dst_ds.GetRasterBand(3).WriteArray(b)  # write b-band to the raster
+    dst_ds.GetRasterBand(4).WriteArray(a)  # write b-band to the raster
+
+    # Convert Coordinate System of the GeoTiff image
+
+    dst_ds.FlushCache()  # write to disk
+
+    dst_ds = None

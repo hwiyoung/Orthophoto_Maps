@@ -5,7 +5,7 @@ import time
 from ExifData import getExif, restoreOrientation
 from EoData import readEO, convertCoordinateSystem, Rot3D
 from Boundary import boundary
-from BackprojectionResample import projectedCoord, backProjection, resample
+from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
 
 if __name__ == '__main__':
     ground_height = 0  # unit: m
@@ -76,14 +76,10 @@ if __name__ == '__main__':
                 b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                print('Merge channels')
+                print('Save the image in GeoTiff')
                 start_time = time.time()
-                output_image = cv2.merge((b, g, r, a))
-                print("--- %s seconds ---" % (time.time() - start_time))
-
-                print('Save the image')
-                start_time = time.time()
-                cv2.imwrite('./' + filename + '.png', output_image)
+                dst = './' + filename
+                createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('Processing time per each image')
