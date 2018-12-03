@@ -8,7 +8,7 @@ from Boundary import boundary
 from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
 
 if __name__ == '__main__':
-    ground_height = 0  # unit: m
+    ground_height = 65  # unit: m
     sensor_width = 6.3  # unit: mm
 
     for root, dirs, files in os.walk('./Data'):

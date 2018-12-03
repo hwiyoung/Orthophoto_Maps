@@ -28,18 +28,32 @@ def backProjection(coord, R, focal_length, pixel_size, image_size):
     return coord_out
 
 @jit(nopython=True)
-def resample(coord, image, b, g, r, a, row_col):
-    # row_col: row, column in for loop
-    proj_col = int(coord[0, 0])  # projected column
-    proj_row = int(coord[1, 0])  # projected row
+def resample(coord, boundary_rows, boundary_cols, image):
+    # Define the orthophoto
+    b = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    g = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    r = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    a = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
 
-    if proj_col < 0 or proj_col >= image.shape[1]:
-        return
-    elif proj_row < 0 or proj_row >= image.shape[0]:
-        return
-    else:
-        b[row_col[0], row_col[1]], g[row_col[0], row_col[1]], r[row_col[0], row_col[1]], a[row_col[0], row_col[1]] = \
-            image[proj_row, proj_col][0], image[proj_row, proj_col][1], image[proj_row, proj_col][2], 255
+    rows = np.reshape(coord[1], (boundary_rows, boundary_cols))
+    cols = np.reshape(coord[0], (boundary_rows, boundary_cols))
+
+    rows = rows.astype(np.int16)
+    #rows = np.int16(rows)
+    cols = cols.astype(np.int16)
+
+    for row in range(boundary_rows):
+        for col in range(boundary_cols):
+            if cols[row, col] < 0 or cols[row, col] >= image.shape[1]:
+                continue
+            elif rows[row, col] < 0 or rows[row, col] >= image.shape[0]:
+                continue
+            else:
+                b[row, col], g[row, col], r[row, col], a[row, col] = image[rows[row, col], cols[row, col]][0], \
+                                                                     image[rows[row, col], cols[row, col]][1], \
+                                                                     image[rows[row, col], cols[row, col]][2], 255
+
+    return b, g, r, a
 
 def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
     # https://stackoverflow.com/questions/33537599/how-do-i-write-create-a-geotiff-rgb-image-file-in-python
