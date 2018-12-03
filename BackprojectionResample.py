@@ -42,7 +42,7 @@ def resample(coord, image, b, g, r, a, row_col):
             image[proj_row, proj_col][0], image[proj_row, proj_col][1], image[proj_row, proj_col][2], 255
 
 def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
-    # https: // gis.stackexchange.com / questions / 150300 / how - to - place - an - numpy - array - into - geotiff - image - using - python - gdal
+    # https://stackoverflow.com/questions/33537599/how-do-i-write-create-a-geotiff-rgb-image-file-in-python
     geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
 
     # create the 3-band raster file
