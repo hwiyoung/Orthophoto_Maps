@@ -82,5 +82,5 @@ if __name__ == '__main__':
                 createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                print('Processing time per each image')
+                print('*** Processing time per each image')
                 print("--- %s seconds ---" % (time.time() - image_start_time + read_time))

@@ -29,7 +29,7 @@ def backProjection(coord, R, focal_length, pixel_size, image_size):
 
 @jit(nopython=True)
 def resample(coord, boundary_rows, boundary_cols, image):
-    # Define the orthophoto
+    # Define channels of an orthophoto
     b = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
     g = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
     r = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
@@ -49,9 +49,10 @@ def resample(coord, boundary_rows, boundary_cols, image):
             elif rows[row, col] < 0 or rows[row, col] >= image.shape[0]:
                 continue
             else:
-                b[row, col], g[row, col], r[row, col], a[row, col] = image[rows[row, col], cols[row, col]][0], \
-                                                                     image[rows[row, col], cols[row, col]][1], \
-                                                                     image[rows[row, col], cols[row, col]][2], 255
+                b[row, col] = image[rows[row, col], cols[row, col]][0]
+                g[row, col] = image[rows[row, col], cols[row, col]][1]
+                r[row, col] = image[rows[row, col], cols[row, col]][2]
+                a[row, col] = 255
 
     return b, g, r, a
 
@@ -59,8 +60,7 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
     # https://stackoverflow.com/questions/33537599/how-do-i-write-create-a-geotiff-rgb-image-file-in-python
     geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
 
-    # create the 3-band raster file
-    #dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', rows, cols, 4, gdal.GDT_Byte)
+    # create the 4-band(RGB+Alpha) raster file
     dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 4, gdal.GDT_Byte)
     dst_ds.SetGeoTransform(geotransform)  # specify coords
 
@@ -72,10 +72,7 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
     dst_ds.GetRasterBand(1).WriteArray(r)  # write r-band to the raster
     dst_ds.GetRasterBand(2).WriteArray(g)  # write g-band to the raster
     dst_ds.GetRasterBand(3).WriteArray(b)  # write b-band to the raster
-    dst_ds.GetRasterBand(4).WriteArray(a)  # write b-band to the raster
-
-    # Convert Coordinate System of the GeoTiff image
+    dst_ds.GetRasterBand(4).WriteArray(a)  # write a-band to the raster
 
     dst_ds.FlushCache()  # write to disk
-
     dst_ds = None
