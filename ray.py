@@ -14,16 +14,16 @@ if __name__ == '__main__':
 
     # test on a sphere mesh
     #mesh = trimesh.primitives.Sphere()
-    #mesh = trimesh.load('../models/cube_compressed.obj')
-    mesh = trimesh.load('../models/cube.OBJ')
-    #mesh = trimesh.load('../models/cube_test.OBJ')
-    #mesh = trimesh.load('../models/DEM_yeosu/34707 - Cloud.obj')
+    #mesh = trimesh.load('./models/cube_compressed.obj')
+    #mesh = trimesh.load('./models/cube.OBJ')
+    #mesh = trimesh.load('./models/cube_test.OBJ')
+    mesh = trimesh.load('./models/DEM_yeosu/34707 - Cloud.obj')
 
     # create some rays
-    ray_origins = np.array([[0, 0, -5],
-                            [2, 2, -10]])
-    ray_directions = np.array([[0, 0, 1],
-                               [0, 0, 1]])
+    # DJI_0386.JPG in Data
+    ray_origins = np.array([[266277.339, 237080.832, 214.9540]])
+    direction = [1.697624393, - 2.926766149, - 54.16184732]
+    ray_directions = np.array([[0, 0, -1]])
 
     """
     Signature: mesh.ray.intersects_location(ray_origins,
