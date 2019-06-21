@@ -1,7 +1,7 @@
 import gdal
 from PIL import Image
 import piexif
-# from libxmp import XMPFiles, consts
+from libxmp import XMPFiles, consts
 
 if __name__ == '__main__':
     file_path1 = './testData/20180213_064947.tiff'
@@ -19,10 +19,10 @@ if __name__ == '__main__':
     #     for tag in exif_dict[ifd]:
     #         print(piexif.TAGS[ifd][tag]["name"], exif_dict[ifd][tag])
 
-    # ### Python XMP Toolkit
-    # xmpfile = XMPFiles(file_path2, open_forupdate=True)
-    # xmp = xmpfile.get_xmp()
-    # print(xmp.get_property(consts.XMP_NS_DC, 'format'))
+    ### Python XMP Toolkit
+    xmpfile = XMPFiles(file_path2, open_forupdate=True)
+    xmp = xmpfile.get_xmp()
+    print(xmp.get_property(consts.XMP_NS_DC, 'format'))
 
 
 
