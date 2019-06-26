@@ -54,13 +54,14 @@ if __name__ == '__main__':
                 bbox = boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
+                # 5. Compute GSD & Boundary size
+                # GSD
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
-
                 # Boundary size
                 boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
                 boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
 
-                # 5.
+                # 6. Compute coordinates of the projected boundary
                 print('projectedCoord')
                 start_time = time.time()
                 proj_coords = projectedCoord(bbox, boundary_rows, boundary_cols, gsd, eo, ground_height)
@@ -69,19 +70,19 @@ if __name__ == '__main__':
                 # Image size
                 image_size = np.reshape(restored_image.shape[0:2], (2, 1))
 
-                # 6.
+                # 6. Back-projection into camera coordinate system
                 print('backProjection')
                 start_time = time.time()
                 backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                # 7.
+                # 7. Resample the pixels
                 print('resample')
                 start_time = time.time()
                 b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                # 8.
+                # 8. Create GeoTiff
                 print('Save the image in GeoTiff')
                 start_time = time.time()
                 dst = './' + filename

@@ -1,11 +1,12 @@
 import gdal
 from PIL import Image
-import piexif
-from libxmp import XMPFiles, consts
+import exifread
+# from libxmp import XMPFiles, consts
 
 if __name__ == '__main__':
     file_path1 = './testData/20180213_064947.tiff'
-    file_path2 = './Data/DJI_0386.JPG'
+    file_path2 = '../Data/DJI_0386.JPG'
+    file_path3 = './testData/20181018_160439_346.tiff'
 
     # ## GDAL
     # hDataset = gdal.Open(file_path1, gdal.GA_ReadOnly)
@@ -13,16 +14,22 @@ if __name__ == '__main__':
     # print("Driver: %s/%s" % (hDriver.ShortName, hDriver.LongName))
 
 
-    ### piexif
-    # exif_dict = piexif.load(file_path1)
-    # for ifd in ("0th", "Exif", "GPS", "1st"):
-    #     for tag in exif_dict[ifd]:
-    #         print(piexif.TAGS[ifd][tag]["name"], exif_dict[ifd][tag])
+    ## exifread
+    # Open image file for reading (binary mode)
+    f = open(file_path2, 'rb')
 
-    ### Python XMP Toolkit
-    xmpfile = XMPFiles(file_path2, open_forupdate=True)
-    xmp = xmpfile.get_xmp()
-    print(xmp.get_property(consts.XMP_NS_DC, 'format'))
+    # Return Exif tags
+    tags = exifread.process_file(f)
+
+    for tag in tags.keys():
+        if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote'):
+            print("Key: %s, value %s" % (tag, tags[tag]))
+
+
+    # ### Python XMP Toolkit
+    # xmpfile = XMPFiles(file_path2, open_forupdate=True)
+    # xmp = xmpfile.get_xmp()
+    # print(xmp.get_property(consts.XMP_NS_DC, 'format'))
 
 
 
