@@ -21,7 +21,7 @@ if __name__ == '__main__':
             extension = os.path.splitext(file)[1]
             file_path = root + '/' + file
 
-            if extension == '.tiff':
+            if extension == '.tiff' or extension == '.tif':
                 print('Read the image - ' + file)
                 image = cv2.imread(file_path, -1)
 
@@ -31,10 +31,11 @@ if __name__ == '__main__':
                 # focal_length, orientation = getExif(file_path) # unit: m
                 #
                 # # 2. Restore the image based on orientation information
-                restored_image = restoreOrientation(image, 3)
+                # restored_image = restoreOrientation(image, 3)
+                restored_image = image
 
                 # 3. Convert pixel values into temperature
-                restored_image = restored_image * 0.04 - 273.15
+                converted_image = restored_image * 0.04 - 273.15
 
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
@@ -83,7 +84,7 @@ if __name__ == '__main__':
                 # 7. Resample the pixels
                 print('resample')
                 start_time = time.time()
-                grey, alpha = resampleThermal(backProj_coords, boundary_rows, boundary_cols, image)
+                grey, alpha = resampleThermal(backProj_coords, boundary_rows, boundary_cols, converted_image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff
