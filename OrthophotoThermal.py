@@ -23,17 +23,18 @@ if __name__ == '__main__':
 
             if extension == '.tiff':
                 print('Read the image - ' + file)
-                image = cv2.imread(file_path)
-                restored_image = image
+                image = cv2.imread(file_path, -1)
+
                 focal_length = 9 / 1000   # unit : mm -> m
 
                 # # 1. Extract EXIF data from a image
                 # focal_length, orientation = getExif(file_path) # unit: m
                 #
                 # # 2. Restore the image based on orientation information
-                # restored_image = restoreOrientation(image, orientation)
+                restored_image = restoreOrientation(image, 3)
 
                 # 3. Convert pixel values into temperature
+                restored_image = restored_image * 0.04 - 273.15
 
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]

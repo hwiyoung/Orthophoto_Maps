@@ -19,6 +19,7 @@ if __name__ == '__main__':
             if extension == '.tiff':
                 print('Read the image - ' + file)
                 image_cv = cv2.imread(file_path, -1)
+                image_cv = image_cv * 0.04 - 273.15
                 # # cv2.imshow("Original", image)
                 # # cv2.waitKey(0)
                 #
@@ -38,7 +39,7 @@ if __name__ == '__main__':
                 winname = 'Test'
                 cv2.namedWindow(winname)  # Create a named window
                 cv2.moveWindow(winname, 40, 30)  # Move it to (40,30)
-                cv2.imshow(winname, calculation)
+                cv2.imshow(winname, image_cv)
                 cv2.waitKey(0)
                 cv2.destroyAllWindows()
 
