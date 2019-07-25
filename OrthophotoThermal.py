@@ -5,7 +5,8 @@ import time
 from ExifData import getExif, restoreOrientation
 from EoData import readEO, convertCoordinateSystem, Rot3D
 from Boundary import boundary
-from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
+from BackprojectionResample import projectedCoord, backProjection,\
+    resampleThermal, createGeoTiffThermal
 
 if __name__ == '__main__':
     ground_height = 65  # unit: m
@@ -81,14 +82,14 @@ if __name__ == '__main__':
                 # 7. Resample the pixels
                 print('resample')
                 start_time = time.time()
-                b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
+                grey, alpha = resampleThermal(backProj_coords, boundary_rows, boundary_cols, image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff
                 print('Save the image in GeoTiff')
                 start_time = time.time()
                 dst = './' + filename
-                createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
+                createGeoTiffThermal(grey, alpha, bbox, gsd, boundary_rows, boundary_cols, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')

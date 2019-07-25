@@ -76,3 +76,46 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
 
     dst_ds.FlushCache()  # write to disk
     dst_ds = None
+
+@jit(nopython=True)
+def resampleThermal(coord, boundary_rows, boundary_cols, image):
+    # Define channels of an orthophoto
+    grey = np.zeros(shape=(boundary_rows, boundary_cols))
+    alpha = np.zeros(shape=(boundary_rows, boundary_cols))
+
+    rows = np.reshape(coord[1], (boundary_rows, boundary_cols))
+    cols = np.reshape(coord[0], (boundary_rows, boundary_cols))
+
+    rows = rows.astype(np.int16)
+    cols = cols.astype(np.int16)
+
+    for row in range(boundary_rows):
+        for col in range(boundary_cols):
+            if cols[row, col] < 0 or cols[row, col] >= image.shape[1]:
+                continue
+            elif rows[row, col] < 0 or rows[row, col] >= image.shape[0]:
+                continue
+            else:
+                grey[row, col] = image[rows[row, col], cols[row, col]]
+                alpha[row, col] = 255
+
+    return grey, alpha
+
+def createGeoTiffThermal(grey, alpha, boundary, gsd, rows, cols, dst):
+    # https://stackoverflow.com/questions/33537599/how-do-i-write-create-a-geotiff-rgb-image-file-in-python
+    geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
+
+    # create the 4-band(RGB+Alpha) raster file
+    dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 2, gdal.GDT_Byte)
+    dst_ds.SetGeoTransform(geotransform)  # specify coords
+
+    # Define the TM central coordinate system (EPSG 5186)
+    srs = osr.SpatialReference()  # establish encoding
+    srs.ImportFromEPSG(5186)
+
+    dst_ds.SetProjection(srs.ExportToWkt())  # export coords to file
+    dst_ds.GetRasterBand(1).WriteArray(grey)  # write r-band to the raster
+    dst_ds.GetRasterBand(2).WriteArray(alpha)  # write a-band to the raster
+
+    dst_ds.FlushCache()  # write to disk
+    dst_ds = None
