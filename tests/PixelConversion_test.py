@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
             if extension == '.tiff':
                 print('Read the image - ' + file)
-                # image = cv2.imread(file_path)
+                image_cv = cv2.imread(file_path, -1)
                 # # cv2.imshow("Original", image)
                 # # cv2.waitKey(0)
                 #

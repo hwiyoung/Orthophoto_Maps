@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
             if extension == '.JPG':
                 print('Read the image - ' + file)
-                image = cv2.imread(file_path)
+                image = cv2.imread(file_path, -1)
 
                 # 1. Extract EXIF data from a image
                 focal_length, orientation = getExif(file_path) # unit: m
