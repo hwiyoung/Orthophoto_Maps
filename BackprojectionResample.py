@@ -80,8 +80,7 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
 @jit(nopython=True)
 def resampleThermal(coord, boundary_rows, boundary_cols, image):
     # Define channels of an orthophoto
-    grey = np.zeros(shape=(boundary_rows, boundary_cols))
-    alpha = np.zeros(shape=(boundary_rows, boundary_cols))
+    gray = np.zeros(shape=(boundary_rows, boundary_cols))
 
     rows = np.reshape(coord[1], (boundary_rows, boundary_cols))
     cols = np.reshape(coord[0], (boundary_rows, boundary_cols))
@@ -96,17 +95,16 @@ def resampleThermal(coord, boundary_rows, boundary_cols, image):
             elif rows[row, col] < 0 or rows[row, col] >= image.shape[0]:
                 continue
             else:
-                grey[row, col] = image[rows[row, col], cols[row, col]]
-                alpha[row, col] = 255
+                gray[row, col] = image[rows[row, col], cols[row, col]]
 
-    return grey, alpha
+    return gray
 
-def createGeoTiffThermal(grey, alpha, boundary, gsd, rows, cols, dst):
+def createGeoTiffThermal(grey, boundary, gsd, rows, cols, dst):
     # https://stackoverflow.com/questions/33537599/how-do-i-write-create-a-geotiff-rgb-image-file-in-python
     geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
 
     # create the 4-band(RGB+Alpha) raster file
-    dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 2, gdal.GDT_Byte)
+    dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 1, gdal.GDT_Byte)
     dst_ds.SetGeoTransform(geotransform)  # specify coords
 
     # Define the TM central coordinate system (EPSG 5186)
@@ -114,8 +112,10 @@ def createGeoTiffThermal(grey, alpha, boundary, gsd, rows, cols, dst):
     srs.ImportFromEPSG(5186)
 
     dst_ds.SetProjection(srs.ExportToWkt())  # export coords to file
-    dst_ds.GetRasterBand(1).WriteArray(grey)  # write r-band to the raster
-    dst_ds.GetRasterBand(2).WriteArray(alpha)  # write a-band to the raster
+    dst_ds.GetRasterBand(1).WriteArray(grey)  # write gray-band to the raster
+    # https://gis.stackexchange.com/questions/220753/how-do-i-create-blank-geotiff-
+    # with-same-spatial-properties-as-existing-geotiff
+    dst_ds.GetRasterBand(1).SetNoDataValue(0)
 
     dst_ds.FlushCache()  # write to disk
     dst_ds = None

@@ -35,7 +35,8 @@ if __name__ == '__main__':
                 restored_image = image
 
                 # 3. Convert pixel values into temperature
-                converted_image = restored_image * 0.04 - 273.15
+                # converted_image = restored_image * 0.04 - 273.15
+                converted_image = restored_image
 
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
@@ -84,14 +85,14 @@ if __name__ == '__main__':
                 # 7. Resample the pixels
                 print('resample')
                 start_time = time.time()
-                grey, alpha = resampleThermal(backProj_coords, boundary_rows, boundary_cols, converted_image)
+                gray = resampleThermal(backProj_coords, boundary_rows, boundary_cols, converted_image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff
                 print('Save the image in GeoTiff')
                 start_time = time.time()
                 dst = './' + filename
-                createGeoTiffThermal(grey, alpha, bbox, gsd, boundary_rows, boundary_cols, dst)
+                createGeoTiffThermal(gray, bbox, gsd, boundary_rows, boundary_cols, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')
