@@ -35,8 +35,8 @@ if __name__ == '__main__':
                 restored_image = image
 
                 # 3. Convert pixel values into temperature
-                # converted_image = restored_image * 0.04 - 273.15
-                converted_image = restored_image
+                converted_image = restored_image * 0.04 - 273.15
+                # converted_image = restored_image
 
                 image_rows = restored_image.shape[0]
                 image_cols = restored_image.shape[1]
