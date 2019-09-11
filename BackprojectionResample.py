@@ -104,7 +104,7 @@ def createGeoTiffThermal(grey, boundary, gsd, rows, cols, dst):
     geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
 
     # create the 4-band(RGB+Alpha) raster file
-    dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 1, gdal.GDT_Byte)
+    dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 1, gdal.GDT_Float32)
     dst_ds.SetGeoTransform(geotransform)  # specify coords
 
     # Define the TM central coordinate system (EPSG 5186)
