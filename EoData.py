@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from osgeo.osr import SpatialReference, CoordinateTransformation
+import pyexiv2
 
 def readEO(path):
     eo_line = np.genfromtxt(path, delimiter='\t',
@@ -17,6 +18,41 @@ def readEO(path):
 
     return eo
 
+def readEO_multiSpectral(path):
+    metadata = pyexiv2.ImageMetadata(path)
+    metadata.read()
+
+    # Lon, Lat, Alt, Roll, Pitch, Yaw
+    latitude = metadata['Exif.GPSInfo.GPSLatitude']
+    latitudeValue = latitude.raw_value.split('/')
+    latitudeDeg = int(latitudeValue[0]) / int(latitudeValue[1].split(' ')[0])
+    latitudeMin = int(latitudeValue[1].split(' ')[1]) / int(latitudeValue[2].split(' ')[0])
+    latitudeSec = int(latitudeValue[2].split(' ')[1]) / int(latitudeValue[3].split(' ')[0])
+    lat = latitudeDeg + latitudeMin / 60 + latitudeSec / 3600
+
+    longitude = metadata['Exif.GPSInfo.GPSLongitude']
+    longitudeValue = longitude.raw_value.split('/')
+    longitudeDeg = int(longitudeValue[0]) / int(longitudeValue[1].split(' ')[0])
+    longitudeMin = int(longitudeValue[1].split(' ')[1]) / int(longitudeValue[2].split(' ')[0])
+    longitudeSec = int(longitudeValue[2].split(' ')[1]) / int(longitudeValue[3].split(' ')[0])
+    lon = longitudeDeg + longitudeMin / 60 + longitudeSec / 3600
+
+    altitude = metadata['Exif.GPSInfo.GPSAltitude']
+    altitudeValue = altitude.raw_value.split('/')
+    alt = int(altitudeValue[0]) / int(altitudeValue[1])
+
+    roll = metadata['Xmp.DLS.Roll']
+    pitch = metadata['Xmp.DLS.Pitch']
+    yaw = metadata['Xmp.DLS.Yaw']
+
+    rollValue = float(roll.value) * 180 / math.pi
+    pitchValue = float(pitch.value) * 180 / math.pi
+    yawValue = float(yaw.value) * 180 / math.pi
+
+    eo = [lon, lat, alt, rollValue, pitchValue, yawValue]
+
+    return eo
+
 def convertCoordinateSystem(eo):
     # Define the TM central coordinate system (EPSG 5186)
     epsg5186 = SpatialReference()
@@ -30,8 +66,7 @@ def convertCoordinateSystem(eo):
     latlon2tm = CoordinateTransformation(epsg4326, epsg5186)
 
     # Check the transformation for a point close to the centre of the projected grid
-    # xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))   # The order: Lat, Lon
-    xy = latlon2tm.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
+    xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
     eo[0:2] = xy[0:2]
 
     return eo

@@ -2,8 +2,8 @@ import os
 import numpy as np
 import cv2
 import time
-from ExifData import getExif, restoreOrientation
-from EoData import readEO, convertCoordinateSystem, Rot3D
+from ExifData import getExif_multiSepctral
+from EoData import readEO_multiSpectral, convertCoordinateSystem, Rot3D
 from Boundary import boundary
 from BackprojectionResample import projectedCoord, backProjection,\
     resampleThermal, createGeoTiffThermal
@@ -26,21 +26,11 @@ if __name__ == '__main__':
                 print('Read the image - ' + file)
                 image = cv2.imread(file_path, -1)
 
-                focal_length = 5.5 / 1000   # unit : mm -> m
+                # 1. Extract EXIF data from a image
+                focal_length, sensor_width = getExif_multiSepctral(file_path)   # unit: m, mm
 
-                # # 1. Extract EXIF data from a image
-                # focal_length, orientation = getExif(file_path) # unit: m
-                #
-                # # 2. Restore the image based on orientation information
-                # restored_image = restoreOrientation(image, 3)
-                restored_image = image
-
-                # 3. Convert pixel values into temperature
-                # converted_image = restored_image * 0.04 - 273.15
-                converted_image = restored_image
-
-                image_rows = restored_image.shape[0]
-                image_cols = restored_image.shape[1]
+                image_rows = image.shape[0]
+                image_cols = image.shape[1]
 
                 # pixel_size = sensor_width / image_cols  # unit: mm/px
                 pixel_size = 0.00375    # unit: mm/px
@@ -51,15 +41,15 @@ if __name__ == '__main__':
 
                 read_time = end_time - start_time
 
-            else:
                 print('Read EOP - ' + file)
-                print('Longitude | Latitude | Height | Omega | Phi | Kappa')
-                eo = readEO(file_path)
+                print('Easting | Northing | Altitude | Roll | Pitch | Yaw')
+                eo = readEO_multiSpectral(file_path)
                 eo = convertCoordinateSystem(eo)
+                print(eo)
                 R = Rot3D(eo)
 
                 # 4. Extract a projected boundary of the image
-                bbox = boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
+                bbox = boundary(image, eo, R, ground_height, pixel_size, focal_length)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 5. Compute GSD & Boundary size
@@ -76,7 +66,7 @@ if __name__ == '__main__':
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # Image size
-                image_size = np.reshape(restored_image.shape[0:2], (2, 1))
+                image_size = np.reshape(image.shape[0:2], (2, 1))
 
                 # 6. Back-projection into camera coordinate system
                 print('backProjection')
@@ -87,7 +77,7 @@ if __name__ == '__main__':
                 # 7. Resample the pixels
                 print('resample')
                 start_time = time.time()
-                gray = resampleThermal(backProj_coords, boundary_rows, boundary_cols, converted_image)
+                gray = resampleThermal(backProj_coords, boundary_rows, boundary_cols, image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff

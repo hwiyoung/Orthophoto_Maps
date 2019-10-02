@@ -1,20 +1,23 @@
 import cv2
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
+import pyexiv2
+import math
 
-def getExif(path):
-    src_image = Image.open(path)
-    info = src_image._getexif()
+def getExif_multiSepctral(path):
+    metadata = pyexiv2.ImageMetadata(path)
+    metadata.read()
 
     # Focal Length
-    focalLength = info[37386]
-    focal_length = focalLength[0] / focalLength[1] # unit: mm
-    focal_length = focal_length * pow(10, -3) # unit: m
+    focalLength = metadata['Exif.Photo.FocalLength'].value
+    focal_length = focalLength.numerator / focalLength.denominator   # unit: mm
+    focal_length = focal_length * pow(10, -3)   # unit: m
 
-    # Orientation
-    orientation = info[274]
+    # Sensor Width
+    sensorWidth = metadata['Exif.Photo.FocalPlaneXResolution'].value    # width
+    sensor_width = sensorWidth.numerator / sensorWidth.denominator   # unit: mm
 
-    return focal_length, orientation
+    return focal_length, sensor_width
 
 def restoreOrientation(image, orientation):
     if orientation == 8:
