@@ -4,6 +4,20 @@ from PIL.ExifTags import TAGS, GPSTAGS
 import pyexiv2
 import math
 
+def getExif(path):
+    src_image = Image.open(path)
+    info = src_image._getexif()
+
+    # Focal Length
+    focalLength = info[37386]
+    focal_length = focalLength[0] / focalLength[1] # unit: mm
+    focal_length = focal_length * pow(10, -3) # unit: m
+
+    # Orientation
+    orientation = info[274]
+
+    return focal_length, orientation
+
 def getExif_multiSepctral(path):
     metadata = pyexiv2.ImageMetadata(path)
     metadata.read()

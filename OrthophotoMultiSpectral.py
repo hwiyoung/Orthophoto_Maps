@@ -7,10 +7,15 @@ from EoData import readEO_multiSpectral, convertCoordinateSystem, Rot3D
 from Boundary import boundary
 from BackprojectionResample import projectedCoord, backProjection,\
     resampleThermal, createGeoTiffThermal
+from system_calibration import calibrate
 
 if __name__ == '__main__':
     ground_height = 0  # unit: m
-    sensor_width = 10.88  # unit: mm
+
+    R_CB = np.array(
+        [[0.992103011532570, -0.0478682839576757, -0.115932057253170],
+         [0.0636038625107261, 0.988653550290218, 0.136083452970098],
+         [0.108102558627082, -0.142382530141501, 0.983890772356761]], dtype=float)
 
     for root, dirs, files in os.walk('/home/innopam-ldm/hdd/dbrain/190829_Yeosu_Raw'):
         files.sort()
@@ -45,6 +50,12 @@ if __name__ == '__main__':
                 print('Easting | Northing | Altitude | Roll | Pitch | Yaw')
                 eo = readEO_multiSpectral(file_path)
                 eo = convertCoordinateSystem(eo)
+                print(eo)
+
+                # System Calibration
+                OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
+                eo[3] = OPK[0], eo[4] = OPK[1], eo[5] = OPK[2]
+                print('Easting | Northing | Altitude | Omega | Phi | Kappa')
                 print(eo)
                 R = Rot3D(eo)
 
