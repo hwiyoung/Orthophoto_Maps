@@ -45,9 +45,15 @@ def readEO_multiSpectral(path):
     pitch = metadata['Xmp.DLS.Pitch']
     yaw = metadata['Xmp.DLS.Yaw']
 
-    rollValue = float(roll.value) * 180 / math.pi
-    pitchValue = float(pitch.value) * 180 / math.pi
-    yawValue = float(yaw.value) * 180 / math.pi
+    # Radians
+    rollValue = float(roll.value)
+    pitchValue = float(pitch.value)
+    yawValue = float(yaw.value)
+
+    # # Degrees
+    # rollValue = float(roll.value) * 180 / math.pi
+    # pitchValue = float(pitch.value) * 180 / math.pi
+    # yawValue = float(yaw.value) * 180 / math.pi
 
     eo = [lon, lat, alt, rollValue, pitchValue, yawValue]
 

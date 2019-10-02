@@ -13,11 +13,15 @@ if __name__ == '__main__':
     ground_height = 0  # unit: m
 
     R_CB = np.array(
-        [[0.992103011532570, -0.0478682839576757, -0.115932057253170],
-         [0.0636038625107261, 0.988653550290218, 0.136083452970098],
-         [0.108102558627082, -0.142382530141501, 0.983890772356761]], dtype=float)
+        [[0.990635238726878, 0.135295782209043, 0.0183541578119133],
+         [-0.135993334134149, 0.989711806459606, 0.0444561944563446],
+         [-0.0121505910810649, -0.0465359159242159, 0.998842716179817]], dtype=float)
 
-    for root, dirs, files in os.walk('/home/innopam-ldm/hdd/dbrain/190829_Yeosu_Raw'):
+        # [[0.992103011532570, -0.0478682839576757, -0.115932057253170],
+        #  [0.0636038625107261, 0.988653550290218, 0.136083452970098],
+        #  [0.108102558627082, -0.142382530141501, 0.983890772356761]], dtype=float)
+
+    for root, dirs, files in os.walk('/home/innopam-ldm/hdd/dbrain/20190925_고흥_300m_50m간격/0002SET/000/'):
         files.sort()
         for file in files:
             image_start_time = time.time()
@@ -54,7 +58,9 @@ if __name__ == '__main__':
 
                 # System Calibration
                 OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
-                eo[3] = OPK[0], eo[4] = OPK[1], eo[5] = OPK[2]
+                eo[3] = OPK[0]
+                eo[4] = OPK[1]
+                eo[5] = OPK[2]
                 print('Easting | Northing | Altitude | Omega | Phi | Kappa')
                 print(eo)
                 R = Rot3D(eo)
@@ -94,9 +100,13 @@ if __name__ == '__main__':
                 # 8. Create GeoTiff
                 print('Save the image in GeoTiff')
                 start_time = time.time()
-                dst = './' + filename
+                dst = './Output/' + filename
                 createGeoTiffThermal(gray, bbox, gsd, boundary_rows, boundary_cols, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')
                 print("--- %s seconds ---" % (time.time() - image_start_time + read_time))
+
+    # Mosaic indiviual orthophotos
+    # https://github.com/ossimlabs/ossim.git
+
