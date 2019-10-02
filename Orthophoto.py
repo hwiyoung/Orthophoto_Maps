@@ -4,8 +4,8 @@ import cv2
 import time
 from ExifData import getExif, restoreOrientation
 from EoData import readEO, convertCoordinateSystem, Rot3D
-from Boundary import boundary
-from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
+from Boundary import boundary, export_bbox_to_wkt
+from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff, createPNGA
 
 if __name__ == '__main__':
     ground_height = 65  # unit: m
@@ -13,7 +13,6 @@ if __name__ == '__main__':
 
     for root, dirs, files in os.walk('./Data'):
         for file in files:
-            image_start_time = time.time()
             start_time = time.time()
 
             filename = os.path.splitext(file)[0]
@@ -45,14 +44,16 @@ if __name__ == '__main__':
 
             else:
                 print('Read EOP - ' + file)
-                print('Latitude | Longitude | Height | Omega | Phi | Kappa')
+                print('Easting | Northing | Height | Omega | Phi | Kappa')
                 eo = readEO(file_path)
                 eo = convertCoordinateSystem(eo)
+                print(eo)
                 R = Rot3D(eo)
 
                 # 4. Extract a projected boundary of the image
                 bbox = boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
                 print("--- %s seconds ---" % (time.time() - start_time))
+
 
                 # 5. Compute GSD & Boundary size
                 # GSD
@@ -83,11 +84,12 @@ if __name__ == '__main__':
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff
-                print('Save the image in GeoTiff')
+                print('Save the image in PNGA')
                 start_time = time.time()
                 dst = './' + filename
-                createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
+                createPNGA(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
+                export_bbox_to_wkt(bbox, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')
-                print("--- %s seconds ---" % (time.time() - image_start_time + read_time))
+                print("--- %s seconds ---" % (time.time() - start_time + read_time))

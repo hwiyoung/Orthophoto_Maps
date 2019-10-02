@@ -1,4 +1,5 @@
 import numpy as np
+from osgeo import ogr
 
 def boundary(image, eo, R, dem, pixel_size, focal_length):
     inverse_R = R.transpose()
@@ -49,3 +50,19 @@ def projection(vertices, eo, rotation_matrix, dem):
     plane_coord_GCS = scale * coord_GCS[0:2] + [[eo[0]], [eo[1]]]
 
     return plane_coord_GCS
+
+def export_bbox_to_wkt(bbox, dst):
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(bbox[0][0], bbox[2][0])   # Xmin, Ymin
+    ring.AddPoint(bbox[0][0], bbox[3][0])   # Xmin, Ymax
+    ring.AddPoint(bbox[1][0], bbox[3][0])   # Xmax, Ymax
+    ring.AddPoint(bbox[1][0], bbox[2][0])   # Xmax, Ymin
+    ring.AddPoint(bbox[0][0], bbox[2][0])   # Xmin, Ymin
+
+    geom_poly = ogr.Geometry(ogr.wkbPolygon)
+    geom_poly.AddGeometry(ring)
+    wkt = geom_poly.ExportToWkt()
+
+    f = open(dst + '.txt', 'w')
+    f.write(wkt)
+    f.close()

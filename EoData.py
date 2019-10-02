@@ -4,32 +4,32 @@ from osgeo.osr import SpatialReference, CoordinateTransformation
 
 def readEO(path):
     eo_line = np.genfromtxt(path, delimiter='\t',
-                            dtype={'names': ('Image', 'Latitude', 'Longitude', 'Height', 'Omega', 'Phi', 'Kappa'),
+                            dtype={'names': ('Image', 'Longitude', 'Latitude', 'Height', 'Omega', 'Phi', 'Kappa'),
                                    'formats': ('U15', '<f8', '<f8', '<f8', '<f8', '<f8', '<f8')})
 
     eo_line['Omega'] = eo_line['Omega'] * math.pi / 180
     eo_line['Phi'] = eo_line['Phi'] * math.pi / 180
     eo_line['Kappa'] = eo_line['Kappa'] * math.pi / 180
 
-    eo = [float(eo_line['Latitude']), float(eo_line['Longitude']), float(eo_line['Height']),
+    eo = [float(eo_line['Longitude']), float(eo_line['Latitude']), float(eo_line['Height']),
           float(eo_line['Omega']), float(eo_line['Phi']), float(eo_line['Kappa'])]
 
     return eo
 
 def convertCoordinateSystem(eo):
-    # Define the TM central coordinate system (EPSG 5186)
-    epsg5186 = SpatialReference()
-    epsg5186.ImportFromEPSG(5186)
+    # Define the plane coordinate system (EPSG 3857)
+    epsg3857 = SpatialReference()
+    epsg3857.ImportFromEPSG(3857)
 
     # Define the wgs84 system (EPSG 4326)
     epsg4326 = SpatialReference()
     epsg4326.ImportFromEPSG(4326)
 
-    tm2latlon = CoordinateTransformation(epsg5186, epsg4326)
-    latlon2tm = CoordinateTransformation(epsg4326, epsg5186)
+    tm2latlon = CoordinateTransformation(epsg3857, epsg4326)
+    latlon2tm = CoordinateTransformation(epsg4326, epsg3857)
 
     # Check the transformation for a point close to the centre of the projected grid
-    xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))
+    xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))   # The order: Lon, Lat
     eo[0:2] = xy[0:2]
 
     return eo

@@ -1,6 +1,7 @@
 import numpy as np
 from numba import jit
 from osgeo import gdal, osr
+import cv2
 
 @jit(nopython=True)
 def projectedCoord(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height):
@@ -77,45 +78,7 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
     dst_ds.FlushCache()  # write to disk
     dst_ds = None
 
-@jit(nopython=True)
-def resampleThermal(coord, boundary_rows, boundary_cols, image):
-    # Define channels of an orthophoto
-    gray = np.zeros(shape=(boundary_rows, boundary_cols))
-
-    rows = np.reshape(coord[1], (boundary_rows, boundary_cols))
-    cols = np.reshape(coord[0], (boundary_rows, boundary_cols))
-
-    rows = rows.astype(np.int16)
-    cols = cols.astype(np.int16)
-
-    for row in range(boundary_rows):
-        for col in range(boundary_cols):
-            if cols[row, col] < 0 or cols[row, col] >= image.shape[1]:
-                continue
-            elif rows[row, col] < 0 or rows[row, col] >= image.shape[0]:
-                continue
-            else:
-                gray[row, col] = image[rows[row, col], cols[row, col]]
-
-    return gray
-
-def createGeoTiffThermal(grey, boundary, gsd, rows, cols, dst):
-    # https://stackoverflow.com/questions/33537599/how-do-i-write-create-a-geotiff-rgb-image-file-in-python
-    geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
-
-    # create the 4-band(RGB+Alpha) raster file
-    dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 1, gdal.GDT_Byte)
-    dst_ds.SetGeoTransform(geotransform)  # specify coords
-
-    # Define the TM central coordinate system (EPSG 5186)
-    srs = osr.SpatialReference()  # establish encoding
-    srs.ImportFromEPSG(5186)
-
-    dst_ds.SetProjection(srs.ExportToWkt())  # export coords to file
-    dst_ds.GetRasterBand(1).WriteArray(grey)  # write gray-band to the raster
-    # https://gis.stackexchange.com/questions/220753/how-do-i-create-blank-geotiff-
-    # with-same-spatial-properties-as-existing-geotiff
-    dst_ds.GetRasterBand(1).SetNoDataValue(0)
-
-    dst_ds.FlushCache()  # write to disk
-    dst_ds = None
+def createPNGA(b, g, r, a, boundary, gsd, rows, cols, dst):
+    # https://stackoverflow.com/questions/42314272/imwrite-merged-image-writing-image-after-adding-alpha-channel-to-it-opencv-pyt
+    png = cv2.merge((b, g, r, a))
+    cv2.imwrite(dst + '.png', png)
