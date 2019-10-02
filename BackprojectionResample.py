@@ -81,4 +81,5 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
 def createPNGA(b, g, r, a, boundary, gsd, rows, cols, dst):
     # https://stackoverflow.com/questions/42314272/imwrite-merged-image-writing-image-after-adding-alpha-channel-to-it-opencv-pyt
     png = cv2.merge((b, g, r, a))
-    cv2.imwrite(dst + '.png', png)
+    # https: // www.programcreek.com / python / example / 71303 / cv2.imwrite - example 6
+    cv2.imwrite(dst + '.png', png, [int(cv2.IMWRITE_PNG_COMPRESSION), 5])   # from 0 to 9, default: 3

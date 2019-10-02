@@ -58,6 +58,7 @@ if __name__ == '__main__':
                 # 5. Compute GSD & Boundary size
                 # GSD
                 gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
+                gsd = 0.1
                 # Boundary size
                 boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
                 boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
@@ -83,7 +84,7 @@ if __name__ == '__main__':
                 b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                # 8. Create GeoTiff
+                # 8. Create PNGA
                 print('Save the image in PNGA')
                 start_time = time.time()
                 dst = './' + filename
