@@ -109,7 +109,8 @@ def createGeoTiffThermal(grey, boundary, gsd, rows, cols, dst):
 
     # Define the TM central coordinate system (EPSG 5186)
     srs = osr.SpatialReference()  # establish encoding
-    srs.ImportFromEPSG(5186)
+    # srs.ImportFromEPSG(5186)
+    srs.ImportFromEPSG(3857)
 
     dst_ds.SetProjection(srs.ExportToWkt())  # export coords to file
     dst_ds.GetRasterBand(1).WriteArray(grey)  # write gray-band to the raster

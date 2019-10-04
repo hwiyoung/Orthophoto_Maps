@@ -63,7 +63,8 @@ if __name__ == '__main__':
 
     f = open('RPY000.txt', 'w')
 
-    for root, dirs, files in os.walk('/home/innopam-ldm/hdd/dbrain/20190829_여수_1소티/000'):
+    for root, dirs, files in os.walk('/home/innopam-ldm/hdd/dbrain/20190925_고흥_300m_50m간격/0002SET/000/'):
+        files.sort()
         for file in files:
             filename = os.path.splitext(file)[0]
             extension = os.path.splitext(file)[1]

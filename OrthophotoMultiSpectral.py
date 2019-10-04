@@ -21,7 +21,7 @@ if __name__ == '__main__':
         #  [0.0636038625107261, 0.988653550290218, 0.136083452970098],
         #  [0.108102558627082, -0.142382530141501, 0.983890772356761]], dtype=float)
 
-    for root, dirs, files in os.walk('/home/innopam-ldm/hdd/dbrain/20190925_고흥_300m_50m간격/0002SET/000/'):
+    for root, dirs, files in os.walk('/hdd/Sandbox_nifs/20190925_고흥_300m_50m간격/Total/'):
         files.sort()
         for file in files:
             image_start_time = time.time()
@@ -31,7 +31,8 @@ if __name__ == '__main__':
             extension = os.path.splitext(file)[1]
             file_path = root + '/' + file
 
-            if extension == '.tiff' or extension == '.tif':
+            # if extension == '.tiff' or extension == '.tif':
+            if extension == '.tiff' or extension == '.tif' and filename.split('_')[2] == '1':
                 print('Read the image - ' + file)
                 image = cv2.imread(file_path, -1)
 
@@ -71,7 +72,8 @@ if __name__ == '__main__':
 
                 # 5. Compute GSD & Boundary size
                 # GSD
-                gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
+                # gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
+                gsd = 0.5
                 # Boundary size
                 boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
                 boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
@@ -100,7 +102,7 @@ if __name__ == '__main__':
                 # 8. Create GeoTiff
                 print('Save the image in GeoTiff')
                 start_time = time.time()
-                dst = './Output/' + filename
+                dst = './Output_50cm/' + filename
                 createGeoTiffThermal(gray, bbox, gsd, boundary_rows, boundary_cols, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 

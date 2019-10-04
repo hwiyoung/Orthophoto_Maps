@@ -64,15 +64,21 @@ def convertCoordinateSystem(eo):
     epsg5186 = SpatialReference()
     epsg5186.ImportFromEPSG(5186)
 
+    # Define the TM central coordinate system (EPSG 5186)
+    epsg3857 = SpatialReference()
+    epsg3857.ImportFromEPSG(3857)
+
     # Define the wgs84 system (EPSG 4326)
     epsg4326 = SpatialReference()
     epsg4326.ImportFromEPSG(4326)
 
     tm2latlon = CoordinateTransformation(epsg5186, epsg4326)
     latlon2tm = CoordinateTransformation(epsg4326, epsg5186)
+    latlon2world = CoordinateTransformation(epsg4326, epsg3857)
 
     # Check the transformation for a point close to the centre of the projected grid
-    xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
+    # xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
+    xy = latlon2world.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
     eo[0:2] = xy[0:2]
 
     return eo
