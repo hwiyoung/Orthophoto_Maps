@@ -66,3 +66,10 @@ def export_bbox_to_wkt(bbox, dst):
     f = open(dst + '.txt', 'w')
     f.write(wkt)
     f.close()
+
+def createPGW(bbox, gsd, dst):
+    pgw = str(gsd) + '\n' + str(0) + '\n' + str(0) + '\n' + str(-gsd) + \
+          '\n' + str(bbox[0][0]) + '\n' + str(bbox[3][0])
+    f = open(dst + '.pgw', 'w')
+    f.write(pgw)
+    f.close()
