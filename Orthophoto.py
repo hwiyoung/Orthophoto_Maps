@@ -5,7 +5,7 @@ import time
 from ExifData import getExif, restoreOrientation
 from EoData import readEO, convertCoordinateSystem, Rot3D
 from Boundary import boundary, export_bbox_to_wkt, createPGW
-from BackprojectionResample import projectedCoord, backProjection, resample, createPNGA
+from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff, createPNGA
 
 if __name__ == '__main__':
     ground_height = 36  # unit: m, JeonjuWorldcup
@@ -88,8 +88,9 @@ if __name__ == '__main__':
                 print('Save the image in PNGA')
                 start_time = time.time()
                 dst = './190703_JeonjuWorldcup_ortho/' + filename
+                createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
                 createPNGA(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
-                createPGW(bbox, gsd, dst)
+                # createPGW(bbox, gsd, dst)
                 export_bbox_to_wkt(bbox, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 

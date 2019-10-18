@@ -83,3 +83,5 @@ def createPNGA(b, g, r, a, boundary, gsd, rows, cols, dst):
     png = cv2.merge((b, g, r, a))
     # https: // www.programcreek.com / python / example / 71303 / cv2.imwrite - example 6
     cv2.imwrite(dst + '.png', png, [int(cv2.IMWRITE_PNG_COMPRESSION), 5])   # from 0 to 9, default: 3
+
+    # Convert GeoTiff to PNG using gdal.Translate
