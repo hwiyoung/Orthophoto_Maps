@@ -57,7 +57,7 @@ def resample(coord, boundary_rows, boundary_cols, image):
 
     return b, g, r, a
 
-def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
+def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, epsg, dst):
     # https://stackoverflow.com/questions/33537599/how-do-i-write-create-a-geotiff-rgb-image-file-in-python
     geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
 
@@ -67,7 +67,7 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
 
     # Define the TM central coordinate system (EPSG 5186)
     srs = osr.SpatialReference()  # establish encoding
-    srs.ImportFromEPSG(5186)
+    srs.ImportFromEPSG(epsg)
 
     dst_ds.SetProjection(srs.ExportToWkt())  # export coords to file
     dst_ds.GetRasterBand(1).WriteArray(r)  # write r-band to the raster
@@ -78,10 +78,13 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
     dst_ds.FlushCache()  # write to disk
     dst_ds = None
 
+def convert2PNG(src, dst):
+    # Convert GeoTiff to PNG using gdal.Translate
+    gdal.Translate(dst, src)
+
+
 def createPNGA(b, g, r, a, boundary, gsd, rows, cols, dst):
     # https://stackoverflow.com/questions/42314272/imwrite-merged-image-writing-image-after-adding-alpha-channel-to-it-opencv-pyt
     png = cv2.merge((b, g, r, a))
     # https: // www.programcreek.com / python / example / 71303 / cv2.imwrite - example 6
     cv2.imwrite(dst + '.png', png, [int(cv2.IMWRITE_PNG_COMPRESSION), 5])   # from 0 to 9, default: 3
-
-    # Convert GeoTiff to PNG using gdal.Translate

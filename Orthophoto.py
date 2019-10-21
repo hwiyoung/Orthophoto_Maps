@@ -4,12 +4,15 @@ import cv2
 import time
 from ExifData import getExif, restoreOrientation
 from EoData import readEO, convertCoordinateSystem, Rot3D
-from Boundary import boundary, export_bbox_to_wkt, createPGW
-from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff, createPNGA
+from Boundary import boundary, export_bbox_to_wkt
+from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff, convert2PNG
 
 if __name__ == '__main__':
-    ground_height = 36  # unit: m, JeonjuWorldcup
+    ground_height = 32  # unit: m, JeonjuWorldcup
     sensor_width = 13.2  # unit: mm, Phantom4
+
+    dst = './'
+    epsg = 3857
 
     for root, dirs, files in os.walk('./190703_JeonjuWorldcup'):
         for file in files:
@@ -46,7 +49,7 @@ if __name__ == '__main__':
                 print('Read EOP - ' + file)
                 print('Easting | Northing | Height | Omega | Phi | Kappa')
                 eo = readEO(file_path)
-                eo = convertCoordinateSystem(eo)
+                eo = convertCoordinateSystem(eo, epsg)
                 print(eo)
                 R = Rot3D(eo)
 
@@ -87,11 +90,9 @@ if __name__ == '__main__':
                 # 8. Create PNGA
                 print('Save the image in PNGA')
                 start_time = time.time()
-                dst = './190703_JeonjuWorldcup_ortho/' + filename
-                createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
-                createPNGA(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
-                # createPGW(bbox, gsd, dst)
-                export_bbox_to_wkt(bbox, dst)
+                createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, epsg, dst + filename)
+                convert2PNG(dst + filename + '.tif', dst + filename + '.png')   # src, dst
+                export_bbox_to_wkt(bbox, dst + filename)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')

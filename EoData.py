@@ -16,17 +16,18 @@ def readEO(path):
 
     return eo
 
-def convertCoordinateSystem(eo):
-    # Define the plane coordinate system (EPSG 3857)
-    epsg3857 = SpatialReference()
-    epsg3857.ImportFromEPSG(3857)
+def convertCoordinateSystem(eo, epsg):
+    ### Convert wgs84 to epsg
+    # Define the plane coordinate system
+    epsg_dst = SpatialReference()
+    epsg_dst.ImportFromEPSG(epsg)
 
     # Define the wgs84 system (EPSG 4326)
     epsg4326 = SpatialReference()
     epsg4326.ImportFromEPSG(4326)
 
-    tm2latlon = CoordinateTransformation(epsg3857, epsg4326)
-    latlon2tm = CoordinateTransformation(epsg4326, epsg3857)
+    tm2latlon = CoordinateTransformation(epsg_dst, epsg4326)
+    latlon2tm = CoordinateTransformation(epsg4326, epsg_dst)
 
     # Check the transformation for a point close to the centre of the projected grid
     xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))   # The order: Lon, Lat

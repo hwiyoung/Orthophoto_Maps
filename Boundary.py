@@ -52,6 +52,7 @@ def projection(vertices, eo, rotation_matrix, dem):
     return plane_coord_GCS
 
 def export_bbox_to_wkt(bbox, dst):
+    # Create a polygon
     ring = ogr.Geometry(ogr.wkbLinearRing)
     ring.AddPoint(bbox[0][0], bbox[2][0])   # Xmin, Ymin
     ring.AddPoint(bbox[0][0], bbox[3][0])   # Xmin, Ymax
@@ -61,6 +62,8 @@ def export_bbox_to_wkt(bbox, dst):
 
     geom_poly = ogr.Geometry(ogr.wkbPolygon)
     geom_poly.AddGeometry(ring)
+
+    # Export geometry to WKT
     wkt = geom_poly.ExportToWkt()
 
     f = open(dst + '.txt', 'w')
