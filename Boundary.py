@@ -49,3 +49,12 @@ def projection(vertices, eo, rotation_matrix, dem):
     plane_coord_GCS = scale * coord_GCS[0:2] + [[eo[0]], [eo[1]]]
 
     return plane_coord_GCS
+
+def pcs2ccs(bbox_px, rows, cols, pixel_size, focal_length):
+    bbox_camera = np.empty(shape=(3, bbox_px.shape[1]))
+
+    bbox_camera[0, :] = (bbox_px[0, :] - cols / 2) * pixel_size
+    bbox_camera[1, :] = -(bbox_px[1, :] - rows / 2) * pixel_size
+    bbox_camera[2, :] = -focal_length
+
+    return bbox_camera

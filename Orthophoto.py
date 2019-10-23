@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import time
 from ExifData import getExif, restoreOrientation
-from EoData import readEO, convertCoordinateSystem, Rot3D
+from EoData import readEO, latlon2tmcentral, Rot3D
 from Boundary import boundary
 from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 print('Read EOP - ' + file)
                 print('Latitude | Longitude | Height | Omega | Phi | Kappa')
                 eo = readEO(file_path)
-                eo = convertCoordinateSystem(eo)
+                eo = latlon2tmcentral(eo)
                 R = Rot3D(eo)
 
                 # 4. Extract a projected boundary of the image

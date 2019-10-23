@@ -17,7 +17,25 @@ def readEO(path):
 
     return eo
 
-def convertCoordinateSystem(eo):
+def latlon2tmcentral(eo):
+    # Define the TM central coordinate system (EPSG 5186)
+    epsg5186 = SpatialReference()
+    epsg5186.ImportFromEPSG(5186)
+
+    # Define the wgs84 system (EPSG 4326)
+    epsg4326 = SpatialReference()
+    epsg4326.ImportFromEPSG(4326)
+
+    latlon2tm = CoordinateTransformation(epsg4326, epsg5186)
+
+    # Check the transformation for a point close to the centre of the projected grid
+    # xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))   # The order: Lat, Lon
+    xy = latlon2tm.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
+    eo[0:2] = xy[0:2]
+
+    return eo
+
+def tmcentral2latlon(eo):
     # Define the TM central coordinate system (EPSG 5186)
     epsg5186 = SpatialReference()
     epsg5186.ImportFromEPSG(5186)
@@ -27,12 +45,10 @@ def convertCoordinateSystem(eo):
     epsg4326.ImportFromEPSG(4326)
 
     tm2latlon = CoordinateTransformation(epsg5186, epsg4326)
-    latlon2tm = CoordinateTransformation(epsg4326, epsg5186)
 
     # Check the transformation for a point close to the centre of the projected grid
-    # xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))   # The order: Lat, Lon
-    xy = latlon2tm.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
-    eo[0:2] = xy[0:2]
+    lonlat = tm2latlon.TransformPoint(float(eo[0]), float(eo[1]))  # The order: x, y
+    eo[0:2] = lonlat[0:2]
 
     return eo
 
