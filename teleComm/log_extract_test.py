@@ -28,8 +28,10 @@ df = df[['CUSTOM.updateTime', 'OSD.latitude', 'OSD.longitude', 'OSD.height [m]',
 
 df_np = df.to_numpy()
 for i in range(df_np[:, 0].shape[0]):
-    df_np[i, 0] = df_np[:, 0][i][11:23]
-    # df_np[i, 0][0:2] = str(int(df_np[i, 0][0:2]) + 9)
+    # df_np[i, 0] = df_np[:, 0][i][11:23]
+    hours_edit = str(int(df_np[i, 0][11:13]) + 9)
+    time_edit = df_np[i, 0][0:11] + hours_edit + df_np[i, 0][13:len(df_np[i, 0])]
+    df_np[i, 0] = time_edit
 
 logs = np.empty((df_np.shape[0]*3, df_np.shape[1]), dtype=object)
 for i in range(df_np.shape[0]):
