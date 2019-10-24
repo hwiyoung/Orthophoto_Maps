@@ -5,13 +5,13 @@ from osgeo.osr import SpatialReference, CoordinateTransformation
 def readEO(path):
     eo_line = np.genfromtxt(path, delimiter='\t',
                             dtype={'names': ('Image', 'Longitude', 'Latitude', 'Height', 'Omega', 'Phi', 'Kappa'),
-                                   'formats': ('U15', '<f8', '<f8', '<f8', '<f8', '<f8', '<f8')})
+                                   'formats': ('U30', '<f8', '<f8', '<f8', '<f8', '<f8', '<f8')})
 
     eo_line['Omega'] = eo_line['Omega'] * math.pi / 180
     eo_line['Phi'] = eo_line['Phi'] * math.pi / 180
     eo_line['Kappa'] = eo_line['Kappa'] * math.pi / 180
 
-    eo = [float(eo_line['Latitude']), float(eo_line['Longitude']), float(eo_line['Height']),
+    eo = [float(eo_line['Longitude']), float(eo_line['Latitude']), float(eo_line['Height']),
           float(eo_line['Omega']), float(eo_line['Phi']), float(eo_line['Kappa'])]
     print(eo)
 
@@ -29,8 +29,7 @@ def latlon2tmcentral(eo):
     latlon2tm = CoordinateTransformation(epsg4326, epsg5186)
 
     # Check the transformation for a point close to the centre of the projected grid
-    # xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))   # The order: Lat, Lon
-    xy = latlon2tm.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
+    xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
     eo[0:2] = xy[0:2]
 
     return eo

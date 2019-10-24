@@ -12,7 +12,10 @@ def getExif(path):
     focal_length = focal_length * pow(10, -3) # unit: m
 
     # Orientation
-    orientation = info[274]
+    try:
+        orientation = info[274]
+    except:
+        orientation = 0
 
     return focal_length, orientation
 
