@@ -8,6 +8,10 @@ from Boundary import boundary
 from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
 from system_calibration import calibrate
 
+print('*****************************')
+print('For try-except in orthophotos')
+print('*****************************')
+
 # FLIR Duo Pro R in Jeju 190830
 R_CB = np.array([[0.998424007914030, -0.0558051944297136, -0.00593975551236918],
                  [-0.00675010686299412, -0.0143438195676995, -0.999874337553249],
@@ -18,6 +22,7 @@ if __name__ == '__main__':
     sensor_width = 10.88  # unit: mm
 
     for root, dirs, files in os.walk('./tests/calibration_test'):
+        files.sort()
         for file in files:
             image_start_time = time.time()
             start_time = time.time()
@@ -58,6 +63,9 @@ if __name__ == '__main__':
                 eo[3] = OPK[0]
                 eo[4] = OPK[1]
                 eo[5] = OPK[2]
+                print('*****************************')
+                print('1. Incorrect cal. params')
+                print('*****************************')
                 R = Rot3D(eo)
 
                 # 4. Extract a projected boundary of the image
@@ -83,6 +91,9 @@ if __name__ == '__main__':
 
                 # 6. Back-projection into camera coordinate system
                 print('backProjection')
+                print('*****************************')
+                print('2. MemoryError from incorrect projection')
+                print('*****************************')
                 start_time = time.time()
                 backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)
                 print("--- %s seconds ---" % (time.time() - start_time))
