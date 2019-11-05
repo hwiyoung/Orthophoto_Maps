@@ -18,7 +18,7 @@ def readEO(path):
 
     return eo
 
-def readEO_multiSpectral(path):
+def readEOfromMetadata(path):
     metadata = pyexiv2.ImageMetadata(path)
     metadata.read()
 

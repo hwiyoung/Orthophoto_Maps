@@ -1,0 +1,5 @@
+SourceFile,    GPSDateStamp,GPSTimeStamp,    GPSLatitude,GpsLatitudeRef,    GPSLongitude,GPSLongitudeRef,    GPSAltitude,GPSAltitudeRef,    FocalLength,    XResolution,YResolution,ResolutionUnits
+"img_0073.tif",2019:08:29,06:18:23,"34 deg 36' 20.53"" N",North,"127 deg 43' 6.46"" E",East,164.3m, Above Sea Level,5.43165075,266.666667,266.666667,mm
+"img_0074.tif",2019:08:29,06:18:25,"34 deg 36' 20.50"" N",North,"127 deg 43' 4.62"" E",East,163.1m, Above Sea Level,5.43165075,266.666667,266.666667,mm
+"img_0075.tif",2019:08:29,06:18:27,"34 deg 36' 20.49"" N",North,"127 deg 43' 2.78"" E",East,162.7m, Above Sea Level,5.43165075,266.666667,266.666667,mm
+"img_0076.tif",2019:08:29,06:18:29,"34 deg 36' 20.52"" N",North,"127 deg 43' 0.94"" E",East,163.2m, Above Sea Level,5.43165075,266.666667,266.666667,mm
