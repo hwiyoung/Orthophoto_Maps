@@ -1,0 +1,18 @@
+Rasterization|out
+Reproject and rasterize a vector dataset
+Vector Data Manipulation
+QgsProcessingParameterVectorLayer|in|Input vector dataset|-1|None|False
+QgsProcessingParameterRasterDestination|out|Output image|None|False
+QgsProcessingParameterRasterLayer|im|Input reference image|None|True
+QgsProcessingParameterNumber|szx|Output size x|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|szy|Output size y|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterCrs|epsg|Output EPSG code|ProjectCrs|True
+QgsProcessingParameterNumber|orx|Output Upper-left x|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|ory|Output Upper-left y|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|spx|Spacing (GSD) x|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|spy|Spacing (GSD) y|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|background|Background value|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|mode|Rasterization mode|binary;attribute|0|True
+QgsProcessingParameterNumber|mode.binary.foreground|Foreground value|QgsProcessingParameterNumber.Double|255|True
+QgsProcessingParameterString|mode.attribute.field|The attribute field to burn|None|False|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

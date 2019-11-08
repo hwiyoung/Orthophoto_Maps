@@ -1,0 +1,17 @@
+GridBasedImageResampling|io.out
+Resamples an image according to a resampling grid
+Geometry
+QgsProcessingParameterRasterLayer|io.in|Input image|None|False
+QgsProcessingParameterRasterDestination|io.out|Output Image|None|False
+QgsProcessingParameterRasterLayer|grid.in|Input resampling grid|None|False
+OTBParameterChoice|grid.type|Grid Type|def;loc|0|True
+QgsProcessingParameterNumber|out.ulx|Upper Left X|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|out.uly|Upper Left Y|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|out.sizex|Size X|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|out.sizey|Size Y|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|out.spacingx|Pixel Size X|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|out.spacingy|Pixel Size Y|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|out.default|Default value|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|interpolator|Interpolation|nn;linear;bco|2|True
+QgsProcessingParameterNumber|interpolator.bco.radius|Radius for bicubic interpolation|QgsProcessingParameterNumber.Integer|2|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

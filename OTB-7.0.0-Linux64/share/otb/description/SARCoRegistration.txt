@@ -1,0 +1,15 @@
+SARCoRegistration|out
+CoRegistration between two SAR images.
+SAR
+QgsProcessingParameterRasterLayer|ingrid|Input deformation grid|None|False
+QgsProcessingParameterRasterLayer|insarslave|Input SAR Slave image|None|False
+QgsProcessingParameterRasterLayer|insarmaster|Input SAR Master image (for metadata only)|None|False
+QgsProcessingParameterNumber|gridsteprange|Grid Step for range dimension into SLC geometry|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|gridstepazimut|Grid Step for azimut dimension into SLC geometry|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|doppler0|Doppler 0 in azimut for SAR Slave Image|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|sizetiles|Size Tiles for output cut|QgsProcessingParameterNumber.Integer|50|True
+QgsProcessingParameterNumber|margin|Margin for window extractions into Slave Image|QgsProcessingParameterNumber.Integer|7|True
+QgsProcessingParameterNumber|nbramps|Number of Ramps for filtering inside coregistration|QgsProcessingParameterNumber.Integer|257|True
+QgsProcessingParameterRasterDestination|out|Coregistrated slave image into master geometry|None|False
+QgsProcessingParameterBoolean|cint16|Set Output conversion with cInt16 to false|false|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

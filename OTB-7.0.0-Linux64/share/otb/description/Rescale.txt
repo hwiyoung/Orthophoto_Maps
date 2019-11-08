@@ -1,0 +1,8 @@
+Rescale|out
+Rescale the image between two given values.
+Deprecated
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|outmin|Output min value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|outmax|Output max value|QgsProcessingParameterNumber.Double|255|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

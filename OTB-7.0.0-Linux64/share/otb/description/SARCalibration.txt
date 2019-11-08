@@ -1,0 +1,8 @@
+SARCalibration|out
+Perform radiometric calibration of SAR images. Following sensors are supported: TerraSAR-X, Sentinel1 and Radarsat-2.Both Single Look Complex(SLC) and detected products are supported as input.
+Calibration
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterBoolean|noise|Disable Noise|false|True
+OTBParameterChoice|lut|Lookup table|sigma;gamma;beta;dn|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

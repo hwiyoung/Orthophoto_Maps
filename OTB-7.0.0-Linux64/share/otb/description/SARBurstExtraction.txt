@@ -1,0 +1,8 @@
+SARBurstExtraction|out
+This application performs a burst extraction by keeping only lines and samples of a required burst.
+SAR
+QgsProcessingParameterRasterLayer|in|Input Sentinel1 IW SLC Image|None|False
+QgsProcessingParameterNumber|burstindex|Index of Burst|QgsProcessingParameterNumber.Integer|-1|True
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterBoolean|allpixels|Select the modes for output image|false|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

@@ -1,0 +1,17 @@
+KMeansClassification|out
+Unsupervised KMeans image classification
+Learning
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|nc|Number of classes|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|ts|Training set size|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterNumber|maxit|Maximum number of iterations|QgsProcessingParameterNumber.Integer|1000|True
+QgsProcessingParameterFile|centroids.in|input centroids text file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterFileDestination|centroids.out|Output centroids text file|None|None|True
+OTBParameterChoice|sampler|Sampler type|periodic;random|0|True
+QgsProcessingParameterNumber|sampler.periodic.jitter|Jitter amplitude|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterRasterLayer|vm|Validity Mask|None|True
+QgsProcessingParameterNumber|nodatalabel|Label mask value|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterBoolean|cleanup|Clean-up of temporary files|true|True
+QgsProcessingParameterNumber|rand|Random seed|QgsProcessingParameterNumber.Integer|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

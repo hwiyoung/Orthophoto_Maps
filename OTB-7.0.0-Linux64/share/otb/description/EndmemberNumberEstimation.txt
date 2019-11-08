@@ -1,0 +1,6 @@
+EndmemberNumberEstimation
+Estimate the number of endmembers in a hyperspectral image
+Hyperspectral
+QgsProcessingParameterRasterLayer|in|Input Image Filename|None|False
+OTBParameterChoice|algo|Unmixing algorithm|elm;vd|0|True
+QgsProcessingParameterNumber|algo.vd.far|False alarm rate|QgsProcessingParameterNumber.Double|0.001|True

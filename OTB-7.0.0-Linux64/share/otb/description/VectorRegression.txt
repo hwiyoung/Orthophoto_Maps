@@ -1,0 +1,9 @@
+VectorRegression
+Performs regression on the input vector data according to a model file.
+Learning
+QgsProcessingParameterFile|in|Name of the input vector data|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFile|instat|Statistics file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterFile|model|Model file|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterString|cfield|Output field|None|False|True
+QgsProcessingParameterString|feat|Field names to be calculated|None|True
+QgsProcessingParameterFileDestination|out|Output vector data file|None|None|True

@@ -1,0 +1,6 @@
+ComputeImagesStatistics
+Computes global mean and standard deviation for each band from a set of images and optionally saves the results in an XML file.
+Learning
+QgsProcessingParameterMultipleLayers|il|Input images|3|None|False
+QgsProcessingParameterNumber|bv|Background Value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterFileDestination|out|Output XML file|None|None|True

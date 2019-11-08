@@ -1,0 +1,8 @@
+SARConcatenateBursts|out
+Concatenate a list of Bursts to provide a whole SAR Deburst Image.
+SAR
+QgsProcessingParameterMultipleLayers|il|Input bursts list|3|None|False
+QgsProcessingParameterRasterLayer|insar|Input Sentinel1 IW SLC Image (only metadata used)|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|burstindex|Index of the first Burst|QgsProcessingParameterNumber.Integer|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

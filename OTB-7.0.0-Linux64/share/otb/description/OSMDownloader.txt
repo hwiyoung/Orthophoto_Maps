@@ -1,0 +1,11 @@
+OSMDownloader
+Download vector data from OSM and store it to file
+Vector Data Manipulation
+QgsProcessingParameterVectorDestination|out|Output vector data|-1|None|False
+QgsProcessingParameterRasterLayer|support|Support image|None|False
+QgsProcessingParameterString|key|OSM tag key|None|False|True
+QgsProcessingParameterString|value|OSM tag value|None|False|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterBoolean|printclasses|Displays available key/value classes|false|True

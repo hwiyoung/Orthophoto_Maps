@@ -1,0 +1,16 @@
+SARInterferogram|out
+Interferogram between two SAR images.
+SAR
+QgsProcessingParameterRasterLayer|insarslave|Input SAR Slave image (Coregistrated image)|None|False
+QgsProcessingParameterRasterLayer|insarmaster|Input SAR Master image|None|False
+QgsProcessingParameterRasterLayer|indem|Input DEM (for metadata only)|None|True
+QgsProcessingParameterRasterLayer|topographicphase|Input Topographic Phase (estimation with DEM projection)|None|True
+QgsProcessingParameterNumber|mlran|ML factor on distance|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlazi|ML factor on azimut|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|marginran|Margin on distance for averaging|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|marginazi|Margin on azimut for averaging|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|gain|Gain to apply for amplitude estimation|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterBoolean|ortho|Build interferogram into ortho geometry|false|True
+QgsProcessingParameterRasterDestination|out|Interferogram|None|False
+QgsProcessingParameterRasterDestination|outopt|Interferogram into ortho geometry|None|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

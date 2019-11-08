@@ -1,0 +1,32 @@
+Segmentation|mode.raster.out
+Performs segmentation of an image, and output either a raster or a vector file. In vector mode, large input datasets are supported.
+Segmentation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+OTBParameterChoice|filter|Segmentation algorithm|meanshift;cc;watershed;mprofiles|0|True
+QgsProcessingParameterNumber|filter.meanshift.spatialr|Spatial radius|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|filter.meanshift.ranger|Range radius|QgsProcessingParameterNumber.Double|15|True
+QgsProcessingParameterNumber|filter.meanshift.thres|Mode convergence threshold|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|filter.meanshift.maxiter|Maximum number of iterations|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterNumber|filter.meanshift.minsize|Minimum region size|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterString|filter.cc.expr|Condition|None|False|False
+QgsProcessingParameterNumber|filter.watershed.threshold|Depth Threshold|QgsProcessingParameterNumber.Double|0.01|True
+QgsProcessingParameterNumber|filter.watershed.level|Flood Level|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|filter.mprofiles.size|Profile Size|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|filter.mprofiles.start|Initial radius|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|filter.mprofiles.step|Radius step|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|filter.mprofiles.sigma|Threshold of the final decision rule|QgsProcessingParameterNumber.Double|1|True
+OTBParameterChoice|mode|Processing mode|vector;raster|0|True
+QgsProcessingParameterFileDestination|mode.vector.out|Output vector file|None|None|False
+OTBParameterChoice|mode.vector.outmode|Writing mode for the output vector file|ulco;ovw;ulovw;ulu|0|True
+QgsProcessingParameterRasterLayer|mode.vector.inmask|Mask Image|None|True
+QgsProcessingParameterBoolean|mode.vector.neighbor|8-neighbor connectivity|false|True
+QgsProcessingParameterBoolean|mode.vector.stitch|Stitch polygons|true|True
+QgsProcessingParameterNumber|mode.vector.minsize|Minimum object size|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|mode.vector.simplify|Simplify polygons|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterString|mode.vector.layername|Layer name|None|False|True
+QgsProcessingParameterString|mode.vector.fieldname|Geometry index field name|None|False|True
+QgsProcessingParameterNumber|mode.vector.tilesize|Tiles size|QgsProcessingParameterNumber.Integer|1024|True
+QgsProcessingParameterNumber|mode.vector.startlabel|Starting geometry index|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterString|mode.vector.ogroptions|OGR options for layer creation|None|True|True
+QgsProcessingParameterRasterDestination|mode.raster.out|Output labeled image|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

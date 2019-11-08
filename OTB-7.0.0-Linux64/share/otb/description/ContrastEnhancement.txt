@@ -1,0 +1,23 @@
+ContrastEnhancement|out
+This application is the implementation of the histogram equalization algorithm. It can be used to enhance contrast in an image or to reduce the dynamic of the image without losing too much contrast. It offers several options as a nodata value, a contrast limitation factor, a local version of the algorithm and also a mode to equalize the luminance of the image.
+Image Filtering
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|bins|Number of bins|QgsProcessingParameterNumber.Integer|256|True
+QgsProcessingParameterNumber|hfact|Contrast Limitation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|nodata|Nodata Value|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|spatial|Spatial parameters for the histogram computation|local;global|0|True
+QgsProcessingParameterNumber|spatial.local.h|Thumbnail height|QgsProcessingParameterNumber.Integer|256|True
+QgsProcessingParameterNumber|spatial.local.w|Thumbnail width|QgsProcessingParameterNumber.Integer|256|True
+OTBParameterChoice|minmax|Minimum and maximum settings|auto;manual|0|True
+QgsProcessingParameterBoolean|minmax.auto.global|Global|false|True
+QgsProcessingParameterNumber|minmax.manual.min|Minimum value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|minmax.manual.max|Maximum value|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|mode|What to equalized|each;lum|0|True
+QgsProcessingParameterNumber|mode.lum.red.ch|Red channel|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|mode.lum.red.coef|Value for luminance computation for the red channel|QgsProcessingParameterNumber.Double|0.21|True
+QgsProcessingParameterNumber|mode.lum.green.ch|Green channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|mode.lum.green.coef|Value for luminance computation of the green channel|QgsProcessingParameterNumber.Double|0.71|True
+QgsProcessingParameterNumber|mode.lum.blue.ch|Blue channel|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|mode.lum.blue.coef|Value for luminance computation of the blue channel|QgsProcessingParameterNumber.Double|0.08|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

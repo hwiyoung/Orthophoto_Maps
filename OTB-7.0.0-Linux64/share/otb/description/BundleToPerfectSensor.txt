@@ -1,0 +1,20 @@
+BundleToPerfectSensor|out
+Perform P+XS pansharpening
+Geometry
+QgsProcessingParameterRasterLayer|inp|Input PAN Image|None|False
+QgsProcessingParameterRasterLayer|inxs|Input XS Image|None|False
+QgsProcessingParameterRasterDestination|out|Output image|None|False
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|mode|Mode|default;phr|0|True
+OTBParameterChoice|method|Algorithm|rcs;lmvm;bayes|0|True
+QgsProcessingParameterNumber|method.lmvm.radiusx|X radius|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|method.lmvm.radiusy|Y radius|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|method.bayes.lambda|Weight|QgsProcessingParameterNumber.Double|0.9999|True
+QgsProcessingParameterNumber|method.bayes.s|S coefficient|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|lms|Spacing of the deformation field|QgsProcessingParameterNumber.Double|4|True
+OTBParameterChoice|interpolator|Interpolation|bco;nn;linear|0|True
+QgsProcessingParameterNumber|interpolator.bco.radius|Radius for bicubic interpolation|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|fv|Fill Value|QgsProcessingParameterNumber.Double|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

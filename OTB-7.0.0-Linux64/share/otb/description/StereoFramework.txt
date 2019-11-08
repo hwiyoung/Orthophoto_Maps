@@ -1,0 +1,38 @@
+StereoFramework|output.out
+Compute the ground elevation based on one or multiple stereo pair(s)
+Stereo
+QgsProcessingParameterMultipleLayers|input.il|Input images list|3|None|False
+QgsProcessingParameterString|input.co|Couples list|None|False|True
+QgsProcessingParameterNumber|input.channel|Input Image channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|output.res|Output resolution|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|output.nodata|NoData value|QgsProcessingParameterNumber.Double|-32768|True
+OTBParameterChoice|output.fusionmethod|Method to fuse measures in each DSM cell|max;min;mean;acc|0|True
+QgsProcessingParameterRasterDestination|output.out|Output DSM|None|False
+OTBParameterChoice|output.mode|Parameters estimation modes|fit;user|0|True
+QgsProcessingParameterNumber|output.mode.user.ulx|Upper Left X|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|output.mode.user.uly|Upper Left Y|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|output.mode.user.sizex|Size X|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|output.mode.user.sizey|Size Y|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|output.mode.user.spacingx|Pixel Size X|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|output.mode.user.spacingy|Pixel Size Y|QgsProcessingParameterNumber.Double|0|False
+OTBParameterChoice|map|Map Projection|utm;lambert2;lambert93;wgs;epsg|3|True
+QgsProcessingParameterNumber|map.utm.zone|Zone number|QgsProcessingParameterNumber.Integer|31|True
+QgsProcessingParameterBoolean|map.utm.northhem|Northern Hemisphere|false|True
+QgsProcessingParameterCrs|map.epsg.code|EPSG Code|ProjectCrs|True
+QgsProcessingParameterNumber|stereorect.fwdgridstep|Step of the displacement grid (in pixels)|QgsProcessingParameterNumber.Integer|16|True
+QgsProcessingParameterNumber|stereorect.invgridssrate|Sub-sampling rate for epipolar grid inversion|QgsProcessingParameterNumber.Integer|10|True
+OTBParameterChoice|bm.metric|Block-matching metric|ssdmean;ssd;ncc;lp|0|True
+QgsProcessingParameterNumber|bm.metric.lp.p|p value|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|bm.radius|Correlation window radius (in pixels)|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|bm.minhoffset|Minimum altitude offset (in meters)|QgsProcessingParameterNumber.Double|-20|True
+QgsProcessingParameterNumber|bm.maxhoffset|Maximum altitude offset (in meters)|QgsProcessingParameterNumber.Double|20|True
+QgsProcessingParameterBoolean|postproc.bij|Use bijection consistency in block matching strategy|true|True
+QgsProcessingParameterBoolean|postproc.med|Use median disparities filtering|false|True
+QgsProcessingParameterNumber|postproc.metrict|Correlation metric threshold|QgsProcessingParameterNumber.Double|0.6|True
+QgsProcessingParameterRasterLayer|mask.left|Input left mask|None|True
+QgsProcessingParameterRasterLayer|mask.right|Input right mask|None|True
+QgsProcessingParameterNumber|mask.variancet|Discard pixels with low local variance|QgsProcessingParameterNumber.Double|50|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

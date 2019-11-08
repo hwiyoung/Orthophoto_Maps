@@ -1,0 +1,8 @@
+VertexComponentAnalysis|outendm
+Given a set of mixed spectral vectors, estimate reference substances also known as endmembers using the Vertex Component Analysis algorithm.
+Hyperspectral
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|outendm|Output Endmembers|None|False
+QgsProcessingParameterNumber|ne|Number of endmembers|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|rand|Random seed|QgsProcessingParameterNumber.Integer|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

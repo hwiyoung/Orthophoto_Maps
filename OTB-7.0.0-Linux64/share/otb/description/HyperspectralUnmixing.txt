@@ -1,0 +1,8 @@
+HyperspectralUnmixing|out
+Estimate abundance maps from an hyperspectral image and a set of endmembers.
+Hyperspectral
+QgsProcessingParameterRasterLayer|in|Input Image Filename|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterRasterLayer|ie|Input endmembers|None|False
+OTBParameterChoice|ua|Unmixing algorithm|ucls;isra;mdmdnmf|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

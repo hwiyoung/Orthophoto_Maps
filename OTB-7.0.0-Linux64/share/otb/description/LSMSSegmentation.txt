@@ -1,0 +1,14 @@
+LSMSSegmentation|out
+This application performs the second step of the exact Large-Scale Mean-Shift segmentation workflow (LSMS) [1].
+Segmentation
+QgsProcessingParameterRasterLayer|in|Filtered image|None|False
+QgsProcessingParameterRasterLayer|inpos|Filtered position image|None|True
+QgsProcessingParameterRasterDestination|out|Output labeled Image|None|False
+QgsProcessingParameterNumber|spatialr|Spatial radius|QgsProcessingParameterNumber.Double|5|True
+QgsProcessingParameterNumber|ranger|Range radius|QgsProcessingParameterNumber.Double|15|True
+QgsProcessingParameterNumber|minsize|Minimum Segment Size|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|tilesizex|Size of tiles in pixel (X-axis)|QgsProcessingParameterNumber.Integer|500|True
+QgsProcessingParameterNumber|tilesizey|Size of tiles in pixel (Y-axis)|QgsProcessingParameterNumber.Integer|500|True
+QgsProcessingParameterFile|tmpdir|Directory where to write temporary files|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterBoolean|cleanup|Temporary files cleaning|true|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

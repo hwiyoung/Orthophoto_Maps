@@ -1,0 +1,20 @@
+Mosaic|out
+Perform a mosaic of input images
+Image Manipulation
+QgsProcessingParameterMultipleLayers|il|Input Images|3|None|False
+QgsProcessingParameterMultipleLayers|vdcut|Input VectorData for composition|-1|None|True
+QgsProcessingParameterMultipleLayers|vdstats|Input VectorData for statistics|-1|None|True
+OTBParameterChoice|comp.feather|Feathering method|none;large;slim|0|True
+QgsProcessingParameterNumber|comp.feather.slim.exponent|Transition smoothness (1.0 = linear transition)|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|comp.feather.slim.length|Transition length (In cartographic units)|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|harmo.method|harmonization method|none;band;rgb|0|True
+OTBParameterChoice|harmo.cost|harmonization cost function|rmse;musig;mu|0|True
+QgsProcessingParameterRasterDestination|out|Output image|None|False
+OTBParameterChoice|interpolator|Interpolation|nn;bco;linear|0|True
+QgsProcessingParameterNumber|interpolator.bco.radius|Radius for bicubic interpolation|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|output.spacingx|Pixel Size (X)|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|output.spacingy|Pixel Size (Y)|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterFile|tmpdir|Directory for temporary files|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterNumber|distancemap.sr|Distance maps sampling ratio|QgsProcessingParameterNumber.Double|10|True
+QgsProcessingParameterNumber|nodata|no-data value|QgsProcessingParameterNumber.Double|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

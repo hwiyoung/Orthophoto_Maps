@@ -1,0 +1,13 @@
+ImageClassifier|out
+Performs a classification of the input image according to a model file.
+Learning
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterLayer|mask|Input Mask|None|True
+QgsProcessingParameterFile|model|Model file|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFile|imstat|Statistics file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|nodatalabel|Label mask value|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterRasterDestination|confmap|Confidence map|None|True
+QgsProcessingParameterRasterDestination|probamap|Probability map|None|True
+QgsProcessingParameterNumber|nbclasses|Number of classes in the model|QgsProcessingParameterNumber.Integer|20|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

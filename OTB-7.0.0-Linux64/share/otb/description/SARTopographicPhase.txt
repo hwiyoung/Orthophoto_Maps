@@ -1,0 +1,13 @@
+SARTopographicPhase|out
+Estimates topographic phase for interferogram.
+SAR
+QgsProcessingParameterRasterLayer|ingrid|Input deformation grid|None|False
+QgsProcessingParameterRasterLayer|insarslave|Input SAR Slave image (metadata)|None|False
+QgsProcessingParameterRasterLayer|incartmeanmaster|Input Cartesian Mean Master image|None|False
+QgsProcessingParameterNumber|gridsteprange|Grid Step for range dimension into SLC geometry|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|gridstepazimut|Grid Step for azimut dimension into SLC geometry|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|mlran|ML factor on range|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlazi|ML factor on azimut|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterBoolean|cartcopy|Copy cartesian coordonates into output|false|True
+QgsProcessingParameterRasterDestination|out|Topographic Phase (And Copy of Cartesian Mean Master Image)|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

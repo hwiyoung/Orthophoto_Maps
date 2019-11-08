@@ -1,0 +1,14 @@
+Quicklook|out
+Generates a subsampled version of an image extract
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterString|cl|Channel List|None|True
+QgsProcessingParameterNumber|rox|ROI Origin X|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|roy|ROI Origin Y|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|rsx|ROI Size X|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|rsy|ROI Size Y|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|sr|Sampling ratio|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|sx|Size X|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|sy|Size Y|QgsProcessingParameterNumber.Integer|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

@@ -1,0 +1,11 @@
+SARDecompositions|out
+From one-band complex images (each one related to an element of the Sinclair matrix), returns the selected decomposition.
+SAR
+QgsProcessingParameterRasterLayer|inhh|Input Image|None|False
+QgsProcessingParameterRasterLayer|inhv|Input Image|None|True
+QgsProcessingParameterRasterLayer|invh|Input Image|None|True
+QgsProcessingParameterRasterLayer|invv|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+OTBParameterChoice|decomp|Decompositions|haa;barnes;huynen;pauli|0|True
+QgsProcessingParameterNumber|inco.kernelsize|Kernel size for spatial incoherent averaging|QgsProcessingParameterNumber.Integer|3|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

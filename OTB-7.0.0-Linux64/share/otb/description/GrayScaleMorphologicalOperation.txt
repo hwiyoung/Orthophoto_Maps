@@ -1,0 +1,11 @@
+GrayScaleMorphologicalOperation|out
+Performs morphological operations on a grayscale input image
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Feature Output Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+OTBParameterChoice|structype|Structuring Element Type|box;ball;cross|0|True
+QgsProcessingParameterNumber|xradius|Structuring element X radius|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|yradius|Structuring element Y radius|QgsProcessingParameterNumber.Integer|5|True
+OTBParameterChoice|filter|Morphological Operation|dilate;erode;opening;closing|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

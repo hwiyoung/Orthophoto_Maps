@@ -1,0 +1,7 @@
+BandMath|out
+Outputs a monoband image which is the result of a mathematical operation on several multi-band images.
+Image Manipulation
+QgsProcessingParameterMultipleLayers|il|Input image list|3|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterString|exp|Expression|None|False|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

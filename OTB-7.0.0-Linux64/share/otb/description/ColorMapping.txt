@@ -1,0 +1,18 @@
+ColorMapping|out
+Map a label image to 8-bits RGB using look-up tables.
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+OTBParameterChoice|op|Operation|labeltocolor;colortolabel|0|True
+QgsProcessingParameterNumber|op.colortolabel.notfound|Not Found Label|QgsProcessingParameterNumber.Integer|404|True
+OTBParameterChoice|method|Color mapping method|custom;continuous;optimal;image|0|True
+QgsProcessingParameterFile|method.custom.lut|Look-up table file|QgsProcessingParameterFile.File|None|None|False
+OTBParameterChoice|method.continuous.lut|Look-up tables|red;green;blue;grey;hot;cool;spring;summer;autumn;winter;copper;jet;hsv;overunder;relief|0|True
+QgsProcessingParameterNumber|method.continuous.min|Mapping range lower value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|method.continuous.max|Mapping range higher value|QgsProcessingParameterNumber.Double|255|True
+QgsProcessingParameterNumber|method.optimal.background|Background label|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterRasterLayer|method.image.in|Support Image|None|False
+QgsProcessingParameterNumber|method.image.nodatavalue|NoData value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|method.image.low|lower quantile|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|method.image.up|upper quantile|QgsProcessingParameterNumber.Integer|2|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

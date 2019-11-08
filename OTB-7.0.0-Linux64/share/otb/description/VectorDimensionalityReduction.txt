@@ -1,0 +1,13 @@
+VectorDimensionalityReduction
+Performs dimensionality reduction of the input vector data according to a model file.
+Learning
+QgsProcessingParameterVectorLayer|in|Name of the input vector data|-1|None|False
+QgsProcessingParameterFile|instat|Statistics file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterFile|model|Model file|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|out|Output vector data file containing the reduced vector|None|None|True
+QgsProcessingParameterString|feat|Input features to use for reduction|None|True
+OTBParameterChoice|featout|Output feature|prefix;list|0|True
+QgsProcessingParameterString|featout.prefix.name|Feature name prefix|None|False|True
+QgsProcessingParameterString|featout.list.names|Feature name list|None|True|True
+QgsProcessingParameterNumber|pcadim|Principal component dimension|QgsProcessingParameterNumber.Integer|0|True
+OTBParameterChoice|mode|Writing mode|overwrite;update|0|True

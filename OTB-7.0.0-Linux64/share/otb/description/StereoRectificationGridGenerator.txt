@@ -1,0 +1,17 @@
+StereoRectificationGridGenerator|io.outright
+Generates two deformation fields to resample in epipolar geometry, a pair of stereo images up to the sensor model precision
+Stereo
+QgsProcessingParameterRasterLayer|io.inleft|Left input image|None|False
+QgsProcessingParameterRasterLayer|io.inright|Right input image|None|False
+QgsProcessingParameterRasterDestination|io.outleft|Left output deformation grid|None|False
+QgsProcessingParameterRasterDestination|io.outright|Right output deformation grid|None|False
+QgsProcessingParameterFile|epi.elevation.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|epi.elevation.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|epi.elevation.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|epi.elevation.avgdem.step|Sub-sampling step|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|epi.scale|Scale of epipolar images|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|epi.step|Step of the deformation grid (in number of pixels)|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterRasterDestination|inverse.outleft|Left inverse deformation grid|None|True
+QgsProcessingParameterRasterDestination|inverse.outright|Right inverse deformation grid|None|True
+QgsProcessingParameterNumber|inverse.ssrate|Sub-sampling rate for inversion|QgsProcessingParameterNumber.Integer|16|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

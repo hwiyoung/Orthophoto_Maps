@@ -1,0 +1,9 @@
+VectorDataExtractROI
+Perform an extract ROI on the input vector data according to the input image extent
+Vector Data Manipulation
+QgsProcessingParameterVectorLayer|io.vd|Input Vector data|-1|None|False
+QgsProcessingParameterRasterLayer|io.in|Support image|None|False
+QgsProcessingParameterVectorDestination|io.out|Output Vector data|-1|None|False
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True

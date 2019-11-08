@@ -1,0 +1,12 @@
+SARDEMProjection|out
+Projects a DEM into SAR geometry.
+SAR
+QgsProcessingParameterRasterLayer|indem|Input DEM|None|False
+QgsProcessingParameterRasterLayer|insar|Input SAR image|None|False
+QgsProcessingParameterFile|infilemetadata|Input file to get precise metadata|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterBoolean|withh|Set H components into projection|false|True
+QgsProcessingParameterBoolean|withxyz|Set XYZ Cartesian components into projection|false|True
+QgsProcessingParameterBoolean|withsatpos|Set SatPos components into projection|false|True
+QgsProcessingParameterNumber|nodata|No Data values for the DEM|QgsProcessingParameterNumber.Integer|-32768|True
+QgsProcessingParameterRasterDestination|out|Output Vector Image|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

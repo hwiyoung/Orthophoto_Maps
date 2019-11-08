@@ -1,0 +1,12 @@
+Smoothing|out
+Apply a smoothing filter to an image
+Image Filtering
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+OTBParameterChoice|type|Smoothing Type|mean;gaussian;anidif|2|True
+QgsProcessingParameterNumber|type.mean.radius|Radius|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|type.gaussian.radius|Radius|QgsProcessingParameterNumber.Double|2|True
+QgsProcessingParameterNumber|type.anidif.timestep|Time Step|QgsProcessingParameterNumber.Double|0.125|True
+QgsProcessingParameterNumber|type.anidif.nbiter|Nb Iterations|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|type.anidif.conductance|Conductance|QgsProcessingParameterNumber.Double|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

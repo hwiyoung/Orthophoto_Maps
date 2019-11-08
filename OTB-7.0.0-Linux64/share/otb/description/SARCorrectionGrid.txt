@@ -1,0 +1,10 @@
+SARCorrectionGrid|out
+Computes SAR correction grid.
+SAR
+QgsProcessingParameterRasterLayer|indemgrid|Input DEM grid (Vector Image)|None|False
+QgsProcessingParameterRasterLayer|incorgrid|Input Correlation grid (Vector Image)|None|False
+QgsProcessingParameterRasterDestination|out|Output Correction grid (Vector Image)|None|False
+QgsProcessingParameterNumber|threshold|Threshold for correlation rate|QgsProcessingParameterNumber.Double|0.3|True
+QgsProcessingParameterNumber|gap|Maximum difference between input grid values and mean values|QgsProcessingParameterNumber.Double|0.7|True
+QgsProcessingParameterString|advantage|Give an advantage to DEM or Correlation Grid|None|False|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

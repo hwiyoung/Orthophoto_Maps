@@ -1,0 +1,13 @@
+MorphologicalMultiScaleDecomposition|outleveling
+Perform a geodesic morphology based image analysis on an input image channel
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|outconvex|Output Convex Image|None|False
+QgsProcessingParameterRasterDestination|outconcave|Output Concave Image|None|False
+QgsProcessingParameterRasterDestination|outleveling|Output Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+OTBParameterChoice|structype|Structuring Element Type|ball;cross|0|True
+QgsProcessingParameterNumber|radius|Initial radius|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|step|Radius step|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|levels|Number of levels use for multi scale|QgsProcessingParameterNumber.Integer|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

@@ -1,0 +1,12 @@
+Pansharpening|out
+Perform P+XS pansharpening
+Geometry
+QgsProcessingParameterRasterLayer|inp|Input PAN Image|None|False
+QgsProcessingParameterRasterLayer|inxs|Input XS Image|None|False
+QgsProcessingParameterRasterDestination|out|Output image|None|False
+OTBParameterChoice|method|Algorithm|rcs;lmvm;bayes|0|True
+QgsProcessingParameterNumber|method.lmvm.radiusx|X radius|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|method.lmvm.radiusy|Y radius|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|method.bayes.lambda|Weight|QgsProcessingParameterNumber.Double|0.9999|True
+QgsProcessingParameterNumber|method.bayes.s|S coefficient|QgsProcessingParameterNumber.Double|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

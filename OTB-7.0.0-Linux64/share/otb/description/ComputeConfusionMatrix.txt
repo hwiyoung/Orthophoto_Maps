@@ -1,0 +1,13 @@
+ComputeConfusionMatrix
+Computes the confusion matrix of a classification
+Learning
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterFileDestination|out|Matrix output|None|None|False
+OTBParameterChoice|format|set the output format to contingency table or confusion matrix|confusionmatrix;contingencytable|0|True
+OTBParameterChoice|ref|Ground truth|raster;vector|0|True
+QgsProcessingParameterRasterLayer|ref.raster.in|Input reference image|None|False
+QgsProcessingParameterNumber|ref.raster.nodata|Value for nodata pixels in the reference raster|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterFile|ref.vector.in|Input reference vector data|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterString|ref.vector.field|Field name|None|True
+QgsProcessingParameterNumber|ref.vector.nodata|Value for nodata pixels in the reference vector|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|nodatalabel|Value for nodata pixels in the input image|QgsProcessingParameterNumber.Integer|0|True

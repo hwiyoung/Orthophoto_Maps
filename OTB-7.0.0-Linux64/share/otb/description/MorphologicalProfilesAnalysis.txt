@@ -1,0 +1,13 @@
+MorphologicalProfilesAnalysis|out
+Performs morphological profiles analysis on an input image channel.
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+OTBParameterChoice|structype|Structuring Element Type|ball;cross|0|True
+QgsProcessingParameterNumber|size|Profile Size|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|radius|Initial radius|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|step|Radius step|QgsProcessingParameterNumber.Integer|1|True
+OTBParameterChoice|profile|Profile|opening;closing;derivativeopening;derivativeclosing;openingcharacteristics;closingcharacteristics;classification|0|True
+QgsProcessingParameterNumber|profile.classification.sigma|Sigma value for leveling tolerance|QgsProcessingParameterNumber.Double|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

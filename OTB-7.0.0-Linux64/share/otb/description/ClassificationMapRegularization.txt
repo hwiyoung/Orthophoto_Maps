@@ -1,0 +1,12 @@
+ClassificationMapRegularization|io.out
+Filters the input labeled image using Majority Voting in a ball shaped neighbordhood
+Learning
+QgsProcessingParameterRasterLayer|io.in|Input classification image|None|False
+QgsProcessingParameterRasterDestination|io.out|Output regularized image|None|False
+QgsProcessingParameterNumber|ip.radius|Structuring element radius (in pixels)|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterBoolean|ip.suvbool|Set tie pixels to undecided|false|True
+QgsProcessingParameterNumber|ip.nodatalabel|Label for the NoData class|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|ip.undecidedlabel|Label for the Undecided class|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterBoolean|ip.onlyisolatedpixels|Process isolated pixels only|false|True
+QgsProcessingParameterNumber|ip.isolatedthreshold|Threshold for isolated pixels|QgsProcessingParameterNumber.Integer|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

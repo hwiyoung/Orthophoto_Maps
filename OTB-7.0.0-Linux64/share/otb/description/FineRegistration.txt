@@ -1,0 +1,26 @@
+FineRegistration|out
+Estimate disparity map between two images.
+Stereo
+QgsProcessingParameterRasterLayer|ref|Reference Image|None|False
+QgsProcessingParameterRasterLayer|sec|Secondary Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|erx|Exploration Radius X|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|ery|Exploration Radius Y|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|mrx|Metric Radius X|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|mry|Metric Radius Y|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterRasterLayer|w|Image To Warp|None|True
+QgsProcessingParameterRasterDestination|wo|Output Warped Image|None|True
+QgsProcessingParameterNumber|cox|Coarse Offset X|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|coy|Coarse Offset Y|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|ssrx|Sub-Sampling Rate X|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|ssry|Sub-Sampling Rate Y|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|rgsx|Reference Gaussian Smoothing X|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|rgsy|Reference Gaussian Smoothing Y|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|sgsx|Secondary Gaussian Smoothing X|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|sgsy|Secondary Gaussian Smoothing Y|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterString|m|Metric|None|False|True
+QgsProcessingParameterNumber|spa|SubPixelAccuracy|QgsProcessingParameterNumber.Double|0.01|True
+QgsProcessingParameterNumber|cva|ConvergenceAccuracy|QgsProcessingParameterNumber.Double|0.01|True
+QgsProcessingParameterNumber|vmlt|Validity Mask Lower Threshold|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|vmut|Validity Mask Upper Threshold|QgsProcessingParameterNumber.Double|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

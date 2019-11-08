@@ -1,0 +1,6 @@
+ConcatenateImages|out
+Concatenate a list of images of the same size into a single multi-channel image.
+Image Manipulation
+QgsProcessingParameterMultipleLayers|il|Input images list|3|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

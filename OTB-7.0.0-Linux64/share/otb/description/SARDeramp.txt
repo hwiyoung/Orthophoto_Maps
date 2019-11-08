@@ -1,0 +1,12 @@
+SARDeramp|out
+Deramping/Reramping of S1 IW Burst.
+SAR
+QgsProcessingParameterRasterLayer|in|Input burst|None|False
+QgsProcessingParameterRasterLayer|inslave|Input SAR slave image (for interferometry processing|None|True
+QgsProcessingParameterRasterDestination|out|Output burst|None|False
+QgsProcessingParameterRasterLayer|ingrid|Input deformation grid|None|True
+QgsProcessingParameterNumber|gridsteprange|Grid Step for range dimension into SLC geometry|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|gridstepazimut|Grid Step for azimut dimension into SLC geometry|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterBoolean|reramp|Activate Reramping mode|false|True
+QgsProcessingParameterBoolean|shift|Activate Shift mode (To reramp/deramp accordingly a deformation grid)|false|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

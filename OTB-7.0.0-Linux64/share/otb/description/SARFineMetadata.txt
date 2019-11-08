@@ -1,0 +1,10 @@
+SARFineMetadata|out
+SAR metadata correction.
+SAR
+QgsProcessingParameterRasterLayer|ingrid|Input correlation grid|None|False
+QgsProcessingParameterRasterLayer|insar|Input SAR image|None|False
+QgsProcessingParameterFileDestination|outfile|Output file to store new metadata values|None|None|True
+QgsProcessingParameterNumber|stepmax|Max step for histogram|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|threshold|Threshold on correlation rate|QgsProcessingParameterNumber.Double|0.3|True
+QgsProcessingParameterRasterDestination|out|Output image with precise metadata|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

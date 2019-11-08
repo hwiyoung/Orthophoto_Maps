@@ -1,0 +1,6 @@
+SplitImage|out
+Split a N multiband image into N images.
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

@@ -1,0 +1,7 @@
+LocalRxDetection
+Performs local Rx score computation on an hyperspectral image.
+Hyperspectral
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|True
+QgsProcessingParameterNumber|ir|Internal radius|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|er|External radius|QgsProcessingParameterNumber.Integer|5|True

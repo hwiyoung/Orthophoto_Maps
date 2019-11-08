@@ -1,0 +1,27 @@
+ExtractROI|out
+Extract a ROI defined by the user.
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+OTBParameterChoice|mode|Extraction mode|standard;fit;extent;radius|0|True
+QgsProcessingParameterRasterLayer|mode.fit.im|Reference image|None|False
+QgsProcessingParameterVectorLayer|mode.fit.vect|Reference vector|-1|None|False
+QgsProcessingParameterNumber|mode.extent.ulx|X coordinate of the Upper left corner|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|mode.extent.uly|Y coordinate of Upper Left corner point|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|mode.extent.lrx|X coordinate of Lower Right corner point|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|mode.extent.lry|Y coordinate of Lower Right corner point|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|mode.extent.unit|Unit|pxl;phy;lonlat|0|True
+QgsProcessingParameterNumber|mode.radius.r|Radius|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|mode.radius.unitr|Radius unit|pxl;phy|0|True
+QgsProcessingParameterNumber|mode.radius.cx|X coordinate of the center|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|mode.radius.cy|Y coordinate of the center|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|mode.radius.unitc|Center unit|pxl;phy;lonlat|0|True
+QgsProcessingParameterNumber|startx|Start X|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|starty|Start Y|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|sizex|Size X|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|sizey|Size Y|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterString|cl|Output Image channels|None|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

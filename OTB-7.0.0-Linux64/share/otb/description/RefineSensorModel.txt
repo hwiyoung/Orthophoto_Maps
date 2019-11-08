@@ -1,0 +1,15 @@
+RefineSensorModel
+Perform least-square fit of a sensor model to a set of tie points
+Geometry
+QgsProcessingParameterFile|ingeom|Input geom file|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|outgeom|Output geom file|None|None|False
+QgsProcessingParameterFile|inpoints|Input file containing tie points|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|outstat|Output file containing output precision statistics|None|None|True
+QgsProcessingParameterFileDestination|outvector|Output vector file with residues|None|None|True
+OTBParameterChoice|map|Map Projection|utm;lambert2;lambert93;wgs;epsg|0|True
+QgsProcessingParameterNumber|map.utm.zone|Zone number|QgsProcessingParameterNumber.Integer|31|True
+QgsProcessingParameterBoolean|map.utm.northhem|Northern Hemisphere|false|True
+QgsProcessingParameterCrs|map.epsg.code|EPSG Code|ProjectCrs|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True

@@ -1,0 +1,15 @@
+Despeckle|out
+Perform speckle noise reduction on SAR image.
+Image Filtering
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+OTBParameterChoice|filter|Speckle filtering method|lee;frost;gammamap;kuan|0|True
+QgsProcessingParameterNumber|filter.lee.rad|Radius|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|filter.lee.nblooks|Number of looks|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|filter.frost.rad|Radius|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|filter.frost.deramp|Deramp factor|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|filter.gammamap.rad|Radius|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|filter.gammamap.nblooks|Number of looks|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|filter.kuan.rad|Radius|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|filter.kuan.nblooks|Number of looks|QgsProcessingParameterNumber.Double|0|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

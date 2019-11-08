@@ -1,0 +1,21 @@
+DimensionalityReduction
+Perform Dimension reduction of the input image.
+Image Filtering
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|True
+OTBParameterChoice|rescale|Rescale Output|no;minmax|0|True
+QgsProcessingParameterNumber|rescale.minmax.outmin|Output min value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|rescale.minmax.outmax|Output max value|QgsProcessingParameterNumber.Double|255|True
+QgsProcessingParameterRasterDestination|outinv| Inverse Output Image|None|True
+OTBParameterChoice|method|Algorithm|pca;napca;maf;ica|0|True
+QgsProcessingParameterFileDestination|method.pca.outeigenvalues|Output file containing eigenvalues (txt format)|None|None|True
+QgsProcessingParameterBoolean|method.pca.whiten|Perform pca whitening|true|True
+QgsProcessingParameterNumber|method.napca.radiusx|Set the x radius of the sliding window|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|method.napca.radiusy|Set the y radius of the sliding window|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|method.ica.iter|number of iterations|QgsProcessingParameterNumber.Integer|20|True
+QgsProcessingParameterNumber|method.ica.mu|Give the increment weight of W in [0, 1]|QgsProcessingParameterNumber.Double|1|True
+OTBParameterChoice|method.ica.g|Nonlinearity|tanh;exp;u3|0|True
+QgsProcessingParameterNumber|nbcomp|Number of Components|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterBoolean|normalize|Center and reduce data|false|True
+QgsProcessingParameterFileDestination|outmatrix|Transformation matrix output (text format)|None|None|True
+QgsProcessingParameterNumber|bv|Background Value|QgsProcessingParameterNumber.Double|0|True

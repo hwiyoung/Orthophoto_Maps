@@ -1,0 +1,15 @@
+LargeScaleMeanShift|mode.raster.out
+Large-scale segmentation using MeanShift
+Segmentation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterNumber|spatialr|Spatial radius|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|ranger|Range radius|QgsProcessingParameterNumber.Double|15|True
+QgsProcessingParameterNumber|minsize|Minimum Segment Size|QgsProcessingParameterNumber.Integer|50|True
+QgsProcessingParameterNumber|tilesizex|Size of tiles in pixel (X-axis)|QgsProcessingParameterNumber.Integer|500|True
+QgsProcessingParameterNumber|tilesizey|Size of tiles in pixel (Y-axis)|QgsProcessingParameterNumber.Integer|500|True
+OTBParameterChoice|mode|Output mode|vector;raster|0|True
+QgsProcessingParameterRasterLayer|mode.vector.imfield|Support image for field computation|None|True
+QgsProcessingParameterFileDestination|mode.vector.out|Output GIS vector file|None|None|False
+QgsProcessingParameterRasterDestination|mode.raster.out|The output raster image|None|False
+QgsProcessingParameterBoolean|cleanup|Temporary files cleaning|true|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

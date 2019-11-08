@@ -1,0 +1,10 @@
+MultiResolutionPyramid|out
+Build a multi-resolution pyramid of the image.
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|level|Number Of Levels|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|sfactor|Subsampling factor|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|vfactor|Variance factor|QgsProcessingParameterNumber.Double|0.6|True
+QgsProcessingParameterBoolean|fast|Use Fast Scheme|false|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

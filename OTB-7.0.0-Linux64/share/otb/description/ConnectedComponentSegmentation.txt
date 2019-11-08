@@ -1,0 +1,12 @@
+ConnectedComponentSegmentation
+Connected component segmentation and object based image filtering of the input image according to user-defined criterions.
+Segmentation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterVectorDestination|out|Output Shape|-1|None|False
+QgsProcessingParameterString|mask|Mask expression|None|False|True
+QgsProcessingParameterString|expr|Connected Component Expression|None|False|False
+QgsProcessingParameterNumber|minsize|Minimum Object Size|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterString|obia|OBIA Expression|None|False|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True

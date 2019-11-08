@@ -1,0 +1,7 @@
+SARCorrelationRough
+Computes SAR correlation shift (rough shifts).
+SAR
+QgsProcessingParameterRasterLayer|inmaster|Input Master image (real image)|None|False
+QgsProcessingParameterRasterLayer|inslave|Input Slave image (real image)|None|False
+QgsProcessingParameterNumber|mlran|MultiLook factor on distance|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlazi|MultiLook factor on azimut|QgsProcessingParameterNumber.Integer|3|True

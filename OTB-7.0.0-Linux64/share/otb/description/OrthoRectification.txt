@@ -1,0 +1,29 @@
+OrthoRectification|io.out
+This application allows ortho-rectifying optical and radar images from supported sensors.
+Geometry
+QgsProcessingParameterRasterLayer|io.in|Input Image|None|False
+QgsProcessingParameterRasterDestination|io.out|Output Image|None|False
+OTBParameterChoice|map|Map Projection|utm;lambert2;lambert93;wgs;epsg|0|True
+QgsProcessingParameterNumber|map.utm.zone|Zone number|QgsProcessingParameterNumber.Integer|31|True
+QgsProcessingParameterBoolean|map.utm.northhem|Northern Hemisphere|false|True
+QgsProcessingParameterCrs|map.epsg.code|EPSG Code|ProjectCrs|True
+OTBParameterChoice|outputs.mode|Parameters estimation modes|auto;autosize;autospacing;outputroi;orthofit|0|True
+QgsProcessingParameterNumber|outputs.ulx|Upper Left X|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|outputs.uly|Upper Left Y|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|outputs.sizex|Size X|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|outputs.sizey|Size Y|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|outputs.spacingx|Pixel Size X|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|outputs.spacingy|Pixel Size Y|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|outputs.lrx|Lower right X|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|outputs.lry|Lower right Y|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterRasterLayer|outputs.ortho|Model ortho-image|None|True
+QgsProcessingParameterBoolean|outputs.isotropic|Force isotropic spacing by default|true|True
+QgsProcessingParameterNumber|outputs.default|Default pixel value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|interpolator|Interpolation|bco;nn;linear|0|True
+QgsProcessingParameterNumber|interpolator.bco.radius|Radius for bicubic interpolation|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|opt.rpc|RPC modeling (points per axis)|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|opt.gridspacing|Resampling grid spacing|QgsProcessingParameterNumber.Double|4|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

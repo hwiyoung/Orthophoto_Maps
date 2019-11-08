@@ -1,0 +1,8 @@
+LocalStatisticExtraction|out
+Computes local statistical moments on every pixel in the selected channel of the input image
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Feature Output Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|radius|Neighborhood radius|QgsProcessingParameterNumber.Integer|3|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

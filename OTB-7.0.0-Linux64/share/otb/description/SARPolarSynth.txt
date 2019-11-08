@@ -1,0 +1,13 @@
+SARPolarSynth|out
+Gives, for each pixel, the power that would have been received by a SAR system with a basis different from the classical (H,V) one (polarimetric synthetis).
+SAR
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|psii|psii|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|khii|khii|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|psir|psir|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|khir|khir|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|emissionh|Emission H|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|emissionv|Emission V|QgsProcessingParameterNumber.Integer|0|True
+OTBParameterChoice|mode|Forced mode|none;co;cross|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

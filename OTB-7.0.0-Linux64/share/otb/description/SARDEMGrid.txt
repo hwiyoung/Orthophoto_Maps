@@ -1,0 +1,14 @@
+SARDEMGrid|out
+Computes deformation DEM grid.
+SAR
+QgsProcessingParameterRasterLayer|insarmaster|Input SAR Master image|None|False
+QgsProcessingParameterRasterLayer|insarslave|Input SAR Slave image|None|False
+QgsProcessingParameterRasterLayer|indem|Input DEM|None|False
+QgsProcessingParameterRasterLayer|indemprojmaster|Input vector of DEM projected into SAR Master geometry|None|True
+QgsProcessingParameterRasterLayer|indemprojslave|Input vector of DEM projected into SAR Slave geometry|None|True
+QgsProcessingParameterRasterDestination|out|Output DEM grid (Vector Image)|None|False
+QgsProcessingParameterNumber|mlran|MultiLook factor on distance|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlazi|MultiLook factor on azimut|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|gridsteprange|Grid step for range dimension (into SLC/SAR geometry)|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|gridstepazimut|Grid step for azimut dimension (into SLC/SAR geometry)|QgsProcessingParameterNumber.Integer|150|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

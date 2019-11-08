@@ -1,0 +1,65 @@
+TrainImagesClassifier
+Train a classifier from multiple pairs of images and training vector data.
+Learning
+QgsProcessingParameterMultipleLayers|io.il|Input Image List|3|None|False
+QgsProcessingParameterMultipleLayers|io.vd|Input Vector Data List|-1|None|False
+QgsProcessingParameterMultipleLayers|io.valid|Validation Vector Data List|-1|None|True
+QgsProcessingParameterFile|io.imstat|Input XML image statistics file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterFileDestination|io.out|Output model|None|None|False
+QgsProcessingParameterFileDestination|io.confmatout|Output confusion matrix or contingency table|None|None|True
+QgsProcessingParameterBoolean|cleanup|Temporary files cleaning|true|True
+QgsProcessingParameterNumber|sample.mt|Maximum training sample size per class|QgsProcessingParameterNumber.Integer|1000|True
+QgsProcessingParameterNumber|sample.mv|Maximum validation sample size per class|QgsProcessingParameterNumber.Integer|1000|True
+QgsProcessingParameterNumber|sample.bm|Bound sample number by minimum|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|sample.vtr|Training and validation sample ratio|QgsProcessingParameterNumber.Double|0.5|True
+QgsProcessingParameterString|sample.vfn|Field containing the class integer label for supervision|None|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|classifier|Classifier to use for the training|libsvm;boost;dt;ann;bayes;rf;knn;sharkrf;sharkkm|0|True
+OTBParameterChoice|classifier.libsvm.k|SVM Kernel Type|linear;rbf;poly;sigmoid|0|True
+OTBParameterChoice|classifier.libsvm.m|SVM Model Type|csvc;nusvc;oneclass|0|True
+QgsProcessingParameterNumber|classifier.libsvm.c|Cost parameter C|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|classifier.libsvm.nu|Cost parameter Nu|QgsProcessingParameterNumber.Double|0.5|True
+QgsProcessingParameterBoolean|classifier.libsvm.opt|Parameters optimization|false|True
+QgsProcessingParameterBoolean|classifier.libsvm.prob|Probability estimation|false|True
+OTBParameterChoice|classifier.boost.t|Boost Type|discrete;real;logit;gentle|1|True
+QgsProcessingParameterNumber|classifier.boost.w|Weak count|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterNumber|classifier.boost.r|Weight Trim Rate|QgsProcessingParameterNumber.Double|0.95|True
+QgsProcessingParameterNumber|classifier.boost.m|Maximum depth of the tree|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|classifier.dt.max|Maximum depth of the tree|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|classifier.dt.min|Minimum number of samples in each node|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|classifier.dt.ra|Termination criteria for regression tree|QgsProcessingParameterNumber.Double|0.01|True
+QgsProcessingParameterNumber|classifier.dt.cat|Cluster possible values of a categorical variable into K <= cat clusters to find a suboptimal split|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterBoolean|classifier.dt.r|Set Use1seRule flag to false|false|True
+QgsProcessingParameterBoolean|classifier.dt.t|Set TruncatePrunedTree flag to false|false|True
+OTBParameterChoice|classifier.ann.t|Train Method Type|back;reg|1|True
+QgsProcessingParameterString|classifier.ann.sizes|Number of neurons in each intermediate layer|None|True|True
+OTBParameterChoice|classifier.ann.f|Neuron activation function type|ident;sig;gau|1|True
+QgsProcessingParameterNumber|classifier.ann.a|Alpha parameter of the activation function|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|classifier.ann.b|Beta parameter of the activation function|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|classifier.ann.bpdw|Strength of the weight gradient term in the BACKPROP method|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|classifier.ann.bpms|Strength of the momentum term (the difference between weights on the 2 previous iterations)|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|classifier.ann.rdw|Initial value Delta_0 of update-values Delta_{ij} in RPROP method|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|classifier.ann.rdwm|Update-values lower limit Delta_{min} in RPROP method|QgsProcessingParameterNumber.Double|1e-07|True
+OTBParameterChoice|classifier.ann.term|Termination criteria|iter;eps;all|2|True
+QgsProcessingParameterNumber|classifier.ann.eps|Epsilon value used in the Termination criteria|QgsProcessingParameterNumber.Double|0.01|True
+QgsProcessingParameterNumber|classifier.ann.iter|Maximum number of iterations used in the Termination criteria|QgsProcessingParameterNumber.Integer|1000|True
+QgsProcessingParameterNumber|classifier.rf.max|Maximum depth of the tree|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|classifier.rf.min|Minimum number of samples in each node|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|classifier.rf.ra|Termination Criteria for regression tree|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|classifier.rf.cat|Cluster possible values of a categorical variable into K <= cat clusters to find a suboptimal split|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|classifier.rf.var|Size of the randomly selected subset of features at each tree node|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|classifier.rf.nbtrees|Maximum number of trees in the forest|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterNumber|classifier.rf.acc|Sufficient accuracy (OOB error)|QgsProcessingParameterNumber.Double|0.01|True
+QgsProcessingParameterNumber|classifier.knn.k|Number of Neighbors|QgsProcessingParameterNumber.Integer|32|True
+QgsProcessingParameterNumber|classifier.sharkrf.nbtrees|Maximum number of trees in the forest|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterNumber|classifier.sharkrf.nodesize|Min size of the node for a split|QgsProcessingParameterNumber.Integer|25|True
+QgsProcessingParameterNumber|classifier.sharkrf.mtry|Number of features tested at each node|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|classifier.sharkrf.oobr|Out of bound ratio|QgsProcessingParameterNumber.Double|0.66|True
+QgsProcessingParameterNumber|classifier.sharkkm.maxiter|Maximum number of iterations for the kmeans algorithm|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|classifier.sharkkm.k|Number of classes for the kmeans algorithm|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterFile|classifier.sharkkm.centroids.in|User definied input centroids|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFile|classifier.sharkkm.centroids.stats|Statistics file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterFileDestination|classifier.sharkkm.centroids.out|Output centroids text file|None|None|True
+QgsProcessingParameterNumber|rand|Random seed|QgsProcessingParameterNumber.Integer|0|True

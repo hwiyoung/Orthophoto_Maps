@@ -1,0 +1,7 @@
+MultivariateAlterationDetector|out
+Change detection by Multivariate Alteration Detector (MAD) algorithm
+Change Detection
+QgsProcessingParameterRasterLayer|in1|Input Image 1|None|False
+QgsProcessingParameterRasterLayer|in2|Input Image 2|None|False
+QgsProcessingParameterRasterDestination|out|Change Map|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

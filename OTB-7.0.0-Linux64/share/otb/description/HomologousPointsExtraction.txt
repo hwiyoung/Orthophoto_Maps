@@ -1,0 +1,24 @@
+HomologousPointsExtraction
+Compute homologous points between images using keypoints
+Feature Extraction
+QgsProcessingParameterRasterLayer|in1|Input Image 1|None|False
+QgsProcessingParameterNumber|band1|Input band 1|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterRasterLayer|in2|Input Image 2|None|False
+QgsProcessingParameterNumber|band2|Input band 2|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterFileDestination|out|Output file with tie points|None|None|False
+QgsProcessingParameterFileDestination|outvector|Output vector file with tie points|None|None|True
+OTBParameterChoice|algorithm|Keypoints detection algorithm|surf;sift|0|True
+QgsProcessingParameterNumber|threshold|Distance threshold for matching|QgsProcessingParameterNumber.Double|0.6|True
+QgsProcessingParameterBoolean|backmatching|Use back-matching to filter matches|false|True
+OTBParameterChoice|mode|Keypoints search mode|full;geobins|0|True
+QgsProcessingParameterNumber|mode.geobins.binsize|Size of bin|QgsProcessingParameterNumber.Integer|256|True
+QgsProcessingParameterNumber|mode.geobins.binsizey|Size of bin (y direction)|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|mode.geobins.binstep|Steps between bins|QgsProcessingParameterNumber.Integer|256|True
+QgsProcessingParameterNumber|mode.geobins.binstepy|Steps between bins (y direction)|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|mode.geobins.margin|Margin from image border to start/end bins (in pixels)|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|precision|Estimated precision of the colocalisation function (in pixels)|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterBoolean|mfilter|Filter points according to geographical or sensor based colocalisation|false|True
+QgsProcessingParameterBoolean|2wgs84|If enabled, points from second image will be exported in WGS84|false|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True

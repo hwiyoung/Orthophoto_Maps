@@ -1,0 +1,18 @@
+DynamicConvert|out
+Change the pixel type and rescale the image's dynamic
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+OTBParameterChoice|type|Rescale type|linear;log2|0|True
+QgsProcessingParameterNumber|type.linear.gamma|Gamma correction factor|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterRasterLayer|mask|Input mask|None|True
+QgsProcessingParameterNumber|quantile.high|High cut quantile|QgsProcessingParameterNumber.Double|2|True
+QgsProcessingParameterNumber|quantile.low|Low cut quantile|QgsProcessingParameterNumber.Double|2|True
+OTBParameterChoice|channels|Channels selection|all;grayscale;rgb|0|True
+QgsProcessingParameterNumber|channels.grayscale.channel|Grayscale channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|channels.rgb.red|Red Channel|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|channels.rgb.green|Green Channel|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|channels.rgb.blue|Blue Channel|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|outmin|Output min value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|outmax|Output max value|QgsProcessingParameterNumber.Double|255|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

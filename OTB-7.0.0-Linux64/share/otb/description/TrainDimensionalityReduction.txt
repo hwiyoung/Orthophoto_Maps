@@ -1,0 +1,25 @@
+TrainDimensionalityReduction
+Train a dimensionality reduction model
+Learning
+QgsProcessingParameterVectorLayer|io.vd|Input Vector Data|-1|None|False
+QgsProcessingParameterFileDestination|io.out|Output model|None|None|False
+QgsProcessingParameterFile|io.stats|Input XML image statistics file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterString|feat|Field names to be used for training|None|True|True
+OTBParameterChoice|algorithm|algorithm to use for the training|som;autoencoder;pca|0|True
+QgsProcessingParameterString|algorithm.som.s|Map size|None|True|True
+QgsProcessingParameterString|algorithm.som.n|Neighborhood sizes|None|True|True
+QgsProcessingParameterNumber|algorithm.som.ni|NumberIteration|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|algorithm.som.bi|BetaInit|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|algorithm.som.bf|BetaFinal|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|algorithm.som.iv|InitialValue|QgsProcessingParameterNumber.Double|10|True
+QgsProcessingParameterNumber|algorithm.autoencoder.nbiter|Maximum number of iterations during training|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterNumber|algorithm.autoencoder.nbiterfinetuning|Maximum number of iterations during training|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|algorithm.autoencoder.epsilon|Epsilon|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|algorithm.autoencoder.initfactor|Weight initialization factor|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterString|algorithm.autoencoder.nbneuron|Size|None|True|True
+QgsProcessingParameterString|algorithm.autoencoder.regularization|Strength of the regularization|None|True|True
+QgsProcessingParameterString|algorithm.autoencoder.noise|Strength of the noise|None|True|True
+QgsProcessingParameterString|algorithm.autoencoder.rho|Sparsity parameter|None|True|True
+QgsProcessingParameterString|algorithm.autoencoder.beta|Sparsity regularization strength|None|True|True
+QgsProcessingParameterFileDestination|algorithm.autoencoder.learningcurve|Learning curve|None|None|True
+QgsProcessingParameterNumber|algorithm.pca.dim|Dimension of the output of the pca transformation|QgsProcessingParameterNumber.Integer|10|True

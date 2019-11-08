@@ -1,0 +1,12 @@
+PolygonClassStatistics
+Computes statistics on a training polygon set.
+Learning
+QgsProcessingParameterRasterLayer|in|Input image|None|False
+QgsProcessingParameterRasterLayer|mask|Input validity mask|None|True
+QgsProcessingParameterFile|vec|Input vectors|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|out|Output XML statistics file|None|None|False
+QgsProcessingParameterString|field|Field Name|None|True
+QgsProcessingParameterNumber|layer|Layer Index|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True

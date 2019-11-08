@@ -1,0 +1,15 @@
+HaralickTextureExtraction
+Computes Haralick textural features on the selected channel of the input image
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|step|Computation step|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|parameters.xrad|X Radius|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|parameters.yrad|Y Radius|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|parameters.xoff|X Offset|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|parameters.yoff|Y Offset|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|parameters.min|Image Minimum|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|parameters.max|Image Maximum|QgsProcessingParameterNumber.Double|255|True
+QgsProcessingParameterNumber|parameters.nbbin|Histogram number of bin|QgsProcessingParameterNumber.Integer|8|True
+OTBParameterChoice|texture|Texture Set Selection|simple;advanced;higher|0|True
+QgsProcessingParameterRasterDestination|out|Output Image|None|True

@@ -1,0 +1,12 @@
+RadiometricIndices|out
+Compute radiometric indices.
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|channels.blue|Blue Channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|channels.green|Green Channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|channels.red|Red Channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|channels.nir|NIR Channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|channels.mir|Mir Channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterString|list|Available Radiometric Indices|None|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

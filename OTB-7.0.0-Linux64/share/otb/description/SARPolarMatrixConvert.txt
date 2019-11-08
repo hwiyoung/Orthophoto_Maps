@@ -1,0 +1,12 @@
+SARPolarMatrixConvert
+This applications allows converting classical polarimetric matrices to each other.
+SAR
+QgsProcessingParameterRasterLayer|inc|Input multi-band complex image|None|True
+QgsProcessingParameterRasterLayer|inf|Input multi-band real image|None|True
+QgsProcessingParameterRasterLayer|inhh|Input one-band complex image (HH)|None|True
+QgsProcessingParameterRasterLayer|inhv|Input one-band complex image (HV)|None|True
+QgsProcessingParameterRasterLayer|invh|Input one-band complex image (VH)|None|True
+QgsProcessingParameterRasterLayer|invv|Input one-band complex image (VV)|None|True
+QgsProcessingParameterRasterDestination|outc|Output Complex Image|None|True
+QgsProcessingParameterRasterDestination|outf|Output Real Image|None|True
+OTBParameterChoice|conv|Conversion|msinclairtocoherency;msinclairtocovariance;msinclairtocircovariance;mcoherencytomueller;mcovariancetocoherencydegree;mcovariancetocoherency;mlinearcovariancetocircularcovariance;muellertomcovariance;bsinclairtocoherency;bsinclairtocovariance;bsinclairtocircovariance;sinclairtomueller;muellertopoldegandpower|0|True

@@ -1,0 +1,8 @@
+TileFusion|out
+Fusion of an image made of several tile files.
+Image Manipulation
+QgsProcessingParameterMultipleLayers|il|Input Tile Images|3|None|False
+QgsProcessingParameterNumber|cols|Number of tile columns|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|rows|Number of tile rows|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

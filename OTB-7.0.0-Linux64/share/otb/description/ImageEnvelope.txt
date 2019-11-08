@@ -1,0 +1,10 @@
+ImageEnvelope
+Extracts an image envelope.
+Geometry
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterVectorDestination|out|Output Vector Data|-1|None|False
+QgsProcessingParameterNumber|sr|Sampling Rate|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterString|proj|Projection|None|False|True

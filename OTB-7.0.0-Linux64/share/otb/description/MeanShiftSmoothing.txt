@@ -1,0 +1,13 @@
+MeanShiftSmoothing|fout
+This application smooths an image using the MeanShift algorithm.
+Image Filtering
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|fout|Spectral filtered output|None|False
+QgsProcessingParameterRasterDestination|foutpos|Spatial filtered displacement output|None|True
+QgsProcessingParameterNumber|spatialr|Spatial radius|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|ranger|Range radius|QgsProcessingParameterNumber.Double|15|True
+QgsProcessingParameterNumber|thres|Mode convergence threshold|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|maxiter|Maximum number of iterations|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterNumber|rangeramp|Range radius ramp coefficient|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterBoolean|modesearch|Mode search|false|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

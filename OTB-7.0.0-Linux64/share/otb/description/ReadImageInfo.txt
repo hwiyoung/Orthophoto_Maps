@@ -1,0 +1,6 @@
+ReadImageInfo
+Get information about the image
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterBoolean|keywordlist|Display the OSSIM keywordlist|false|True
+QgsProcessingParameterFileDestination|outkwl|Write the OSSIM keywordlist to a geom file|None|None|True

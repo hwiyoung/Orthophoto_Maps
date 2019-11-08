@@ -1,0 +1,18 @@
+RigidTransformResample|out
+Resample an image with a rigid transform
+Geometry
+QgsProcessingParameterRasterLayer|in|Input image|None|False
+QgsProcessingParameterRasterDestination|out|Output image|None|False
+OTBParameterChoice|transform.type|Type of transformation|id;translation;rotation|0|True
+QgsProcessingParameterNumber|transform.type.id.scalex|X scaling|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|transform.type.id.scaley|Y scaling|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|transform.type.translation.tx|The X translation (in physical units)|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|transform.type.translation.ty|The Y translation (in physical units)|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|transform.type.translation.scalex|X scaling|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|transform.type.translation.scaley|Y scaling|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|transform.type.rotation.angle|Rotation angle|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|transform.type.rotation.scalex|X scaling|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|transform.type.rotation.scaley|Y scaling|QgsProcessingParameterNumber.Double|1|True
+OTBParameterChoice|interpolator|Interpolation|nn;linear;bco|2|True
+QgsProcessingParameterNumber|interpolator.bco.radius|Radius for bicubic interpolation|QgsProcessingParameterNumber.Integer|2|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

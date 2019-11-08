@@ -1,0 +1,9 @@
+HooverCompareSegmentation
+Compare two segmentations with Hoover metrics
+Segmentation
+QgsProcessingParameterRasterLayer|ingt|Input ground truth|None|False
+QgsProcessingParameterRasterLayer|inms|Input machine segmentation|None|False
+QgsProcessingParameterNumber|bg|Background label|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|th|Overlapping threshold|QgsProcessingParameterNumber.Double|0.75|True
+QgsProcessingParameterRasterDestination|outgt|Colored ground truth output|None|True
+QgsProcessingParameterRasterDestination|outms|Colored machine segmentation output|None|True

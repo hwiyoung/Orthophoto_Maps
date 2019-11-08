@@ -1,0 +1,10 @@
+MorphologicalClassification|out
+Performs morphological convex, concave and flat classification on an input image channel
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+OTBParameterChoice|structype|Structuring Element Type|ball;cross|0|True
+QgsProcessingParameterNumber|radius|Radius|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|sigma|Sigma value for leveling tolerance|QgsProcessingParameterNumber.Double|0.5|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

@@ -1,0 +1,5 @@
+ConcatenateVectorData
+Concatenate vector data files
+Vector Data Manipulation
+QgsProcessingParameterMultipleLayers|vd|Input vector files|-1|None|False
+QgsProcessingParameterVectorDestination|out|Concatenated output|-1|None|False

@@ -1,0 +1,9 @@
+PixelValue
+Get the value of a pixel.
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterNumber|coordx|X coordinate|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|coordy|Y coordinate|QgsProcessingParameterNumber.Double|0|False
+OTBParameterChoice|mode|Coordinate system used to designate the pixel|index;physical;epsg|0|True
+QgsProcessingParameterCrs|mode.epsg.code|EPSG code|ProjectCrs|True
+QgsProcessingParameterString|cl|Channels|None|True

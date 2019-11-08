@@ -1,0 +1,12 @@
+SARCartesianMeanEstimation|out
+SAR Cartesian mean estimation thanks to the associated DEM.
+SAR
+QgsProcessingParameterRasterLayer|indemproj|Input vector of DEM projected into SAR geometry|None|False
+QgsProcessingParameterRasterLayer|indem|Input DEM|None|False
+QgsProcessingParameterRasterLayer|insar|Input SAR image|None|False
+QgsProcessingParameterNumber|indirectiondemc|Range direction for DEM scan|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|indirectiondeml|Azimut direction for DEM scan|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|mlran|Averaging on distance (output geometry)|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlazi|Averaging on azimut (output geometry)|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterRasterDestination|out|Output cartesian (mean) Image for DEM Projection|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

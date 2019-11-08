@@ -1,0 +1,13 @@
+ManageNoData|out
+Manage No-Data
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterBoolean|usenan|Consider NaN as no-data|false|True
+OTBParameterChoice|mode|No-data handling mode|buildmask;changevalue;apply|0|True
+QgsProcessingParameterNumber|mode.buildmask.inv|Inside Value|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|mode.buildmask.outv|Outside Value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|mode.changevalue.newv|The new no-data value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterRasterLayer|mode.apply.mask|Mask image|None|False
+QgsProcessingParameterNumber|mode.apply.ndval|Nodata value used|QgsProcessingParameterNumber.Double|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

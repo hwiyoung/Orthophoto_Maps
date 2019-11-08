@@ -1,0 +1,17 @@
+DisparityMapToElevationMap|io.out
+Projects a disparity map into a regular elevation map.
+Stereo
+QgsProcessingParameterRasterLayer|io.in|Input disparity map|None|False
+QgsProcessingParameterRasterLayer|io.left|Left sensor image|None|False
+QgsProcessingParameterRasterLayer|io.right|Right sensor image|None|False
+QgsProcessingParameterRasterLayer|io.lgrid|Left Grid|None|False
+QgsProcessingParameterRasterLayer|io.rgrid|Right Grid|None|False
+QgsProcessingParameterRasterDestination|io.out|Output elevation map|None|False
+QgsProcessingParameterRasterLayer|io.mask|Disparity mask|None|True
+QgsProcessingParameterNumber|step|DEM step|QgsProcessingParameterNumber.Double|5|True
+QgsProcessingParameterNumber|hmin|Minimum elevation expected|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|hmax|Maximum elevation expected|QgsProcessingParameterNumber.Double|100|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

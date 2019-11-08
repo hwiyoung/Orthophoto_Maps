@@ -1,0 +1,9 @@
+ImageRegression|out
+Performs a prediction of the input image according to a regression model file.
+Learning
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterLayer|mask|Input Mask|None|True
+QgsProcessingParameterFile|model|Model file|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFile|imstat|Statistics file|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

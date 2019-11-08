@@ -1,0 +1,7 @@
+VectorDataSetField
+Set a field in vector data.
+Vector Data Manipulation
+QgsProcessingParameterVectorLayer|in|Input|-1|None|False
+QgsProcessingParameterVectorDestination|out|Output|-1|None|False
+QgsProcessingParameterString|fn|Field|None|False|False
+QgsProcessingParameterString|fv|Value|None|False|False

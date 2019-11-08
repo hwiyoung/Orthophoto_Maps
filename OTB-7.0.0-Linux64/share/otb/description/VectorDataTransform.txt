@@ -1,0 +1,12 @@
+VectorDataTransform
+Apply a transform to each vertex of the input VectorData
+Vector Data Manipulation
+QgsProcessingParameterVectorLayer|vd|Input Vector data|-1|None|False
+QgsProcessingParameterVectorDestination|out|Output Vector data|-1|None|False
+QgsProcessingParameterRasterLayer|in|Support image|None|False
+QgsProcessingParameterNumber|transform.tx|X Translation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|transform.ty|Y Translation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|transform.ro|Rotation Angle|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|transform.centerx|Center X|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|transform.centery|Center Y|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|transform.scale|Scale|QgsProcessingParameterNumber.Double|1|True

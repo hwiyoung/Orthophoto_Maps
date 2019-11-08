@@ -1,0 +1,5 @@
+SARDoppler0
+SAR Doppler 0 calculation.
+SAR
+QgsProcessingParameterRasterLayer|insar|Input image|None|False
+QgsProcessingParameterFileDestination|outfile|Output file to store Doppler 0 value|None|None|True

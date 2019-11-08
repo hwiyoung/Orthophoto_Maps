@@ -1,0 +1,22 @@
+SampleSelection
+Selects samples from a training vector data set.
+Learning
+QgsProcessingParameterRasterLayer|in|InputImage|None|False
+QgsProcessingParameterRasterLayer|mask|InputMask|None|True
+QgsProcessingParameterFile|vec|Input vectors|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|out|Output vectors|None|None|False
+QgsProcessingParameterFile|instats|Input Statistics|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|outrates|Output rates|None|None|True
+OTBParameterChoice|sampler|Sampler type|periodic;random|0|True
+QgsProcessingParameterNumber|sampler.periodic.jitter|Jitter amplitude|QgsProcessingParameterNumber.Integer|0|True
+OTBParameterChoice|strategy|Sampling strategy|byclass;constant;percent;total;smallest;all|4|True
+QgsProcessingParameterFile|strategy.byclass.in|Number of samples by class|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterNumber|strategy.constant.nb|Number of samples for all classes|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|strategy.percent.p|The percentage to use|QgsProcessingParameterNumber.Double|0.5|True
+QgsProcessingParameterNumber|strategy.total.v|The number of samples to generate|QgsProcessingParameterNumber.Integer|1000|True
+QgsProcessingParameterString|field|Field Name|None|True
+QgsProcessingParameterNumber|layer|Layer Index|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|rand|Random seed|QgsProcessingParameterNumber.Integer|0|True

@@ -1,0 +1,8 @@
+LSMSVectorization
+This application performs the fourth step of the exact Large-Scale Mean-Shift segmentation workflow [1].
+Segmentation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterLayer|inseg|Segmented image|None|False
+QgsProcessingParameterFileDestination|out|Output GIS vector file|None|None|False
+QgsProcessingParameterNumber|tilesizex|Size of tiles in pixel (X-axis)|QgsProcessingParameterNumber.Integer|500|True
+QgsProcessingParameterNumber|tilesizey|Size of tiles in pixel (Y-axis)|QgsProcessingParameterNumber.Integer|500|True

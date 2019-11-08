@@ -1,0 +1,11 @@
+SampleExtraction
+Extracts samples values from an image.
+Learning
+QgsProcessingParameterRasterLayer|in|InputImage|None|False
+QgsProcessingParameterFile|vec|Input sampling positions|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|out|Output samples|None|None|True
+OTBParameterChoice|outfield|Output field names|prefix;list|0|True
+QgsProcessingParameterString|outfield.prefix.name|Output field prefix|None|False|True
+QgsProcessingParameterString|outfield.list.names|Output field names|None|True|True
+QgsProcessingParameterString|field|Field Name|None|True
+QgsProcessingParameterNumber|layer|Layer Index|QgsProcessingParameterNumber.Integer|0|True

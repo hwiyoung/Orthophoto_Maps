@@ -1,0 +1,18 @@
+BinaryMorphologicalOperation|out
+Performs morphological operations on an input image channel
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+OTBParameterChoice|structype|Type of structuring element|box;ball;cross|0|True
+QgsProcessingParameterNumber|xradius|Structuring element X radius|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|yradius|Structuring element Y radius|QgsProcessingParameterNumber.Integer|5|True
+OTBParameterChoice|filter|Morphological Operation|dilate;erode;opening;closing|0|True
+QgsProcessingParameterNumber|filter.dilate.foreval|Foreground value|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|filter.dilate.backval|Background value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|filter.erode.foreval|Foreground value|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|filter.erode.backval|Background value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|filter.opening.foreval|Foreground value|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|filter.opening.backval|Background value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|filter.closing.foreval|Foreground value|QgsProcessingParameterNumber.Double|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

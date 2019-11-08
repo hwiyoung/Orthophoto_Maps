@@ -1,0 +1,11 @@
+DomainTransform|out
+Domain Transform application for wavelet and fourier
+Image Filtering
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+OTBParameterChoice|mode|Mode|fft;wavelet|1|True
+QgsProcessingParameterBoolean|mode.fft.shift|Shift fft transform|false|True
+OTBParameterChoice|mode.wavelet.form|Select wavelet form|haar;db4;db6;db8;db12;db20;sb24;sb44;sym8|0|True
+QgsProcessingParameterNumber|mode.wavelet.nlevels|Number of decomposition levels|QgsProcessingParameterNumber.Integer|2|True
+OTBParameterChoice|direction|Direction|forward;inverse|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

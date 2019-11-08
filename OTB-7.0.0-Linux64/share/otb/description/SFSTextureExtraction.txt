@@ -1,0 +1,12 @@
+SFSTextureExtraction|out
+Computes Structural Feature Set textures on every pixel of the input image selected channel
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|parameters.spethre|Spectral Threshold|QgsProcessingParameterNumber.Double|50|True
+QgsProcessingParameterNumber|parameters.spathre|Spatial Threshold|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterNumber|parameters.nbdir|Number of Direction|QgsProcessingParameterNumber.Integer|20|True
+QgsProcessingParameterNumber|parameters.alpha|Alpha|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|parameters.maxcons|Ratio Maximum Consideration Number|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterRasterDestination|out|Feature Output Image|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

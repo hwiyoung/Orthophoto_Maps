@@ -1,0 +1,35 @@
+BlockMatching|io.out
+Performs block-matching to estimate pixel-wise disparities between two images.
+Stereo
+QgsProcessingParameterRasterLayer|io.inleft|Left input image|None|False
+QgsProcessingParameterRasterLayer|io.inright|Right input image|None|False
+QgsProcessingParameterRasterDestination|io.out|The output disparity map|None|False
+QgsProcessingParameterRasterDestination|io.outmask|The output mask corresponding to all criterions|None|True
+QgsProcessingParameterBoolean|io.outmetric|Flag to output optimal metric values as well|false|True
+QgsProcessingParameterRasterLayer|mask.inleft|Mask to discard left pixels|None|True
+QgsProcessingParameterRasterLayer|mask.inright|Mask to discard right pixels|None|True
+QgsProcessingParameterNumber|mask.nodata|Discard pixels with no-data value|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|mask.variancet|Discard pixels with low local variance|QgsProcessingParameterNumber.Double|100|True
+OTBParameterChoice|bm.metric|Block-matching metric|ssd;ncc;lp|0|True
+QgsProcessingParameterNumber|bm.metric.lp.p|p value|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|bm.radius|Radius of blocks|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|bm.minhd|Minimum horizontal disparity|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|bm.maxhd|Maximum horizontal disparity|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|bm.minvd|Minimum vertical disparity|QgsProcessingParameterNumber.Integer|0|False
+QgsProcessingParameterNumber|bm.maxvd|Maximum vertical disparity|QgsProcessingParameterNumber.Integer|0|False
+OTBParameterChoice|bm.subpixel|Sub-pixel interpolation|none;parabolic;triangular;dichotomy|0|True
+QgsProcessingParameterNumber|bm.step|Computation step|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|bm.startx|X start index|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|bm.starty|Y start index|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|bm.medianfilter.radius|Radius|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|bm.medianfilter.incoherence|Incoherence threshold|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|bm.initdisp|Initial disparities|none;uniform;maps|0|True
+QgsProcessingParameterNumber|bm.initdisp.uniform.hdisp|Horizontal initial disparity|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|bm.initdisp.uniform.vdisp|Vertical initial disparity|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|bm.initdisp.uniform.hrad|Horizontal exploration radius|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|bm.initdisp.uniform.vrad|Vertical exploration radius|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterRasterLayer|bm.initdisp.maps.hmap|Horizontal initial disparity map|None|False
+QgsProcessingParameterRasterLayer|bm.initdisp.maps.vmap|Vertical initial disparity map|None|False
+QgsProcessingParameterNumber|bm.initdisp.maps.hrad|Horizontal exploration radius|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|bm.initdisp.maps.vrad|Vertical exploration radius|QgsProcessingParameterNumber.Integer|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

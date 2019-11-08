@@ -1,0 +1,7 @@
+SARDeburst|out
+This application performs deburst of Sentinel1 IW SLC images by removing redundant lines.
+SAR
+QgsProcessingParameterRasterLayer|in|Input Sentinel1 IW SLC Image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterBoolean|onlyvalidsamples|Select the modes for output image|false|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

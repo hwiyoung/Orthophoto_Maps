@@ -1,0 +1,11 @@
+MultiImageSamplingRate
+Compute sampling rate for an input set of images.
+Learning
+QgsProcessingParameterMultipleLayers|il|Input statistics|4|None|False
+QgsProcessingParameterFileDestination|out|Output sampling rates|None|None|False
+OTBParameterChoice|strategy|Sampling strategy|byclass;constant;smallest;percent;total;all|2|True
+QgsProcessingParameterMultipleLayers|strategy.byclass.in|Number of samples by class|4|None|False
+QgsProcessingParameterString|strategy.constant.nb|Number of samples for all classes|None|False|False
+QgsProcessingParameterString|strategy.percent.p|The percentage(s) to use|None|False|False
+QgsProcessingParameterString|strategy.total.v|The number of samples to generate|None|False|False
+OTBParameterChoice|mim|Multi-Image Mode|proportional;equal;custom|0|True

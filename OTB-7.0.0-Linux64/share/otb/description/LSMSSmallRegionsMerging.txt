@@ -1,0 +1,10 @@
+LSMSSmallRegionsMerging|out
+This application performs the third (optional) step of the exact Large-Scale Mean-Shift segmentation workflow [1].
+Segmentation
+QgsProcessingParameterRasterLayer|in|Input image|None|False
+QgsProcessingParameterRasterLayer|inseg|Segmented image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|minsize|Minimum Segment Size|QgsProcessingParameterNumber.Integer|50|True
+QgsProcessingParameterNumber|tilesizex|Size of tiles in pixel (X-axis)|QgsProcessingParameterNumber.Integer|500|True
+QgsProcessingParameterNumber|tilesizey|Size of tiles in pixel (Y-axis)|QgsProcessingParameterNumber.Integer|500|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

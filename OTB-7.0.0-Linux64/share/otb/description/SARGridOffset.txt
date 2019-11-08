@@ -1,0 +1,8 @@
+SARGridOffset|out
+Applies offsets on a deformation grid.
+SAR
+QgsProcessingParameterRasterLayer|ingrid|Input grid (Vector Image)|None|False
+QgsProcessingParameterNumber|offsetran|Offset on distance|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|offsetazi|Offset on azimut|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterRasterDestination|out|Output Grid|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

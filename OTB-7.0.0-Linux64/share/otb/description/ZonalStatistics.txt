@@ -1,0 +1,16 @@
+ZonalStatistics|out.raster.filename
+This application computes zonal statistics
+Image Manipulation
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterNumber|inbv|Background value to ignore in statistics computation|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|inzone|Type of input for the zone definitions|vector;labelimage|0|True
+QgsProcessingParameterVectorLayer|inzone.vector.in|Input vector data|-1|None|False
+QgsProcessingParameterBoolean|inzone.vector.reproject|Reproject the input vector|false|True
+QgsProcessingParameterRasterLayer|inzone.labelimage.in|Input label image|None|False
+QgsProcessingParameterNumber|inzone.labelimage.nodata|No-data value for the input label image|QgsProcessingParameterNumber.Integer|0|True
+OTBParameterChoice|out|Format of the output stats|vector;xml;raster|0|True
+QgsProcessingParameterVectorDestination|out.vector.filename|Filename for the output vector data|-1|None|False
+QgsProcessingParameterString|out.xml.filename|Filename for the output xml file|None|False|False
+QgsProcessingParameterRasterDestination|out.raster.filename|File name for the raster image|None|False
+QgsProcessingParameterNumber|out.raster.bv|Background value for the output raster|QgsProcessingParameterNumber.Double|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

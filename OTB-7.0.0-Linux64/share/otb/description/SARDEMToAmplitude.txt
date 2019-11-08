@@ -1,0 +1,11 @@
+SARDEMToAmplitude|out
+Simu_SAR step for Diapason chain.
+SAR
+QgsProcessingParameterRasterLayer|indem|Input DEM|None|False
+QgsProcessingParameterRasterLayer|insar|Input SAR image|None|False
+QgsProcessingParameterRasterDestination|out|Output simulated amplitude Image (this output image is multilooked)|None|False
+QgsProcessingParameterNumber|nodata|No Data values for the DEM|QgsProcessingParameterNumber.Integer|-32768|True
+QgsProcessingParameterNumber|mlran|Averaging on distance|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlazi|Averaging on azimut|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlgain|Gain to apply on ML image|QgsProcessingParameterNumber.Double|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

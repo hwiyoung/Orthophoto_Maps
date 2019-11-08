@@ -1,0 +1,11 @@
+CompareImages
+Estimator between 2 images.
+Image Manipulation
+QgsProcessingParameterRasterLayer|ref.in|Reference image|None|False
+QgsProcessingParameterNumber|ref.channel|Reference image channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterRasterLayer|meas.in|Measured image|None|False
+QgsProcessingParameterNumber|meas.channel|Measured image channel|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|roi.startx|Start X|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|roi.starty|Start Y|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|roi.sizex|Size X|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|roi.sizey|Size Y|QgsProcessingParameterNumber.Integer|0|True

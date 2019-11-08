@@ -1,0 +1,15 @@
+Superimpose|out
+Using available image metadata, project one image onto another one
+Geometry
+QgsProcessingParameterRasterLayer|inr|Reference input|None|False
+QgsProcessingParameterRasterLayer|inm|The image to reproject|None|False
+QgsProcessingParameterRasterDestination|out|Output image|None|False
+QgsProcessingParameterFile|elev.dem|DEM directory|QgsProcessingParameterFile.Folder|False|None|True
+QgsProcessingParameterFile|elev.geoid|Geoid File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|elev.default|Default elevation|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|lms|Spacing of the deformation field|QgsProcessingParameterNumber.Double|4|True
+QgsProcessingParameterNumber|fv|Fill Value|QgsProcessingParameterNumber.Double|0|True
+OTBParameterChoice|mode|Mode|default;phr|0|True
+OTBParameterChoice|interpolator|Interpolation|bco;nn;linear|0|True
+QgsProcessingParameterNumber|interpolator.bco.radius|Radius for bicubic interpolation|QgsProcessingParameterNumber.Integer|2|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

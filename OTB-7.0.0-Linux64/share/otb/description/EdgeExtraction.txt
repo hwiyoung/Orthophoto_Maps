@@ -1,0 +1,10 @@
+EdgeExtraction|out
+This application computes edge features on every pixel of the input image selected channel
+Feature Extraction
+QgsProcessingParameterRasterLayer|in|Input Image|None|False
+QgsProcessingParameterRasterDestination|out|Feature Output Image|None|False
+QgsProcessingParameterNumber|channel|Selected Channel|QgsProcessingParameterNumber.Integer|1|True
+OTBParameterChoice|filter|Edge feature|gradient;sobel;touzi|0|True
+QgsProcessingParameterNumber|filter.touzi.xradius|X radius of the neighborhood|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|filter.touzi.yradius|Y radius of the neighborhood|QgsProcessingParameterNumber.Integer|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

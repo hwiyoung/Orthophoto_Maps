@@ -1,0 +1,19 @@
+SOMClassification|out
+SOM image classification.
+Learning
+QgsProcessingParameterRasterLayer|in|InputImage|None|False
+QgsProcessingParameterRasterDestination|out|OutputImage|None|False
+QgsProcessingParameterRasterLayer|vm|ValidityMask|None|True
+QgsProcessingParameterNumber|tp|TrainingProbability|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|ts|TrainingSetSize|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterRasterDestination|som|SOM Map|None|True
+QgsProcessingParameterNumber|sx|SizeX|QgsProcessingParameterNumber.Integer|32|True
+QgsProcessingParameterNumber|sy|SizeY|QgsProcessingParameterNumber.Integer|32|True
+QgsProcessingParameterNumber|nx|NeighborhoodX|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|ny|NeighborhoodY|QgsProcessingParameterNumber.Integer|10|True
+QgsProcessingParameterNumber|ni|NumberIteration|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|bi|BetaInit|QgsProcessingParameterNumber.Double|1|True
+QgsProcessingParameterNumber|bf|BetaFinal|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterNumber|iv|InitialValue|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|rand|Random seed|QgsProcessingParameterNumber.Integer|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

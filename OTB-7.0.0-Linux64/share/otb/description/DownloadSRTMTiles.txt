@@ -1,0 +1,8 @@
+DownloadSRTMTiles
+Download or list SRTM tiles
+Image Manipulation
+QgsProcessingParameterMultipleLayers|il|Input images list|3|None|True
+QgsProcessingParameterMultipleLayers|vl|Input vector data list|-1|None|True
+QgsProcessingParameterString|names|Input tile names|None|True|True
+QgsProcessingParameterFile|tiledir|Tiles directory|QgsProcessingParameterFile.Folder|False|None|False
+OTBParameterChoice|mode|Download/List corresponding SRTM tiles|download;list|0|True

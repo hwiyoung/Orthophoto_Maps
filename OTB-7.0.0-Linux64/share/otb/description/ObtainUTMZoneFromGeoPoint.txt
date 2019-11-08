@@ -1,0 +1,5 @@
+ObtainUTMZoneFromGeoPoint
+UTM zone determination from a geographic point.
+Geometry
+QgsProcessingParameterNumber|lat|Latitude|QgsProcessingParameterNumber.Double|0|False
+QgsProcessingParameterNumber|lon|Longitude|QgsProcessingParameterNumber.Double|0|False

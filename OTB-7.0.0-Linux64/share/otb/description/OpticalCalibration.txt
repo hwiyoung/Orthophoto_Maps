@@ -1,0 +1,31 @@
+OpticalCalibration|out
+Perform optical calibration TOA/TOC (Top Of Atmosphere/Top Of Canopy). Supported sensors: QuickBird, Ikonos, WorldView2, Formosat, Spot5, Pleiades, Spot6, Spot7. For other sensors the application also allows providing calibration parameters manually.
+Calibration
+QgsProcessingParameterRasterLayer|in|Input|None|False
+QgsProcessingParameterRasterDestination|out|Output|None|False
+OTBParameterChoice|level|Calibration Level|toa;toatoim;toc|0|True
+QgsProcessingParameterBoolean|milli|Convert to milli reflectance|false|True
+QgsProcessingParameterBoolean|clamp|Clamp of reflectivity values between [0, 1]|true|True
+QgsProcessingParameterNumber|acqui.minute|Minute|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|acqui.hour|Hour|QgsProcessingParameterNumber.Integer|12|True
+QgsProcessingParameterNumber|acqui.day|Day|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|acqui.month|Month|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|acqui.year|Year|QgsProcessingParameterNumber.Integer|2000|True
+QgsProcessingParameterNumber|acqui.fluxnormcoeff|Flux Normalization|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|acqui.solardistance|Solar distance|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|acqui.sun.elev|Sun elevation angle (deg)|QgsProcessingParameterNumber.Double|90|True
+QgsProcessingParameterNumber|acqui.sun.azim|Sun azimuth angle (deg)|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|acqui.view.elev|Viewing elevation angle (deg)|QgsProcessingParameterNumber.Double|90|True
+QgsProcessingParameterNumber|acqui.view.azim|Viewing azimuth angle (deg)|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterFile|acqui.gainbias|Gains or biases|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterFile|acqui.solarilluminations|Solar illuminations|QgsProcessingParameterFile.File|None|None|True
+OTBParameterChoice|atmo.aerosol|Aerosol Model|noaersol;continental;maritime;urban;desertic|0|True
+QgsProcessingParameterNumber|atmo.oz|Ozone Amount (cm-atm)|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|atmo.wa|Water Vapor Amount (g/cm2)|QgsProcessingParameterNumber.Double|2.5|True
+QgsProcessingParameterNumber|atmo.pressure|Atmospheric Pressure (hPa)|QgsProcessingParameterNumber.Double|1030|True
+QgsProcessingParameterNumber|atmo.opt|Aerosol Optical Thickness|QgsProcessingParameterNumber.Double|0.2|True
+QgsProcessingParameterFile|atmo.aeronet|Aeronet File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterFile|atmo.rsr|Relative Spectral Response File|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterNumber|atmo.radius|Window radius (adjacency effects)|QgsProcessingParameterNumber.Integer|2|True
+QgsProcessingParameterNumber|atmo.pixsize|Pixel size (in km)|QgsProcessingParameterNumber.Double|1|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

@@ -1,0 +1,6 @@
+ConvertSensorToGeoPoint
+Sensor to geographic coordinates conversion.
+Geometry
+QgsProcessingParameterRasterLayer|in|Sensor image|None|False
+QgsProcessingParameterNumber|input.idx|X value of desired point|QgsProcessingParameterNumber.Double|0|True
+QgsProcessingParameterNumber|input.idy|Y value of desired point|QgsProcessingParameterNumber.Double|0|True

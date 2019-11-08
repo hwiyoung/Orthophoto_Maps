@@ -1,0 +1,9 @@
+BandMathX|out
+This application performs mathematical operations on several multiband images.
+Image Manipulation
+QgsProcessingParameterMultipleLayers|il|Input image list|3|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterString|exp|Expressions|None|False|False
+QgsProcessingParameterFile|incontext|Import context|QgsProcessingParameterFile.File|None|None|True
+QgsProcessingParameterFileDestination|outcontext|Export context|None|None|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

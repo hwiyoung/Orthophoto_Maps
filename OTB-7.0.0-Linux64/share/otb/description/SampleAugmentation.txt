@@ -1,0 +1,14 @@
+SampleAugmentation
+Generates synthetic samples from a sample data file.
+Learning
+QgsProcessingParameterFile|in|Input samples|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|out|Output samples|None|None|False
+QgsProcessingParameterString|field|Field Name|None|True
+QgsProcessingParameterNumber|layer|Layer Index|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|label|Label of the class to be augmented|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|samples|Number of generated samples|QgsProcessingParameterNumber.Integer|100|True
+QgsProcessingParameterString|exclude|Field names for excluded features|None|True
+OTBParameterChoice|strategy|Augmentation strategy|replicate;jitter;smote|0|True
+QgsProcessingParameterNumber|strategy.jitter.stdfactor|Factor for dividing the standard deviation of each feature|QgsProcessingParameterNumber.Double|10|True
+QgsProcessingParameterNumber|strategy.smote.neighbors|Number of nearest neighbors|QgsProcessingParameterNumber.Integer|5|True
+QgsProcessingParameterNumber|seed|Random seed|QgsProcessingParameterNumber.Integer|0|True

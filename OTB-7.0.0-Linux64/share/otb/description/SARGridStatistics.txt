@@ -1,0 +1,5 @@
+SARGridStatistics
+Computes grid statistics.
+SAR
+QgsProcessingParameterRasterLayer|ingrid|Input grid (Vector Image)|None|False
+QgsProcessingParameterNumber|threshold|Threshold for computation of mean shift (used only if grid components are superior or equal to 3)|QgsProcessingParameterNumber.Double|0.3|True

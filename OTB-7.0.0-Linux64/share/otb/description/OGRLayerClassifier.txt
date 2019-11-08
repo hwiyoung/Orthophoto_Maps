@@ -1,0 +1,8 @@
+OGRLayerClassifier
+Classify an OGR layer based on a machine learning model and a list of features to consider.
+Segmentation
+QgsProcessingParameterVectorLayer|inshp|Name of the input shapefile|-1|None|False
+QgsProcessingParameterFile|instats|XML file containing mean and variance of each feature|QgsProcessingParameterFile.File|None|None|False
+QgsProcessingParameterFileDestination|insvm|Input model filename|None|None|False
+QgsProcessingParameterString|feat|Features|None|True
+QgsProcessingParameterString|cfield|Field containing the predicted class|None|False|True

@@ -1,0 +1,20 @@
+SARRobustInterferogram|out
+Estimates robust interferogram with flatenning and averaging.
+SAR
+QgsProcessingParameterRasterLayer|incoregistratedslave|Input SAR Slave image (Coregistrated image)|None|False
+QgsProcessingParameterRasterLayer|insarslave|Input SAR Slave image (Metadata)|None|False
+QgsProcessingParameterRasterLayer|insarmaster|Input SAR Master image|None|False
+QgsProcessingParameterRasterLayer|indem|Input DEM (for metadata only)|None|True
+QgsProcessingParameterRasterLayer|ingrid|Input deformation grid|None|False
+QgsProcessingParameterRasterLayer|incartmeanmaster|Input Cartesian Mean Master image|None|False
+QgsProcessingParameterNumber|gridsteprange|Grid Step for range dimension into SLC geometry|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|gridstepazimut|Grid Step for azimut dimension into SLC geometry|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|mlran|ML factor on range|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlazi|ML factor on azimut|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|marginran|Margin on distance for averaging|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|marginazi|Margin on azimut for averaging|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterNumber|gain|Gain to apply for amplitude estimation|QgsProcessingParameterNumber.Double|0.1|True
+QgsProcessingParameterBoolean|ortho|Build interferogram into ortho geometry|false|True
+QgsProcessingParameterRasterDestination|out|Output interferogram (ML geometry)|None|False
+QgsProcessingParameterRasterDestination|outopt|Interferogram into ortho geometry|None|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

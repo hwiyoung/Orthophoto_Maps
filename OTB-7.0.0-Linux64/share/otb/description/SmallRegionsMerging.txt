@@ -1,0 +1,8 @@
+SmallRegionsMerging|out
+This application merges small regions of a segmentation result.
+Segmentation
+QgsProcessingParameterRasterLayer|in|Input image|None|False
+QgsProcessingParameterRasterLayer|inseg|Segmented image|None|False
+QgsProcessingParameterRasterDestination|out|Output Image|None|False
+QgsProcessingParameterNumber|minsize|Minimum Segment Size|QgsProcessingParameterNumber.Integer|50|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

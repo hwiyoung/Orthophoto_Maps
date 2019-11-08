@@ -1,0 +1,11 @@
+SARESD|out
+ESD processing to correct phase between two bursts.
+SAR
+QgsProcessingParameterRasterLayer|ininterfup|First interferogram (Vector Image)|None|False
+QgsProcessingParameterRasterLayer|ininterflow|Second interferogram (Vector Image)|None|False
+QgsProcessingParameterRasterLayer|insar|Input SAR  image (for metadata only|None|False
+QgsProcessingParameterNumber|burstindex|Index of first interferogram|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|threshold|Threshold for correlation rate|QgsProcessingParameterNumber.Double|0.3|True
+QgsProcessingParameterNumber|mlazi|Averaging on azimut|QgsProcessingParameterNumber.Integer|1|True
+QgsProcessingParameterRasterDestination|out|Output Tmp|None|False
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

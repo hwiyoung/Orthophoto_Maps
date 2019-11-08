@@ -1,0 +1,19 @@
+SARFineDeformationGrid|out
+geo_grid step for Diapason chain.
+SAR
+QgsProcessingParameterRasterLayer|indem|Input DEM|None|False
+QgsProcessingParameterRasterLayer|insarmaster|Input SAR Master image|None|False
+QgsProcessingParameterRasterLayer|insarslave|Input SAR Slave image|None|False
+QgsProcessingParameterRasterLayer|inmlmaster|Input Master Multilooked (real image)|None|False
+QgsProcessingParameterRasterLayer|inmlslave|Input Slave Multilooked (real image)|None|False
+QgsProcessingParameterRasterDestination|out|Output Deformation grid (Vector image)|None|False
+QgsProcessingParameterRasterLayer|indemprojmaster|Input vector of DEM projected into SAR Master geometry|None|True
+QgsProcessingParameterRasterLayer|indemprojslave|Input vector of DEM projected into SAR Slave geometry|None|True
+QgsProcessingParameterNumber|mlran|MultiLook factor on distance|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|mlazi|MultiLook factor on azimut|QgsProcessingParameterNumber.Integer|3|True
+QgsProcessingParameterNumber|gridsteprange|Grid step for range dimension (into SLC/SAR geometry)|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|gridstepazimut|Grid step for azimut dimension (into SLC/SAR geometry)|QgsProcessingParameterNumber.Integer|150|True
+QgsProcessingParameterNumber|threshold|Threshold for correlation rate|QgsProcessingParameterNumber.Double|0.3|True
+QgsProcessingParameterNumber|gap|Maximum difference between input grid values and mean values|QgsProcessingParameterNumber.Double|0.7|True
+QgsProcessingParameterString|advantage|Give an advantage to DEM or Correlation Grid|None|False|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True

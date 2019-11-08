@@ -1,0 +1,11 @@
+FusionOfClassifications|out
+Fuses several classifications maps of the same image on the basis of class labels.
+Learning
+QgsProcessingParameterMultipleLayers|il|Input classifications|3|None|False
+QgsProcessingParameterRasterDestination|out|The output classification image|None|False
+OTBParameterChoice|method|Fusion method|majorityvoting;dempstershafer|0|True
+QgsProcessingParameterMultipleLayers|method.dempstershafer.cmfl|Confusion Matrices|4|None|False
+OTBParameterChoice|method.dempstershafer.mob|Mass of belief measurement|precision;recall;accuracy;kappa|0|True
+QgsProcessingParameterNumber|nodatalabel|Label for the NoData class|QgsProcessingParameterNumber.Integer|0|True
+QgsProcessingParameterNumber|undecidedlabel|Label for the Undecided class|QgsProcessingParameterNumber.Integer|0|True
+*QgsProcessingParameterEnum|outputpixeltype|Output pixel type|uint8;int;float;double|False|2|True
