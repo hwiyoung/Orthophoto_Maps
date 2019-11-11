@@ -9,6 +9,7 @@ from BackprojectionResample import projectedCoord, backProjection,\
     resampleThermal, createGeoTiffThermal
 from system_calibration import calibrate
 import gdal
+import subprocess
 
 if __name__ == '__main__':
     ground_height = 0  # unit: m
@@ -22,9 +23,12 @@ if __name__ == '__main__':
         #  [0.0636038625107261, 0.988653550290218, 0.136083452970098],
         #  [0.108102558627082, -0.142382530141501, 0.983890772356761]], dtype=float)
 
-    pixel_size = 0.00375  # unit: mm/px
+    band = "bgrne"  # blue, green, red, nir, redEdge
+    bandList_b_in = []
+    dstPath = '/internalCompany/PM2019007_nifs/DKC/gomso_stacks_orthophoto/'
 
-    for root, dirs, files in os.walk('./tests/yeosu_stacks'):
+    # for root, dirs, files in os.walk('./tests/yeosu_stacks'):
+    for root, dirs, files in os.walk('/internalCompany/PM2019007_nifs/DKC/gomso_stacks_test'):
         files.sort()
         for file in files:
             filename = os.path.splitext(file)[0]
@@ -39,9 +43,8 @@ if __name__ == '__main__':
                 # 1. Extract EXIF data from the file
                 focal_length, sensor_width = getMetadataExiv2(file_path)  # unit: m, mm
                 # pixel_size = sensor_width / image_cols  # unit: mm/px
+                pixel_size = 0.00375  # unit: mm/px
                 pixel_size = pixel_size / 1000  # unit: m/px
-
-                band = "bgrne"  # blue,green,red,nir,redEdge
 
                 # For each band
                 for i in range(raster.RasterCount):
@@ -62,9 +65,9 @@ if __name__ == '__main__':
                     print('Read EOP')
                     start_time = time.time()
                     print('Easting | Northing | Altitude | Roll | Pitch | Yaw')
-                    # eo = readEOfromMetadata(file_path)
-                    eo = [127.7184603, 34.6057025, 164.289,
-                          -0.004295216134835715, 0.13159595296597484, -1.757874177995705]   # EO of [img_0073.tif]
+                    eo = readEOfromMetadata(file_path)
+                    # eo = [127.7184603, 34.6057025, 164.289,
+                    #       -0.004295216134835715, 0.13159595296597484, -1.757874177995705]   # EO of [img_0073.tif]
                     eo = convertCoordinateSystem(eo)
                     print(eo)
 
@@ -86,7 +89,6 @@ if __name__ == '__main__':
                     # 5. Compute GSD & Boundary size
                     # GSD
                     gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
-                    # gsd = 0.5
                     # Boundary size
                     boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
                     boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
@@ -115,15 +117,36 @@ if __name__ == '__main__':
                     # 8. Create GeoTiff
                     print('Save the image in GeoTiff')
                     start_time = time.time()
-                    dst = './' + filename + '_' + band[i]
+                    dst = dstPath + filename + '_' + band[i]
                     createGeoTiffThermal(gray, bbox, gsd, boundary_rows, boundary_cols, dst)
                     print("--- %s seconds ---" % (time.time() - start_time))
+
+                    if i == 0:
+                        bandList_b_in.append(dst + '.tif ')
 
                     print('*** Processing time per each image')
                     print("--- %s seconds ---" % (time.time() - band_start_time))
 
-                print(filename + 'is processed!')
+                print(filename + ' is processed!\n')
 
-    # Mosaic indiviual orthophotos
-    # https://github.com/ossimlabs/ossim.git
+    # Mosaic individual orthophotos
+    working_path1 = './OTB-7.0.0-Linux64/'
+    working_path2 = './bin/'
+    set_env = './otbenv.profile'
+    mosaic_execution = './otbcli_Mosaic'
+
+    # change path
+    os.chdir(working_path1)
+    # subprocess.call('ls')
+    # https://stackoverflow.com/questions/13702425/source-command-not-found-in-sh-shell/13702876
+    subprocess.call(set_env, shell=True)
+
+    os.chdir(working_path2)
+    # subprocess.call('ls')
+    print(bandList_b_in)
+    bandList_b_out = './IMG_b.tif'
+    # subprocess.call(mosaic_execution, shell=True)
+    subprocess.call(mosaic_execution + ' -il ' + bandList_b_in[0] + bandList_b_in[1] +
+                    bandList_b_in[2] + bandList_b_in[3] + bandList_b_in[4] +
+                    '-out ' + bandList_b_out, shell=True)
 
