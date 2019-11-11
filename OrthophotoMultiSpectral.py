@@ -25,6 +25,10 @@ if __name__ == '__main__':
 
     band = "bgrne"  # blue, green, red, nir, redEdge
     bandList_b_in = []
+    bandList_g_in = []
+    bandList_r_in = []
+    bandList_n_in = []
+    bandList_e_in = []
     dstPath = '/internalCompany/PM2019007_nifs/DKC/gomso_stacks_orthophoto/'
 
     # for root, dirs, files in os.walk('./tests/yeosu_stacks'):
@@ -122,7 +126,15 @@ if __name__ == '__main__':
                     print("--- %s seconds ---" % (time.time() - start_time))
 
                     if i == 0:
-                        bandList_b_in.append(dst + '.tif ')
+                        bandList_b_in.append(dst + '.tif')
+                    elif i == 1:
+                        bandList_g_in.append(dst + '.tif')
+                    elif i == 2:
+                        bandList_r_in.append(dst + '.tif')
+                    elif i == 3:
+                        bandList_n_in.append(dst + '.tif')
+                    else:
+                        bandList_e_in.append(dst + '.tif')
 
                     print('*** Processing time per each image')
                     print("--- %s seconds ---" % (time.time() - band_start_time))
@@ -137,16 +149,23 @@ if __name__ == '__main__':
 
     # change path
     os.chdir(working_path1)
-    # subprocess.call('ls')
     # https://stackoverflow.com/questions/13702425/source-command-not-found-in-sh-shell/13702876
     subprocess.call(set_env, shell=True)
 
     os.chdir(working_path2)
-    # subprocess.call('ls')
-    print(bandList_b_in)
-    bandList_b_out = './IMG_b.tif'
-    # subprocess.call(mosaic_execution, shell=True)
-    subprocess.call(mosaic_execution + ' -il ' + bandList_b_in[0] + bandList_b_in[1] +
-                    bandList_b_in[2] + bandList_b_in[3] + bandList_b_in[4] +
-                    '-out ' + bandList_b_out, shell=True)
+    bandList_b_out = dstPath + '/IMG_b.tif'
+    bandList_g_out = dstPath + '/IMG_g.tif'
+    bandList_r_out = dstPath + '/IMG_r.tif'
+    bandList_n_out = dstPath + '/IMG_n.tif'
+    bandList_e_out = dstPath + '/IMG_e.tif'
+    subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_b_in) +
+                    ' -out ' + bandList_b_out, shell=True)
+    subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_g_in) +
+                    ' -out ' + bandList_g_out, shell=True)
+    subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_r_in) +
+                    ' -out ' + bandList_r_out, shell=True)
+    subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_n_in) +
+                    ' -out ' + bandList_n_out, shell=True)
+    subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_e_in) +
+                    ' -out ' + bandList_e_out, shell=True)
 
