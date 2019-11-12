@@ -10,6 +10,7 @@ from BackprojectionResample import projectedCoord, backProjection,\
 from system_calibration import calibrate
 import gdal
 import subprocess
+import gdal2tiles
 
 if __name__ == '__main__':
     ground_height = 0  # unit: m
@@ -168,4 +169,17 @@ if __name__ == '__main__':
                     ' -out ' + bandList_n_out, shell=True)
     subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_e_in) +
                     ' -out ' + bandList_e_out, shell=True)
+
+    # https://gis.stackexchange.com/questions/44003/python-equivalent-of-gdalbuildvrt
+    vrt_options = gdal.BuildVRTOptions(resolution='average', resampleAlg='cubic', separate=True, VRTNodata=0)
+    my_vrt = gdal.BuildVRT(dstPath + '/IMG_RGB.vrt', [bandList_r_out, bandList_g_out, bandList_b_out],
+                           options=vrt_options)
+    my_vrt = None
+
+    # https://gis.stackexchange.com/questions/42584/how-to-call-gdal-translate-from-python-code
+    ds = gdal.Translate(dstPath + '/IMG_RGB.tif', dstPath + '/IMG_RGB.vrt')
+    ds = None
+
+    options = {'zoom': (14, 21)}
+    gdal2tiles.generate_tiles(dstPath + '/IMG_RGB.tif', dstPath + '/tiles/', **options)
 
