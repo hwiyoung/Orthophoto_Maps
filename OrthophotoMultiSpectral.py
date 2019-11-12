@@ -30,10 +30,12 @@ if __name__ == '__main__':
     bandList_r_in = []
     bandList_n_in = []
     bandList_e_in = []
-    dstPath = '/internalCompany/PM2019007_nifs/DKC/gomso_stacks_orthophoto/'
+    # dstPath = '/internalCompany/PM2019007_nifs/DKC/gomso_stacks_orthophoto/'
+    dstPath = '/internalCompany/PM2019007_nifs/DKC/yeosu/whole_stacks_orthophotos/'
 
+    early_start_time = time.time()
     # for root, dirs, files in os.walk('./tests/yeosu_stacks'):
-    for root, dirs, files in os.walk('/internalCompany/PM2019007_nifs/DKC/gomso_stacks_test'):
+    for root, dirs, files in os.walk('/internalCompany/PM2019007_nifs/DKC/yeosu/whole_stacks'):
         files.sort()
         for file in files:
             filename = os.path.splitext(file)[0]
@@ -142,6 +144,7 @@ if __name__ == '__main__':
 
                 print(filename + ' is processed!\n')
 
+    print('Whole generating orthophoto time: ', time.time() - early_start_time)
     # Mosaic individual orthophotos
     working_path1 = './OTB-7.0.0-Linux64/'
     working_path2 = './bin/'
@@ -153,6 +156,7 @@ if __name__ == '__main__':
     # https://stackoverflow.com/questions/13702425/source-command-not-found-in-sh-shell/13702876
     subprocess.call(set_env, shell=True)
 
+    mosaic_start_time = time.time()
     os.chdir(working_path2)
     bandList_b_out = dstPath + '/IMG_b.tif'
     bandList_g_out = dstPath + '/IMG_g.tif'
@@ -160,15 +164,16 @@ if __name__ == '__main__':
     bandList_n_out = dstPath + '/IMG_n.tif'
     bandList_e_out = dstPath + '/IMG_e.tif'
     subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_b_in) +
-                    ' -out ' + bandList_b_out, shell=True)
+                    ' -comp.feather ' + ' large ' + ' -out ' + bandList_b_out, shell=True)
     subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_g_in) +
-                    ' -out ' + bandList_g_out, shell=True)
+                    ' -comp.feather ' + ' large ' + ' -out ' + bandList_g_out, shell=True)
     subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_r_in) +
-                    ' -out ' + bandList_r_out, shell=True)
+                    ' -comp.feather ' + ' large ' + ' -out ' + bandList_r_out, shell=True)
     subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_n_in) +
-                    ' -out ' + bandList_n_out, shell=True)
+                    ' -comp.feather ' + ' large ' + ' -out ' + bandList_n_out, shell=True)
     subprocess.call(mosaic_execution + ' -il ' + ' '.join(bandList_e_in) +
-                    ' -out ' + bandList_e_out, shell=True)
+                    ' -comp.feather ' + ' large ' + ' -out ' + bandList_e_out, shell=True)
+    print('Mosaic time: ', time.time() - mosaic_start_time)
 
     # https://gis.stackexchange.com/questions/44003/python-equivalent-of-gdalbuildvrt
     vrt_options = gdal.BuildVRTOptions(resolution='average', resampleAlg='cubic', separate=True, VRTNodata=0)
@@ -179,7 +184,9 @@ if __name__ == '__main__':
     # https://gis.stackexchange.com/questions/42584/how-to-call-gdal-translate-from-python-code
     ds = gdal.Translate(dstPath + '/IMG_RGB.tif', dstPath + '/IMG_RGB.vrt')
     ds = None
+    print('Till merge: ', time.time() - early_start_time, ' second')
 
     options = {'zoom': (14, 21)}
     gdal2tiles.generate_tiles(dstPath + '/IMG_RGB.tif', dstPath + '/tiles/', **options)
-
+    print('Whole process time: ', time.time() - early_start_time, ' second')
+    print('Done!')
