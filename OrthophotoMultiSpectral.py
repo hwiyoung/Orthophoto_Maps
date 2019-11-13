@@ -176,7 +176,8 @@ if __name__ == '__main__':
     print('Mosaic time: ', time.time() - mosaic_start_time)
 
     # https://gis.stackexchange.com/questions/44003/python-equivalent-of-gdalbuildvrt
-    vrt_options = gdal.BuildVRTOptions(resolution='average', resampleAlg='cubic', separate=True, VRTNodata=0)
+    # vrt_options = gdal.BuildVRTOptions(resolution='average', resampleAlg='cubic', separate=True, VRTNodata=0)
+    vrt_options = gdal.BuildVRTOptions(separate=True)
     my_vrt = gdal.BuildVRT(dstPath + '/IMG_RGB.vrt', [bandList_r_out, bandList_g_out, bandList_b_out],
                            options=vrt_options)
     my_vrt = None
