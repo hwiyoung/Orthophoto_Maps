@@ -5,35 +5,48 @@ import numpy as np
 from struct import *
 import pandas as pd
 
-def loadcsv(csv_file, fps):
+
+def load_log(filePath):
     # print('********** Read csv file of drone log **********')
-    df = pd.read_csv(csv_file, low_memory=False)
+    df = pd.read_csv(filePath + '.csv', low_memory=False)
 
     # print('********** Extract rows on recording **********')
     df = df[df['CAMERA_INFO.recordState'] == 'Starting']
 
     # print('********** Extract columns on need **********')
-    df = df[['CUSTOM.updateTime', 'OSD.latitude', 'OSD.longitude',
-             'OSD.height [m]', 'OSD.altitude [m]',
-             'OSD.xSpeed [m/s]', 'OSD.ySpeed [m/s]', 'OSD.zSpeed [m/s]',
+    # df = df[['CUSTOM.updateTime', 'OSD.latitude', 'OSD.longitude',
+    #          'OSD.height [m]', 'OSD.altitude [m]',
+    #          'OSD.xSpeed [m/s]', 'OSD.ySpeed [m/s]', 'OSD.zSpeed [m/s]',
+    #          'OSD.roll', 'OSD.pitch', 'OSD.yaw',
+    #          'GIMBAL.pitch', 'GIMBAL.roll', 'GIMBAL.yaw']]
+    df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
              'OSD.roll', 'OSD.pitch', 'OSD.yaw',
-             'GIMBAL.pitch', 'GIMBAL.roll', 'GIMBAL.yaw']]
-
-    # Convert UTC to KST
+             'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df_np = df.to_numpy()
-    for i in range(df_np[:, 0].shape[0]):
-        hours_edit = str(int(df_np[i, 0][11:13]) + 9)   # UTC to KST
-        time_edit = df_np[i, 0][0:11] + hours_edit + df_np[i, 0][13:len(df_np[i, 0])]
-        df_np[i, 0] = time_edit
 
-    # Synchronize the video with the log
-    freq_diff = int(fps / 10)  # fps in video: e.g. 30, fps in log: 10 ... freq: 3
-    logs = np.empty((df_np.shape[0] * freq_diff, df_np.shape[1]), dtype=object)
-    for i in range(df_np.shape[0]):
-        logs[freq_diff*i:freq_diff*i+freq_diff][:] = df_np[i][:].reshape(1, df_np.shape[1])
+    # # Convert UTC to KST
+    # df_np = df.to_numpy()
+    # for i in range(df_np[:, 0].shape[0]):
+    #     hours_edit = str(int(df_np[i, 0][11:13]) + 9)   # UTC to KST
+    #     time_edit = df_np[i, 0][0:11] + hours_edit + df_np[i, 0][13:len(df_np[i, 0])]
+    #     df_np[i, 0] = time_edit
 
-    return logs
+    return df_np
 
+def load_io(filePath):
+    # model = cv2.VideoCapture(filePath + '.MOV')
+    model = 'FC6310R'
+
+    # model_name, sensor_width(mm), focal_length(mm)
+    io_list = np.array([['FC6310R', 13.2, 8.8],     # Phantom4RTK
+                        ['FC220', 6.3, 4.3],        # Mavic
+                        ['FC6520', 17.3, 15]]       # Inspire2
+                       )
+
+    sensor_width = float(io_list[io_list[:, 0] == model][0, 1])
+    focal_length = float(io_list[io_list[:, 0] == model][0, 2])
+
+    return sensor_width, focal_length
 
 def sendall(sock, data, logdata, addr):
     datalen = 65508     # UDP 는 byte[] 배열로 전송, 최대 크기는 65508
@@ -106,36 +119,37 @@ def read_memmap(rows, cols, ch):
 
 
 if __name__ == '__main__':
-    # read_memmap(2160, 3840, 3)
     while True:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind(('localhost', 57810))
         print("binding...")
 
-        rows = 0
-        cols = 0
-
-        head = s.recv(4)
-        if head == b'path':
+        header = s.recv(4)
+        if header == b'path':   # header | length | b_fname
             length = s.recv(4)
-            body = s.recv(int(length))
-            csv = body.decode()
-            print(csv)
-        elif head == b'fram':
-            frameNumber = s.recv(4)
+            b_fname = s.recv(int(length))  # type: bytes
+            fname = b_fname[:-4].decode()  # type: str
+            # EO - lon, lat, hei, roll, pitch, yaw, gimbal.roll, gimbal.pitch, gimbal.yaw
+            log = load_log(fname)
+            # IO - sensor_width, focal_length
+            sensor_width, focal_length = load_io(fname)     # type: float, float
+            print(sensor_width, type(sensor_width), focal_length, type(focal_length))
+            print('Hello')
+        elif header == b'fram': # header | frame_nubmer | rows | cols
+            frame_nubmer = s.recv(4)
             b_rows = s.recv(4)
             b_cols = s.recv(4)
-            rows = b_rows.decode()
-            cols = b_cols.decode()
-            print(frameNumber.decode(), rows, cols)
+            rows = int(b_rows.decode())  # type: int
+            cols = int(b_cols.decode())  # type: int
+
+            time.sleep(1)
+            np_image = read_memmap(int(rows), int(cols), 3)
+
+
         else:
             print('None')
 
-        time.sleep(1)
-        np_image = read_memmap(int(rows), int(cols), 3)
-        cv2.imshow('Test', np_image)
-        cv2.waitKey(0)
 
 
         # vidcap = cv2.VideoCapture(video_path)
