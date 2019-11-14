@@ -30,7 +30,8 @@ def convertCoordinateSystem(eo, epsg):
     latlon2tm = CoordinateTransformation(epsg4326, epsg_dst)
 
     # Check the transformation for a point close to the centre of the projected grid
-    xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))   # The order: Lon, Lat
+    # xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))   # The order: Lon, Lat
+    xy = latlon2tm.TransformPoint(float(eo[1]), float(eo[0]))   # The order: Lat, Lon
     eo[0:2] = xy[0:2]
 
     return eo

@@ -4,36 +4,20 @@ import time
 import numpy as np
 from struct import *
 import pandas as pd
+from Orthophoto import rectify
 
 
-def load_log(filePath):
-    # print('********** Read csv file of drone log **********')
-    df = pd.read_csv(filePath + '.csv', low_memory=False)
-
-    # print('********** Extract rows on recording **********')
+def load_log(file_path):
+    df = pd.read_csv(file_path + '.csv', low_memory=False)
     df = df[df['CAMERA_INFO.recordState'] == 'Starting']
-
-    # print('********** Extract columns on need **********')
-    # df = df[['CUSTOM.updateTime', 'OSD.latitude', 'OSD.longitude',
-    #          'OSD.height [m]', 'OSD.altitude [m]',
-    #          'OSD.xSpeed [m/s]', 'OSD.ySpeed [m/s]', 'OSD.zSpeed [m/s]',
-    #          'OSD.roll', 'OSD.pitch', 'OSD.yaw',
-    #          'GIMBAL.pitch', 'GIMBAL.roll', 'GIMBAL.yaw']]
     df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
              'OSD.roll', 'OSD.pitch', 'OSD.yaw',
              'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df_np = df.to_numpy()
 
-    # # Convert UTC to KST
-    # df_np = df.to_numpy()
-    # for i in range(df_np[:, 0].shape[0]):
-    #     hours_edit = str(int(df_np[i, 0][11:13]) + 9)   # UTC to KST
-    #     time_edit = df_np[i, 0][0:11] + hours_edit + df_np[i, 0][13:len(df_np[i, 0])]
-    #     df_np[i, 0] = time_edit
-
     return df_np
 
-def load_io(filePath):
+def load_io(file_path):
     # model = cv2.VideoCapture(filePath + '.MOV')
     model = 'FC6310R'
 
@@ -43,10 +27,10 @@ def load_io(filePath):
                         ['FC6520', 17.3, 15]]       # Inspire2
                        )
 
-    sensor_width = float(io_list[io_list[:, 0] == model][0, 1])
-    focal_length = float(io_list[io_list[:, 0] == model][0, 2])
+    sensor_width_mm = float(io_list[io_list[:, 0] == model][0, 1])
+    focal_length_mm = float(io_list[io_list[:, 0] == model][0, 2])
 
-    return sensor_width, focal_length
+    return sensor_width_mm, focal_length_mm
 
 def sendall(sock, data, logdata, addr):
     datalen = 65508     # UDP 는 byte[] 배열로 전송, 최대 크기는 65508
@@ -111,7 +95,7 @@ def sendall(sock, data, logdata, addr):
 
 def read_memmap(rows, cols, ch):
     print("memmap read")
-    np_image = np.memmap('frame_image.dat', mode='r', shape=(rows, cols, ch), dtype=np.uint8)
+    np_image = np.memmap('frame_image', mode='r', shape=(rows, cols, ch), dtype=np.uint8)
     print('shape :', np_image.shape, 'type:', np_image.dtype)
     # cv2.imshow('Test', np_image)
     # cv2.waitKey(0)
@@ -126,18 +110,19 @@ if __name__ == '__main__':
         print("binding...")
 
         header = s.recv(4)
-        if header == b'path':   # header | length | b_fname
+        if header == b'PATH':   # header | length | b_fname
             length = s.recv(4)
             b_fname = s.recv(int(length))  # type: bytes
             fname = b_fname[:-4].decode()  # type: str
-            # EO - lon, lat, hei, roll, pitch, yaw, gimbal.roll, gimbal.pitch, gimbal.yaw
+            # Extract EO/IO
+            # EO - lon(deg), lat(deg), hei(deg), roll(deg), pitch(deg), yaw(deg),
+            #       gimbal.roll(deg), gimbal.pitch(deg), gimbal.yaw(deg)
             log = load_log(fname)
-            # IO - sensor_width, focal_length
+            # IO - sensor_width(mm), focal_length(mm)
             sensor_width, focal_length = load_io(fname)     # type: float, float
             print(sensor_width, type(sensor_width), focal_length, type(focal_length))
-            print('Hello')
-        elif header == b'fram': # header | frame_nubmer | rows | cols
-            frame_nubmer = s.recv(4)
+        elif header == b'FRAM':     # header | frame_nubmer | rows | cols
+            frame_number = s.recv(4)
             b_rows = s.recv(4)
             b_cols = s.recv(4)
             rows = int(b_rows.decode())  # type: int
@@ -145,12 +130,14 @@ if __name__ == '__main__':
 
             time.sleep(1)
             np_image = read_memmap(int(rows), int(cols), 3)
-
-
+        elif header == b'INFE':     # header | length | b_json
+            length = s.recv(4)
+            b_json = s.recv(int(length))    # type: bytes
         else:
             print('None')
 
-
+        rectified_path = rectify(project_path='./', img=np_image, rectified_fname='Rectified'+frame_number.decode(),
+                                 eo=log, ground_height=0, sensor_width=sensor_width, focal_length=focal_length)
 
         # vidcap = cv2.VideoCapture(video_path)
         # fps = int(vidcap.get(cv2.CAP_PROP_FPS) + 0.5)
