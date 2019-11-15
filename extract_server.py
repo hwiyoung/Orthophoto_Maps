@@ -4,6 +4,7 @@ import time
 import numpy as np
 from struct import *
 import pandas as pd
+import json
 from ortho_func.system_calibration import calibrate
 from ortho_func.Orthophoto import rectify
 from ortho_func.EoData import convertCoordinateSystem, Rot3D
@@ -37,7 +38,32 @@ def load_io(file_path):
     return sensor_width_mm, focal_length_mm
 
 
-def sendall(sock, data, logdata, addr):
+def create_bbox_json(object_id, object_type, boundary):
+    """
+    Create json of boundary box
+    :param object_id:
+    :param object_type:
+    :param boundary:
+    :return: list of information of boundary box
+    """
+    bbox_info = [
+        {
+            "object_id": object_id,
+            "object_type": object_type,
+            "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
+                         % (boundary[0, 0], boundary[1, 0],
+                            boundary[0, 1], boundary[1, 1],
+                            boundary[0, 2], boundary[1, 2],
+                            boundary[0, 3], boundary[1, 3],
+                            boundary[0, 0], boundary[1, 0])
+        }
+    ]
+
+    return bbox_info
+
+
+# def send_bbox(sock, data, logdata, addr):
+def send_bbox(sock, data, logdata, addr):
     datalen = 65508  # UDP 는 byte[] 배열로 전송, 최대 크기는 65508
     start = 0
     end = start + datalen - 1
@@ -80,11 +106,6 @@ def sendall(sock, data, logdata, addr):
 
     # data = header + uuid_ + fwidth + fheight + data + log_   # 5+16+2+2+len(data)_log(50)
     data = header + fnumber + ftime + fwidth + fheight + data + log_  # 5+2+2+2+2+2+len(data)_log(50)
-
-    # chksum = crc8.crc8()
-    # chksum.update(data)
-    # chksum_byte = pack('<h', chksum._sum)
-    # data = data + chksum_byte
 
     while totalsize < len(data):
         sentsize = sock.send(data[start:end])
@@ -159,8 +180,7 @@ if __name__ == '__main__':
             R_GC = Rot3D(tm_eo)
             R_CG = R_GC.transpose()
 
-            # TODO: Have to do system calibration
-            # System Calibration
+            # TODO: System calibration
             OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
             eo[3] = OPK[0]
             eo[4] = OPK[1]
@@ -172,54 +192,56 @@ if __name__ == '__main__':
             ###########################
             # Rectify the given image #
             ###########################
-            rectified_path = rectify(project_path='./', img=np_image, rectified_fname='Rectified' + frame_number,
+            path_orthophoto = rectify(project_path='./', img=np_image, rectified_fname='Rectified' + frame_number,
                                      eo=tm_eo, ground_height=0, sensor_width=sensor_width, focal_length=focal_length)
         elif header == b'INFE':  # header | frame_number | length | boundary box
             frame_number = s.recv(4).decode()
             length = s.recv(4)
+            # TODO: Need to be assigned
+            object_id = 0
+            object_type = 0
+            ############################
             b_bbox = s.recv(int(length.decode()))  # type: bytes
-            bbox = b_bbox.decode()
-            print(bbox)
+            bbox = json.loads(b_bbox.decode())
+            # LL | UL | UR | LR - 2x4
+            bbox_px = np.array([[bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]],
+                                [bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]]])
+            print(bbox_px)
         else:
             print('None')
 
+        # Assume that for each sending from inference server, only one object information is received
+        # It should be modified later ... like adding for loop from pcs2ccs to create_bbox_json
+        # When applying for loop, appending dictionary to list
+        # https://stackoverflow.com/questions/5244810/python-appending-a-dictionary-to-a-list-i-see-a-pointer-like-behavior
 
-        # # TODO: bbox_px have to be from parsed json
-        # # Convert pixel coordinate system to camera coordinate system
-        # # input params unit: px, px, px, mm/px, mm
-        # bbox_camera = pcs2ccs(bbox_px, rows, cols, sensor_width, focal_length)  # shape: 3 x points
-        #
-        # # Project camera coordinates to ground coordinates
-        # # input params unit: mm, _, _, m
-        # proj_coordinates = projection(bbox_camera, tm_eo, R_CG, 0)
+        # Convert pixel coordinate system to camera coordinate system
+        # input params unit: px, px, px, mm/px, mm
+        bbox_camera = pcs2ccs(bbox_px, rows, cols, sensor_width, focal_length)  # shape: 3(x, y, z) x points
 
-        # vidcap = cv2.VideoCapture(video_path)
-        # fps = int(vidcap.get(cv2.CAP_PROP_FPS) + 0.5)
-        # log = loadcsv(video_path[:-4] + '.csv', fps)  # UDP 로 받을 경로   .MOV path[:-4] +'.csv'
-        #
-        # frame_width = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        # frame_height = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        #
-        # success = True
-        # count = 0
-        # total_time = time.time()
-        #
-        # while success:
-        #
-        #     vidcap.set(cv2.CAP_PROP_POS_MSEC,(count*(1/fps)*1000))
-        #
-        #     frame_number = int(vidcap.get(cv2.CAP_PROP_POS_FRAMES))
-        #     frame_time = int(vidcap.get(cv2.CAP_PROP_POS_MSEC))
-        #
-        #     start = time.time()
-        #     success, image = vidcap.read()
-        #     if not success:
-        #         break
-        #     strimg = image.tostring()
-        #     senttime = time.time()
-        #     cnt = sendall(s1, strimg, log[count][:], dest)
-        #     count += 1
-        #     print("1 frame sent", time.time()-senttime, cnt)
-        #
-        # print("total: ", time.time()-total_time)
-        # s_log.close()
+        # Project camera coordinates to ground coordinates
+        # input params unit: mm, _, _, m
+        boundary = projection(bbox_camera, tm_eo, R_CG, 0)  # shape: 2(x, y) x points
+
+        bbox_info = create_bbox_json(object_id, object_type, boundary)
+
+        object_info = {
+            "path": path_orthophoto,
+            "frame_number": frame_number,
+            "bbox": bbox_info
+        }
+        # https://stackoverflow.com/questions/4547274/convert-a-python-dict-to-a-string-and-back
+        str_object_info = json.dumps(object_info)
+
+        #############################################
+        # Send object information to web map viewer #
+        #############################################
+        s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        dest = ("localhost", 57820)
+
+        s1.sendto(b"MAPP", dest)  # Header
+        s1.sendto(str(len(str_object_info)).encode(), dest)     # Length
+        s1.sendto(str_object_info.encode(), dest)   # json
+
+        print("Done")

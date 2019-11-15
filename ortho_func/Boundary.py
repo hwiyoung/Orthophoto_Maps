@@ -54,15 +54,15 @@ def projection(vertices, eo, rotation_matrix, dem):
 
 
 def pcs2ccs(bbox_px, rows, cols, pixel_size, focal_length):
-    '''
+    """
     Convert pixel coordinate system to camera coordinate system
-    :param bbox_px: Bounding box in pixel coordinate system, px
+    :param bbox_px: Bounding box in pixel coordinate system, px - shape: 2x4
     :param rows: The length of rows in pixel, px
     :param cols: The length of columns in pixel, px
     :param pixel_size: mm/px
     :param focal_length: mm
     :return: Bounding box in camera coordinate system, mm
-    '''
+    """
     bbox_camera = np.empty(shape=(3, bbox_px.shape[1]))
 
     bbox_camera[0, :] = (bbox_px[0, :] - cols / 2) * pixel_size

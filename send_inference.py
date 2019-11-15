@@ -1,7 +1,11 @@
 import socket
+import json
 
-json = [[1469,129],[1469,130],[1470,130],[1470,129]]    # json??
-str_json = str(json)
+# bbox = [[1469,129],[1469,130],[1470,130],[1470,129]]    # json array
+# bbox = [{1469,129},{1469,130},{1470,130},{1470,129}]    # json array
+with open("bbox.json", "r") as bbox:
+    json_array = json.load(bbox)
+str_json = str(json_array)
 str_json = str_json.replace(' ', '')
 length = str(len(str_json))
 
