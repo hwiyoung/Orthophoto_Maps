@@ -123,7 +123,7 @@ if __name__ == '__main__':
         header = s.recv(4)
         if header == b'PATH':  # header | length | b_fname
             length = s.recv(4)
-            b_fname = s.recv(int(length))  # type: bytes
+            b_fname = s.recv(int(length.decode()))  # type: bytes
             fname = b_fname[:-4].decode()  # type: str
 
             #################
@@ -135,12 +135,12 @@ if __name__ == '__main__':
             # IO - sensor_width(mm), focal_length(mm)
             sensor_width, focal_length = load_io(fname)  # type: float, float
             print(sensor_width, focal_length)
-        elif header == b'FRAM':  # header | frame_nubmer | rows | cols
+        elif header == b'FRAM':  # header | frame_number | rows | cols
             frame_number = s.recv(4).decode()
-            b_rows = s.recv(4)
             b_cols = s.recv(4)
-            rows = int(b_rows.decode())  # type: int
+            b_rows = s.recv(4)
             cols = int(b_cols.decode())  # type: int
+            rows = int(b_rows.decode())  # type: int
 
             ####################################
             # memmap ... return to numpy array #
@@ -174,9 +174,12 @@ if __name__ == '__main__':
             ###########################
             rectified_path = rectify(project_path='./', img=np_image, rectified_fname='Rectified' + frame_number,
                                      eo=tm_eo, ground_height=0, sensor_width=sensor_width, focal_length=focal_length)
-        elif header == b'INFE':  # header | length | b_json
+        elif header == b'INFE':  # header | frame_number | length | boundary box
+            frame_number = s.recv(4).decode()
             length = s.recv(4)
-            b_json = s.recv(int(length))  # type: bytes
+            b_bbox = s.recv(int(length.decode()))  # type: bytes
+            bbox = b_bbox.decode()
+            print(bbox)
         else:
             print('None')
 
