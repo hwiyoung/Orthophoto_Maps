@@ -136,9 +136,19 @@ if __name__ == '__main__':
          [-0.0121505910810649, -0.0465359159242159, 0.998842716179817]], dtype=float)
 
     while True:
+        ##########################
+        # Server for frame, bbox #
+        ##########################
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind(('localhost', 57810))
+
+        #########################
+        # Client for map viewer #
+        #########################
+        s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        dest = ("localhost", 57820)
         print("binding...")
 
         header = s.recv(4)
@@ -236,10 +246,6 @@ if __name__ == '__main__':
         #############################################
         # Send object information to web map viewer #
         #############################################
-        s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        dest = ("localhost", 57820)
-
         s1.sendto(b"MAPP", dest)  # Header
         s1.sendto(str(len(str_object_info)).encode(), dest)     # Length
         s1.sendto(str_object_info.encode(), dest)   # json
