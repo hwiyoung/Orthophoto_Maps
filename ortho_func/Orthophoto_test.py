@@ -4,7 +4,7 @@ import cv2
 import time
 from ExifData import getExif, restoreOrientation
 from EoData import readEO, convertCoordinateSystem, Rot3D
-from Boundary import boundary, export_bbox_to_wkt
+from Boundary import boundary, export_bbox_to_wkt2
 from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff, create_pnga
 
 if __name__ == '__main__':
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                 create_pnga(b, g, r, a, bbox, gsd, epsg, dst + filename)
                 # print("--- %s seconds ---" % (time.time() - start_time))
                 # start_time = time.time()
-                export_bbox_to_wkt(bbox, dst + filename)
+                export_bbox_to_wkt2(bbox, dst + filename)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')

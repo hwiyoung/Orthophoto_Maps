@@ -1,7 +1,7 @@
 import numpy as np
 import time
 from .EoData import convertCoordinateSystem, Rot3D
-from .Boundary import boundary, export_bbox_to_wkt
+from .Boundary import boundary, export_bbox_to_wkt, export_bbox_to_wkt2
 from .BackprojectionResample import projectedCoord, backProjection, resample, create_pnga
 
 def rectify(project_path, img, rectified_fname, eo, ground_height, sensor_width, focal_length, gsd='auto'):
@@ -65,10 +65,10 @@ def rectify(project_path, img, rectified_fname, eo, ground_height, sensor_width,
     print('Save the image in PNGA')
     start_time = time.time()
     create_pnga(b, g, r, a, bbox, gsd, epsg, rectified_full_fname)
-    export_bbox_to_wkt(bbox, rectified_full_fname)
+    export_bbox_to_wkt2(bbox, rectified_full_fname)
     print("--- %s seconds ---" % (time.time() - start_time))
 
     print('*** Processing time per each image')
     print("--- %s seconds ---" % (time.time() - ealry_strat_time))
 
-    return rectified_full_fname + '.png'
+    return rectified_full_fname + '.txt'

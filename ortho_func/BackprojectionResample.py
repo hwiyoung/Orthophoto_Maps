@@ -91,21 +91,21 @@ def create_pnga(b, g, r, a, boundary, gsd, epsg, dst):
     # print('cv2.imwrite')
     # start_time = time.time()
     # https://docs.opencv.org/master/d4/da8/group__imgcodecs.html#gga292d81be8d76901bff7988d18d2b42acad2548321c69ab9c0582fd51e75ace1d0
-    cv2.imwrite(dst + '.png', png, [int(cv2.IMWRITE_PNG_COMPRESSION), 0])   # from 0 to 9, default: 3
+    cv2.imwrite(dst + '.png', png, [int(cv2.IMWRITE_PNG_COMPRESSION), 3])   # from 0 to 9, default: 3
     # print("--- %s seconds ---" % (time.time() - start_time))
 
-    xml = '<PAMDataset> ' \
-          '<SRS dataAxisToSRSAxisMapping="1,2">PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]</SRS> ' \
-          '<GeoTransform>  ' + str(boundary[0, 0]) + ',  ' + str(gsd) + ',  0.0000000000000000e+00,  ' + str(boundary[3, 0]) + ',  0.0000000000000000e+00, ' + str(-gsd) + '</GeoTransform> ' \
-          '<Metadata domain="IMAGE_STRUCTURE"> ' \
-          '<MDI key="INTERLEAVE">PIXEL</MDI> ' \
-          '</Metadata> ' \
-          '<Metadata> ' \
-          '<MDI key="AREA_OR_POINT">Area</MDI> ' \
-          '</Metadata> ' \
-          '</PAMDataset>'
-
-    f = open(dst + '.png.aux.xml', 'w')
-    f.write(xml)
-    f.close()
+    # xml = '<PAMDataset> ' \
+    #       '<SRS dataAxisToSRSAxisMapping="1,2">PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs"],AUTHORITY["EPSG","3857"]]</SRS> ' \
+    #       '<GeoTransform>  ' + str(boundary[0, 0]) + ',  ' + str(gsd) + ',  0.0000000000000000e+00,  ' + str(boundary[3, 0]) + ',  0.0000000000000000e+00, ' + str(-gsd) + '</GeoTransform> ' \
+    #       '<Metadata domain="IMAGE_STRUCTURE"> ' \
+    #       '<MDI key="INTERLEAVE">PIXEL</MDI> ' \
+    #       '</Metadata> ' \
+    #       '<Metadata> ' \
+    #       '<MDI key="AREA_OR_POINT">Area</MDI> ' \
+    #       '</Metadata> ' \
+    #       '</PAMDataset>'
+    #
+    # f = open(dst + '.png.aux.xml', 'w')
+    # f.write(xml)
+    # f.close()
 

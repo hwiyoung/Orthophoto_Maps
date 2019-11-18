@@ -14,12 +14,17 @@ from ortho_func.Boundary import pcs2ccs, projection
 def load_log(file_path):
     df = pd.read_csv(file_path + '.csv', low_memory=False)
     df = df[df['CAMERA_INFO.recordState'] == 'Starting']
+    # df = df[['CUSTOM.updateTime', 'OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
+    #          'OSD.roll', 'OSD.pitch', 'OSD.yaw',
+    #          'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
+    df_time = df[['CUSTOM.updateTime']]
+    df_time_np = df_time.to_numpy()
     df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
              'OSD.roll', 'OSD.pitch', 'OSD.yaw',
              'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df_np = df.to_numpy()
 
-    return df_np
+    return df_time_np, df_np
 
 
 def load_io(file_path):
@@ -44,25 +49,34 @@ def create_bbox_json(object_id, object_type, boundary):
     :param object_id:
     :param object_type:
     :param boundary:
-    :return: list of information of boundary box
+    :return: list of information of boundary box ... json array
     """
-    bbox_info = [
-        {
-            "object_id": object_id,
-            "object_type": object_type,
-            "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
-                         % (boundary[0, 0], boundary[1, 0],
-                            boundary[0, 1], boundary[1, 1],
-                            boundary[0, 2], boundary[1, 2],
-                            boundary[0, 3], boundary[1, 3],
-                            boundary[0, 0], boundary[1, 0])
-        }
-    ]
+    # bbox_info = [
+    #     {
+    #         "object_id": object_id,
+    #         "object_type": object_type,
+    #         "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
+    #                      % (boundary[0, 0], boundary[1, 0],
+    #                         boundary[0, 1], boundary[1, 1],
+    #                         boundary[0, 2], boundary[1, 2],
+    #                         boundary[0, 3], boundary[1, 3],
+    #                         boundary[0, 0], boundary[1, 0])
+    #     }
+    # ]
+    bbox_info = {
+        "object_id": object_id,
+        "object_type": object_type,
+        "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
+                    % (boundary[0, 0], boundary[1, 0],
+                       boundary[0, 1], boundary[1, 1],
+                       boundary[0, 2], boundary[1, 2],
+                       boundary[0, 3], boundary[1, 3],
+                       boundary[0, 0], boundary[1, 0])
+    }
 
     return bbox_info
 
 
-# def send_bbox(sock, data, logdata, addr):
 def send_bbox(sock, data, logdata, addr):
     datalen = 65508  # UDP 는 byte[] 배열로 전송, 최대 크기는 65508
     start = 0
@@ -151,6 +165,7 @@ if __name__ == '__main__':
         dest = ("localhost", 57820)
         print("binding...")
 
+        # bbox_total = []
         header = s.recv(4)
         if header == b'PATH':  # header | length | b_fname
             length = s.recv(4)
@@ -162,7 +177,9 @@ if __name__ == '__main__':
             #################
             # EO - lon(deg), lat(deg), hei(deg), roll(deg), pitch(deg), yaw(deg),
             #       gimbal.roll(deg), gimbal.pitch(deg), gimbal.yaw(deg)
-            log = load_log(fname)
+            update_time, log = load_log(fname)
+            prev_time = float(update_time[0, 0][17:])
+            first_image = True
             # IO - sensor_width(mm), focal_length(mm)
             sensor_width, focal_length = load_io(fname)  # type: float, float
             print(sensor_width, focal_length)
@@ -177,77 +194,104 @@ if __name__ == '__main__':
             # memmap ... return to numpy array #
             ####################################
             time.sleep(1)
-            np_image = read_memmap(int(rows), int(cols), 3)
+            np_image = read_memmap(rows, cols, 3)
+
+            bbox_total = []
 
             ################################
             # Sync log w.r.t. frame_number #
             ################################
             eo = log[int((int(frame_number) - 1) / 3 + 1), :]
-            tm_eo = convertCoordinateSystem(eo, epsg=3857)
-            eo[3] = eo[3] * np.pi / 180
-            eo[4] = eo[4] * np.pi / 180
-            eo[5] = eo[5] * np.pi / 180
-            R_GC = Rot3D(tm_eo)
-            R_CG = R_GC.transpose()
+            curr_time = float(update_time[int((int(frame_number) - 1) / 3 + 1), 0][17:])
+            # curr_time = 45
+            # first_image = False
 
-            # TODO: System calibration
-            OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
-            eo[3] = OPK[0]
-            eo[4] = OPK[1]
-            eo[5] = OPK[2]
-            print('Easting | Northing | Altitude | Omega | Phi | Kappa')
-            print(eo)
-            R = Rot3D(eo)
+            if (curr_time - prev_time) < 3.0 or first_image:
+                prev_time = curr_time
+                first_image = False
 
-            ###########################
-            # Rectify the given image #
-            ###########################
-            path_orthophoto = rectify(project_path='./', img=np_image, rectified_fname='Rectified' + frame_number,
-                                     eo=tm_eo, ground_height=0, sensor_width=sensor_width, focal_length=focal_length)
-        elif header == b'INFE':  # header | frame_number | length | boundary box
+                tm_eo = convertCoordinateSystem(eo, epsg=3857)
+                eo[3] = eo[3] * np.pi / 180
+                eo[4] = eo[4] * np.pi / 180
+                eo[5] = eo[5] * np.pi / 180
+                R_GC = Rot3D(tm_eo)
+                R_CG = R_GC.transpose()
+
+                # TODO: System calibration
+                OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
+                eo[3] = OPK[0]
+                eo[4] = OPK[1]
+                eo[5] = OPK[2]
+                print('Easting | Northing | Altitude | Omega | Phi | Kappa')
+                print(eo)
+                R = Rot3D(eo)
+
+                ###########################
+                # Rectify the given image #
+                ###########################
+                path_orthophoto = rectify(project_path='./', img=np_image, rectified_fname='Rectified' + frame_number,
+                                         eo=tm_eo, ground_height=0, sensor_width=sensor_width, focal_length=focal_length)
+            else:
+                prev_time = curr_time
+                continue
+
+        elif header == b'INFE':  # header(4) | frame_number(4) | length(4) | ID(32) | Type(4) | boundary box
             frame_number = s.recv(4).decode()
             length = s.recv(4)
             # TODO: Need to be assigned
-            object_id = 0
+            object_id = '85f46f4c-99d9-40da-880e-b943621f32c0'
             object_type = 0
+            # object_id = s.recv(32)
+            # object_type = s.recv(4)
             ############################
+
             b_bbox = s.recv(int(length.decode()))  # type: bytes
+            # b_bbox = s.recv(int(length.decode())-32-4)  # type: bytes
             bbox = json.loads(b_bbox.decode())
-            # LL | UL | UR | LR - 2x4
-            bbox_px = np.array([[bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]],
-                                [bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]]])
+            # # LL | UL | UR | LR - 2x4
+            # bbox_px = np.array([[bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]],
+            #                     [bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]]])
+
+            bbox_px = np.array([bbox[0][0], bbox[0][1]]).reshape(2, 1)
+            for i in range(1, len(bbox)):
+                bbox_tmp = np.array([bbox[i][0], bbox[i][1]]).reshape(2, 1)
+                bbox_px = np.append(bbox_px, bbox_tmp, 1)
             print(bbox_px)
+
+            # Convert pixel coordinate system to camera coordinate system
+            # input params unit: px, px, px, mm/px, mm
+            bbox_camera = pcs2ccs(bbox_px, rows, cols, sensor_width, focal_length)  # shape: 3(x, y, z) x points
+
+            # Project camera coordinates to ground coordinates
+            # input params unit: mm, _, _, m
+            bbox_world = projection(bbox_camera, tm_eo, R_CG, 0)  # shape: 2(x, y) x points | np.array
+
+            # Create boundary box in type of json for each inference data
+            bbox_info = create_bbox_json(object_id, object_type, bbox_world)  # dictionary
+            bbox_total.append(bbox_info)
+            print(bbox_total)
+
+        elif header == b'DONE':
+            objects_info = {
+                "path": path_orthophoto,  # String
+                "frame_number": frame_number,  # Number
+                "position": [tm_eo[0], tm_eo[1]],  # Array
+                "bbox": bbox_total  # Array includes Object
+            }
+            print(objects_info)
+            # https://stackoverflow.com/questions/4547274/convert-a-python-dict-to-a-string-and-back
+            str_objects_info = json.dumps(objects_info)
+
+            #############################################
+            # Send object information to web map viewer #
+            #############################################
+            s1.sendto(b"MAPP", dest)  # Header
+            s1.sendto(str(len(str_objects_info)).encode(), dest)  # Length
+            s1.sendto(str_objects_info.encode(), dest)  # json
+
+            bbox_total = []
+
         else:
             print('None')
-
-        # Assume that for each sending from inference server, only one object information is received
-        # It should be modified later ... like adding for loop from pcs2ccs to create_bbox_json
-        # When applying for loop, appending dictionary to list
-        # https://stackoverflow.com/questions/5244810/python-appending-a-dictionary-to-a-list-i-see-a-pointer-like-behavior
-
-        # Convert pixel coordinate system to camera coordinate system
-        # input params unit: px, px, px, mm/px, mm
-        bbox_camera = pcs2ccs(bbox_px, rows, cols, sensor_width, focal_length)  # shape: 3(x, y, z) x points
-
-        # Project camera coordinates to ground coordinates
-        # input params unit: mm, _, _, m
-        boundary = projection(bbox_camera, tm_eo, R_CG, 0)  # shape: 2(x, y) x points
-
-        bbox_info = create_bbox_json(object_id, object_type, boundary)
-
-        object_info = {
-            "path": path_orthophoto,
-            "frame_number": frame_number,
-            "bbox": bbox_info
-        }
-        # https://stackoverflow.com/questions/4547274/convert-a-python-dict-to-a-string-and-back
-        str_object_info = json.dumps(object_info)
-
-        #############################################
-        # Send object information to web map viewer #
-        #############################################
-        s1.sendto(b"MAPP", dest)  # Header
-        s1.sendto(str(len(str_object_info)).encode(), dest)     # Length
-        s1.sendto(str_object_info.encode(), dest)   # json
 
         print("Done")

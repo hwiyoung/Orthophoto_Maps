@@ -93,6 +93,18 @@ def export_bbox_to_wkt(bbox, dst):
 
     return wkt
 
+def export_bbox_to_wkt2(bbox, dst):
+    res = "POLYGON ((" + \
+          str(bbox[0, 0]) + " " + str(bbox[2, 0]) + ", " + \
+          str(bbox[0, 0]) + " " + str(bbox[3, 0]) + ", " + \
+          str(bbox[1, 0]) + " " + str(bbox[3, 0]) + ", " + \
+          str(bbox[1, 0]) + " " + str(bbox[2, 0]) + ", " + \
+          str(bbox[0, 0]) + " " + str(bbox[2, 0]) + "))"
+
+    f = open(dst + '.txt', 'w')
+    f.write(res)
+    f.close()
+
 
 def create_pgw(bbox, gsd, dst):
     pgw = str(gsd) + '\n' + str(0) + '\n' + str(0) + '\n' + str(-gsd) + \
