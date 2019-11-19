@@ -19,8 +19,10 @@ def load_log(file_path):
     #          'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df_time = df[['CUSTOM.updateTime']]
     df_time_np = df_time.to_numpy()
+    # df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
+    #          'OSD.roll', 'OSD.pitch', 'OSD.yaw',
+    #          'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
-             'OSD.roll', 'OSD.pitch', 'OSD.yaw',
              'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df_np = df.to_numpy()
 
@@ -64,14 +66,14 @@ def create_bbox_json(object_id, object_type, boundary):
     #     }
     # ]
     bbox_info = {
-        "object_id": object_id,
-        "object_type": object_type,
+        "object_id": object_id,     # uuid
         "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
                     % (boundary[0, 0], boundary[1, 0],
                        boundary[0, 1], boundary[1, 1],
                        boundary[0, 2], boundary[1, 2],
                        boundary[0, 3], boundary[1, 3],
-                       boundary[0, 0], boundary[1, 0])
+                       boundary[0, 0], boundary[1, 0]),
+        "object_type": object_type
     }
 
     return bbox_info
@@ -149,10 +151,14 @@ if __name__ == '__main__':
          [-0.135993334134149, 0.989711806459606, 0.0444561944563446],
          [-0.0121505910810649, -0.0465359159242159, 0.998842716179817]], dtype=float)
 
+    # data_store = 'C:/innomap_real/'     # Have to be defined already
+    data_store = './'  # Have to be defined already
+    project_path = 'test/'  # It has to receive from client, or THIS SERVER designates in PATH step
+
     while True:
-        ##########################
-        # Server for frame, bbox #
-        ##########################
+        ################################
+        # Server for path, frame, bbox #
+        ################################
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind(('localhost', 57810))
@@ -165,26 +171,29 @@ if __name__ == '__main__':
         dest = ("localhost", 57820)
         print("binding...")
 
-        # bbox_total = []
         header = s.recv(4)
         if header == b'PATH':  # header | length | b_fname
-            length = s.recv(4)
-            b_fname = s.recv(int(length.decode()))  # type: bytes
-            fname = b_fname[:-4].decode()  # type: str
+            length_path = s.recv(4)
+            b_filename = s.recv(int(length_path.decode()))  # type: bytes
+            filename = b_filename[:-4].decode()  # type: str .MOV
+
+            project_path = filename.split('/')[-1][:-4] + '/'
 
             #################
             # Extract EO/IO #
             #################
-            # EO - lon(deg), lat(deg), hei(deg), roll(deg), pitch(deg), yaw(deg),
-            #       gimbal.roll(deg), gimbal.pitch(deg), gimbal.yaw(deg)
-            update_time, log = load_log(fname)
+            # EO - lon(deg), lat(deg), hei(m), gimbal.roll(deg), gimbal.pitch(deg), gimbal.yaw(deg)
+            update_time, log = load_log(filename)
+
             prev_time = float(update_time[0, 0][17:])
             first_image = True
+
             # IO - sensor_width(mm), focal_length(mm)
-            sensor_width, focal_length = load_io(fname)  # type: float, float
+            sensor_width, focal_length = load_io(filename)  # type: float, float
             print(sensor_width, focal_length)
+
         elif header == b'FRAM':  # header | frame_number | rows | cols
-            frame_number = s.recv(4).decode()
+            frame_number = int(s.recv(4).decode())
             b_cols = s.recv(4)
             b_rows = s.recv(4)
             cols = int(b_cols.decode())  # type: int
@@ -201,8 +210,8 @@ if __name__ == '__main__':
             ################################
             # Sync log w.r.t. frame_number #
             ################################
-            eo = log[int((int(frame_number) - 1) / 3 + 1), :]
-            curr_time = float(update_time[int((int(frame_number) - 1) / 3 + 1), 0][17:])
+            eo = log[int((frame_number - 1) / 3 + 1), :]
+            curr_time = float(update_time[int((frame_number - 1) / 3 + 1), 0][17:])
             # curr_time = 45
             # first_image = False
 
@@ -211,41 +220,41 @@ if __name__ == '__main__':
                 first_image = False
 
                 tm_eo = convertCoordinateSystem(eo, epsg=3857)
+                # System calibration using gimbal angle
                 eo[3] = eo[3] * np.pi / 180
-                eo[4] = eo[4] * np.pi / 180
-                eo[5] = eo[5] * np.pi / 180
+                eo[4] = (eo[4] + 90) * np.pi / 180
+                eo[5] = -eo[5] * np.pi / 180
                 R_GC = Rot3D(tm_eo)
                 R_CG = R_GC.transpose()
 
-                # TODO: System calibration
-                OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
-                eo[3] = OPK[0]
-                eo[4] = OPK[1]
-                eo[5] = OPK[2]
-                print('Easting | Northing | Altitude | Omega | Phi | Kappa')
+                # OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
+                # eo[3] = OPK[0]
+                # eo[4] = OPK[1]
+                # eo[5] = OPK[2]
+                print('Easting | Northing | Height | Omega | Phi | Kappa')
                 print(eo)
-                R = Rot3D(eo)
 
                 ###########################
                 # Rectify the given image #
                 ###########################
-                path_orthophoto = rectify(project_path='./', img=np_image, rectified_fname='Rectified' + frame_number,
-                                         eo=tm_eo, ground_height=0, sensor_width=sensor_width, focal_length=focal_length)
+                path_orthophoto = rectify(data_store, project_path, img=np_image,
+                                          rectified_fname='Rectified' + str(frame_number), eo=tm_eo,
+                                          ground_height=0, sensor_width=sensor_width, focal_length=focal_length)
             else:
                 prev_time = curr_time
                 continue
 
         elif header == b'INFE':  # header(4) | frame_number(4) | length(4) | ID(32) | Type(4) | boundary box
-            frame_number = s.recv(4).decode()
-            length = s.recv(4)
+            frame_number = int(s.recv(4).decode())
+            length_infe = s.recv(4)
             # TODO: Need to be assigned
             object_id = '85f46f4c-99d9-40da-880e-b943621f32c0'
             object_type = 0
             # object_id = s.recv(32)
-            # object_type = s.recv(4)
+            # object_type = int(s.recv(4).decode())
             ############################
 
-            b_bbox = s.recv(int(length.decode()))  # type: bytes
+            b_bbox = s.recv(int(length_infe.decode()))  # type: bytes
             # b_bbox = s.recv(int(length.decode())-32-4)  # type: bytes
             bbox = json.loads(b_bbox.decode())
             # # LL | UL | UR | LR - 2x4
@@ -273,6 +282,7 @@ if __name__ == '__main__':
 
         elif header == b'DONE':
             objects_info = {
+                # "uid": uid
                 "path": path_orthophoto,  # String
                 "frame_number": frame_number,  # Number
                 "position": [tm_eo[0], tm_eo[1]],  # Array

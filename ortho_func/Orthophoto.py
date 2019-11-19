@@ -4,9 +4,10 @@ from .EoData import convertCoordinateSystem, Rot3D
 from .Boundary import boundary, export_bbox_to_wkt, export_bbox_to_wkt2
 from .BackprojectionResample import projectedCoord, backProjection, resample, create_pnga
 
-def rectify(project_path, img, rectified_fname, eo, ground_height, sensor_width, focal_length, gsd='auto'):
+def rectify(data_store, project_path, img, rectified_fname, eo, ground_height, sensor_width, focal_length, gsd='auto'):
     """
     In order to generate an individual orthophoto, this function rectifies a given drone image on a reference plane.
+    :param data_store       :
     :param project_path     : A path for saving orthophotos(e.g.: './')
     :param img              : Input image in numpy array
     :param rectified_fname  : A name of the orthophoto(e.g. Rectified_1)
@@ -19,7 +20,7 @@ def rectify(project_path, img, rectified_fname, eo, ground_height, sensor_width,
     """
 
     ealry_strat_time = time.time()
-    rectified_full_fname = project_path + rectified_fname
+    rectified_full_fname = data_store + project_path + rectified_fname
     epsg = 3857
 
     image_rows = img.shape[0]
@@ -71,4 +72,4 @@ def rectify(project_path, img, rectified_fname, eo, ground_height, sensor_width,
     print('*** Processing time per each image')
     print("--- %s seconds ---" % (time.time() - ealry_strat_time))
 
-    return rectified_full_fname + '.txt'
+    return project_path + rectified_fname + '.txt'
