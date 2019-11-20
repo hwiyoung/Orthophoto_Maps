@@ -14,14 +14,8 @@ from ortho_func.Boundary import pcs2ccs, projection
 def load_log(file_path):
     df = pd.read_csv(file_path + '.csv', low_memory=False)
     df = df[df['CAMERA_INFO.recordState'] == 'Starting']
-    # df = df[['CUSTOM.updateTime', 'OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
-    #          'OSD.roll', 'OSD.pitch', 'OSD.yaw',
-    #          'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df_time = df[['CUSTOM.updateTime']]
     df_time_np = df_time.to_numpy()
-    # df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
-    #          'OSD.roll', 'OSD.pitch', 'OSD.yaw',
-    #          'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
              'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
     df_np = df.to_numpy()
@@ -53,18 +47,6 @@ def create_bbox_json(object_id, object_type, boundary):
     :param boundary:
     :return: list of information of boundary box ... json array
     """
-    # bbox_info = [x    x
-    #     {
-    #         "object_id": object_id,
-    #         "object_type": object_type,
-    #         "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
-    #                      % (boundary[0, 0], boundary[1, 0],
-    #                         boundary[0, 1], boundary[1, 1],
-    #                         boundary[0, 2], boundary[1, 2],
-    #                         boundary[0, 3], boundary[1, 3],
-    #                         boundary[0, 0], boundary[1, 0])
-    #     }
-    # ]
     bbox_info = {
         "objects_id": object_id,     # uuid
         "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
@@ -77,61 +59,6 @@ def create_bbox_json(object_id, object_type, boundary):
     }
 
     return bbox_info
-
-def send_bbox(sock, data, logdata, addr):
-    datalen = 65508  # UDP 는 byte[] 배열로 전송, 최대 크기는 65508
-    start = 0
-    end = start + datalen - 1
-    totalsize = 0
-    cnt = 0
-
-    # Sending packet info (header(start)(5), uuid(16), width(2), height(2), data)
-    header = pack('5s', b'start')
-    # uuid_ = uuid.uuid4().bytes # The UUID as a 16-byte string (containing the six integer fields in big-endian byte order).
-
-    fnumber = pack('>H', frame_number)
-    ftime = pack('>H', frame_time)
-
-    fwidth = pack('>H', frame_width)  # H : uint16
-    fheight = pack('>H', frame_height)
-
-    time = logdata[0].encode()
-    lat = logdata[1] * 1000000
-    lon = logdata[2] * 1000000
-    hei = logdata[3] * 10
-    alt = logdata[4] * 10
-    xSpd = logdata[5] * 10
-    ySpd = logdata[6] * 10
-    zSpd = logdata[7] * 10
-    roll = logdata[8] * 10
-    pitch = logdata[9] * 10
-    yaw = logdata[10] * 10
-    GBroll = logdata[11] * 10
-    GBpitch = logdata[12] * 10
-    GByaw = logdata[13] * 10
-
-    log_ = pack('>23sIIHHbbbhhhhhh', time, int(lat), int(lon), int(hei), int(alt),
-                int(xSpd), int(ySpd), int(zSpd), int(roll), int(pitch), int(yaw),
-                int(GBroll), int(GBpitch), int(GByaw))
-    # s: string
-    # I: uint32
-    # H: uint16
-    # b: int8
-    # h: int16
-
-    # data = header + uuid_ + fwidth + fheight + data + log_   # 5+16+2+2+len(data)_log(50)
-    data = header + fnumber + ftime + fwidth + fheight + data + log_  # 5+2+2+2+2+2+len(data)_log(50)
-
-    while totalsize < len(data):
-        sentsize = sock.send(data[start:end])
-        # sentsize = sock.sendto(data[start:end], addr)
-        if not sentsize: return None
-        start = start + sentsize
-        end = start + datalen - 1
-        totalsize += sentsize
-        cnt += 1
-
-    return cnt
 
 
 def read_memmap(rows, cols, ch):
@@ -182,13 +109,11 @@ if __name__ == '__main__':
             #################
             # Extract EO/IO #
             #################
-            # EO - lon(deg), lat(deg), hei(m), gimbal.roll(deg), gimbal.pitch(deg), gimbal.yaw(deg)
             update_time, log = load_log(filename)
 
             prev_time = float(update_time[0, 0][17:])
             first_image = True
 
-            # IO - sensor_width(mm), focal_length(mm)
             sensor_width, focal_length = load_io(filename)  # type: float, float
             print(sensor_width, focal_length)
 
@@ -210,28 +135,27 @@ if __name__ == '__main__':
             ################################
             # Sync log w.r.t. frame_number #
             ################################
-            eo = log[int((frame_number - 1) / 3 + 1), :]
             curr_time = float(update_time[int((frame_number - 1) / 3 + 1), 0][17:])
-            # curr_time = 45
-            # first_image = False
+            eo = log[int((frame_number - 1) / 3 + 1), :]
+
 
             if (curr_time - prev_time) < 3.0 or first_image:
                 prev_time = curr_time
                 first_image = False
 
                 tm_eo = convertCoordinateSystem(eo, epsg=3857)
-                # System calibration using gimbal angle
                 eo[3] = eo[3] * np.pi / 180
-                eo[4] = (eo[4] + 90) * np.pi / 180
-                eo[5] = -eo[5] * np.pi / 180
+                eo[4] = eo[4] * np.pi / 180
+                eo[5] = eo[5] * np.pi / 180
                 R_GC = Rot3D(tm_eo)
                 R_CG = R_GC.transpose()
 
-                # OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
-                # eo[3] = OPK[0]
-                # eo[4] = OPK[1]
-                # eo[5] = OPK[2]
-                print('Easting | Northing | Height | Omega | Phi | Kappa')
+                # System Calibration
+                OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
+                eo[3] = OPK[0]
+                eo[4] = OPK[1]
+                eo[5] = OPK[2]
+                print('Easting | Northing | Altitude | Omega | Phi | Kappa')
                 print(eo)
 
                 ###########################
@@ -257,9 +181,6 @@ if __name__ == '__main__':
             b_bbox = s.recv(int(length_infe.decode()))  # type: bytes
             # b_bbox = s.recv(int(length.decode())-32-4)  # type: bytes
             bbox = json.loads(b_bbox.decode())
-            # # LL | UL | UR | LR - 2x4
-            # bbox_px = np.array([[bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]],
-            #                     [bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]]])
 
             bbox_px = np.array([bbox[0][0], bbox[0][1]]).reshape(2, 1)
             for i in range(1, len(bbox)):
@@ -291,7 +212,6 @@ if __name__ == '__main__':
                 "objects": bbox_total  # Array includes Object
             }
             print(objects_info)
-            # https://stackoverflow.com/questions/4547274/convert-a-python-dict-to-a-string-and-back
             str_objects_info = json.dumps(objects_info)
 
             #############################################
@@ -299,20 +219,7 @@ if __name__ == '__main__':
             #############################################
             fmt = '<4si' + str(len(str_objects_info)) + 's'
             data_to_send = pack(fmt, b"MAPP", len(str_objects_info), str_objects_info.encode())
-            # header_length = pack('<4si', b"MAPP", len(str_objects_info))
-            # body = pack('<' + str(len(str_objects_info)) + 's', str_objects_info.encode())
-            # data_to_send = header_length + body
             s1.sendto(data_to_send, dest)
-
-            # # s: string
-            # # I: uint32
-            # # H: uint16
-            # # b: int8
-            # # h: int16
-            #
-            # s1.sendto(b"MAPP", dest)  # Header
-            # s1.sendto(str(len(str_objects_info)).encode(), dest)  # Length
-            # s1.sendto(str_objects_info.encode(), dest)  # json
 
             bbox_total = []
 

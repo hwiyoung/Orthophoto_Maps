@@ -2,7 +2,6 @@ import socket
 import json
 
 # bbox = [[1469,129],[1469,130],[1470,130],[1470,129]]    # json array
-# bbox = [{1469,129},{1469,130},{1470,130},{1470,129}]    # json array
 with open("bbox.json", "r") as bbox:
     json_array = json.load(bbox)
 str_json = str(json_array)

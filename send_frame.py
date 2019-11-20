@@ -8,6 +8,7 @@ dest = ("localhost", 57810)
 
 video_path = 'C:/DJI_0114.MOV'
 # video_path = 'C:/DJI_0018.MOV'
+# video_path = 'C:/DJI_0030.MOV'
 vidcap = cv2.VideoCapture(video_path)
 
 frame_number = str(int(vidcap.get(cv2.CAP_PROP_POS_FRAMES)))

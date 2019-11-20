@@ -2,6 +2,7 @@ import socket
 
 path = 'C:/DJI_0114.csv'
 # path = 'C:/DJI_0018.csv'
+# path = 'C:/DJI_0030.csv'
 length = str(len(path))
 
 s0 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

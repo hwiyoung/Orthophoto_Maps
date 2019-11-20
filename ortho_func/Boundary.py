@@ -56,7 +56,7 @@ def projection(vertices, eo, rotation_matrix, dem):
 def pcs2ccs(bbox_px, rows, cols, pixel_size, focal_length):
     """
     Convert pixel coordinate system to camera coordinate system
-    :param bbox_px: Bounding box in pixel coordinate system, px - shape: 2x4
+    :param bbox_px: Bounding box in pixel coordinate system, px - shape: 2 x n
     :param rows: The length of rows in pixel, px
     :param cols: The length of columns in pixel, px
     :param pixel_size: mm/px
@@ -101,9 +101,10 @@ def export_bbox_to_wkt2(bbox, dst):
           str(bbox[1, 0]) + " " + str(bbox[2, 0]) + ", " + \
           str(bbox[0, 0]) + " " + str(bbox[2, 0]) + "))"
 
-    f = open(dst + '.txt', 'w')
-    f.write(res)
-    f.close()
+    # f = open(dst + '.txt', 'w')
+    # f.write(res)
+    # f.close()
+    return res
 
 
 def create_pgw(bbox, gsd, dst):
