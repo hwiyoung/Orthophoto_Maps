@@ -158,21 +158,6 @@ def FRAM(np_image, frame_number):
 
 
 def INFE(infe_res, cols, rows):
-    # infe_res = [
-    #     {
-    #         "frame_number": 1,
-    #         "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c0",
-    #         "boundary": [[1469,129],[1469,230],[1570,230],[1570,129]],
-    #         "objects_type": 0
-    #     },
-    #     {
-    #         "frame_number": 1,
-    #         "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c1",
-    #         "boundary": [[469,129],[469,230],[570,230],[570,129]],
-    #         "objects_type": 0
-    #     }
-    # ]
-
     frame_number = infe_res[0]["frame_number"]
 
     eo = log_eo[int((frame_number - 1) / 3 + 1), :]
@@ -212,82 +197,47 @@ def INFE(infe_res, cols, rows):
     print(bbox_total)
 
 
-def SEND(bbox_total, ortho_json):
-    #########################
-    # Client for map viewer #
-    #########################
-    s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    dest = ("localhost", 57820)
-    print("binding...")
-
-    bbox_tmp = copy(bbox_total)
-
-    bbox_to_add = []
-    iter = len(bbox_total)
-
-    count = 0
-    for i in range(iter):
-        if bbox_total[i]["frame_number"] == ortho_json["frame_number"]:
-            bbox_to_add.append(bbox_total)
-            count = count + 1
-
-    del bbox_total[:count-1]
-
-    ortho_json["objects"] = bbox_to_add
-    print(ortho_json)
-    # https://stackoverflow.com/questions/4547274/convert-a-python-dict-to-a-string-and-back
-    str_objects_info = json.dumps(ortho_json)
-
-    #############################################
-    # Send object information to web map viewer #
-    #############################################
-    fmt = '<4si' + str(len(str_objects_info)) + 's'     # s: string, i: int
-    data_to_send = pack(fmt, b"MAPP", len(str_objects_info), str_objects_info.encode())
-    s1.sendto(data_to_send, dest)
-
-
-if __name__ == '__main__':
-    PATH(path="C:/DJI_0018.csv", video_id="525c671317165f77b0d31543634093abb")
-    # PATH(path="C:/DJI_0030.csv", video_id="525c671317165f77b0d31543634093aba")
-
-    infe_res = [
-        {
-            "frame_number": 181,
-            "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c0",
-            "boundary": [[1469, 129], [1469, 230], [1670, 230], [1670, 129]],
-            "objects_type": 0
-        },
-        {
-            "frame_number": 181,
-            "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c1",
-            "boundary": [[469, 129], [469, 230], [570, 230], [570, 129]],
-            "objects_type": 0
-        }
-    ]
-
-    # video_path = 'C:/DJI_0114.MOV'
-    video_path = 'C:/DJI_0018.MOV'
-    # video_path = 'C:/DJI_0030.MOV'
-    vidcap = cv2.VideoCapture(video_path)
-
-    count = 0
-    while (vidcap.isOpened()):
-        ret, np_image = vidcap.read()
-        rows = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        cols = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
-
-        if (int(vidcap.get(1)) % 90 == 1):
-            frame_number = int(vidcap.get(cv2.CAP_PROP_POS_FRAMES))
-            # mm = np.memmap('frame_image', mode='w+', shape=np_image.shape, dtype=np_image.dtype)
-            # mm[:] = np_image[:]
-            # mm.flush()
-            # del mm
-            print(np_image.shape)
-
-            INFE(infe_res, cols, rows)
-
-            # frame_number = 1
-            FRAM(np_image, frame_number)
-
-    print("Hello")
+# if __name__ == '__main__':
+#     PATH(path="C:/DJI_0018.csv", video_id="525c671317165f77b0d31543634093abb")
+#     # PATH(path="C:/DJI_0030.csv", video_id="525c671317165f77b0d31543634093aba")
+#
+#     infe_res = [
+#         {
+#             "frame_number": 181,
+#             "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c0",
+#             "boundary": [[1469, 129], [1469, 230], [1670, 230], [1670, 129]],
+#             "objects_type": 0
+#         },
+#         {
+#             "frame_number": 181,
+#             "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c1",
+#             "boundary": [[469, 129], [469, 230], [570, 230], [570, 129]],
+#             "objects_type": 0
+#         }
+#     ]
+#
+#     # video_path = 'C:/DJI_0114.MOV'
+#     video_path = 'C:/DJI_0018.MOV'
+#     # video_path = 'C:/DJI_0030.MOV'
+#     vidcap = cv2.VideoCapture(video_path)
+#
+#     count = 0
+#     while (vidcap.isOpened()):
+#         ret, np_image = vidcap.read()
+#         rows = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+#         cols = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
+#
+#         if (int(vidcap.get(1)) % 90 == 1):
+#             frame_number = int(vidcap.get(cv2.CAP_PROP_POS_FRAMES))
+#             # mm = np.memmap('frame_image', mode='w+', shape=np_image.shape, dtype=np_image.dtype)
+#             # mm[:] = np_image[:]
+#             # mm.flush()
+#             # del mm
+#             print(np_image.shape)
+#
+#             INFE(infe_res, cols, rows)
+#
+#             # frame_number = 1
+#             FRAM(np_image, frame_number)
+#
+#     print("Hello")
