@@ -13,10 +13,13 @@ def calltracker(func):
 @calltracker
 def doubler(number):
     check = 0
-    while check < 50000000:
+    while check < 500000000:
         check += 1
     print(check)
 
+# @calltracker
+# def doubler(number):
+#     print(number*2)
 
 if __name__ == '__main__':
     while True:
@@ -37,5 +40,6 @@ if __name__ == '__main__':
             if not doubler.has_been_called:
                 print("You haven't called this function yet")
                 doubler(2)
+                doubler.has_been_called = False
             if doubler.has_been_called:
                 print('doubler has been called!')

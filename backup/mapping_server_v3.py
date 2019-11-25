@@ -85,12 +85,13 @@ def FRAM(np_image, frame_number):
     tm_eo = convertCoordinateSystem(eo, epsg=3857)
     # System calibration using gimbal angle
     # eo[3] = eo[3] * np.pi / 180
-    # eo[4] = (eo[4] + 90) * np.pi / 180
-    # eo[5] = -eo[5] * np.pi / 180
+    eo[3] = (eo[3] - 40) * np.pi / 180
+    eo[4] = (eo[4] + 90) * np.pi / 180
+    eo[5] = -eo[5] * np.pi / 180
 
-    eo[3:] = eo[3:] * np.pi / 180
-    OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
-    eo[3:] = OPK
+    # eo[3:] = eo[3:] * np.pi / 180
+    # OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
+    # eo[3:] = OPK
     print('Easting | Northing | Height | Omega | Phi | Kappa')
     print(eo)
 
@@ -211,7 +212,6 @@ if __name__ == '__main__':
 
             load_log(path)  # Extract EO
             load_io(file_path_wo_ext + ".MOV")  # Extract IO
-            print(log_eo.shape[0], io, uuid)
 
             # e.g. for an inference result for each frame
             infe_res = [
