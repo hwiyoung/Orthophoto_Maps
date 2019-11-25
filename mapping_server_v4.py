@@ -113,9 +113,11 @@ def FRAM(np_image, frame_number):
     tm_eo = convertCoordinateSystem(eo, epsg=3857)
     # System calibration using gimbal angle
     # Especially in south direction
+    print(eo[3:])
     eo[3] = -(90 + eo[4]) * np.pi / 180  # omega = -(90+pitch)
     eo[4] = -eo[3] * np.pi / 180  # phi = -roll
     eo[5] = -eo[5] * np.pi / 180  # kappa = -yaw
+    print(eo[3:])
 
     # eo[3:] = eo[3:] * np.pi / 180
     # OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
@@ -163,8 +165,8 @@ def FRAM(np_image, frame_number):
 def INFE(infe_res, cols, rows):
     if len(infe_res) == 0:
         return
-    infe_res_json = json.loads(infe_res)
-    frame_number = infe_res_json[0]["frame_number"]
+    # infe_res_json = json.loads(infe_res)
+    frame_number = infe_res[0]["frame_number"]
 
     eo = log_eo[int((frame_number - 1) / 3 + 1), :]
     tm_eo = convertCoordinateSystem(eo, epsg=3857)
@@ -184,10 +186,10 @@ def INFE(infe_res, cols, rows):
     print('Easting | Northing | Height | Omega | Phi | Kappa')
     print(eo)
 
-    for i in range(len(infe_res_json)):
-        object_id = infe_res_json[i]["uid"]
-        object_type = infe_res_json[i]["type"]
-        bbox = infe_res_json[i]["objects"]
+    for i in range(len(infe_res)):
+        object_id = infe_res[i]["objects_id"]
+        object_type = infe_res[i]["objects_type"]
+        bbox = infe_res[i]["boundary"]
         bbox_px = np.array(bbox).transpose()
 
         # Convert pixel coordinate system to camera coordinate system
@@ -272,9 +274,7 @@ if __name__ == '__main__':
                     # del mm
                     print(np_image.shape)
 
-                    # INFE(infe_res, cols, rows)
-                    # FRAM(np_image, frame_number)
-
-                    json_to_map_server(np_image, frame_number, infe_res, cols, rows)
+                    INFE(infe_res, cols, rows)
+                    FRAM(np_image, frame_number)
 
             print("Hello")
