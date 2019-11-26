@@ -6,7 +6,8 @@ import pandas as pd
 def load_log(file_path):
     df = pd.read_csv(file_path, low_memory=False)
     df = df[df['CAMERA_INFO.recordState'] == 'Starting']
-    df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]', 'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
+    df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]', 'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw',
+             "OSD.roll", "OSD.pitch", "OSD.yaw"]]
 
     global log_eo
     log_eo = df.to_numpy()
@@ -14,7 +15,8 @@ def load_log(file_path):
 
 if __name__ == '__main__':
     file_name = "DJI_0002 (2)"
-    folder_path = "Z:/PM2019005_ndmi/20191125/"
+    # folder_path = "Z:/PM2019005_ndmi/20191125/"
+    folder_path = "C:/"
 
     rate = 60
 
@@ -36,6 +38,7 @@ if __name__ == '__main__':
                 break
 
     print("Writing files...")
-    np.savetxt(folder_path + file_name + ".txt", eo, delimiter='\t', fmt='%.10e')
+    # np.savetxt(folder_path + file_name + ".txt", eo, delimiter='\t', fmt='%.10e')
+    np.savetxt("C:/Users/InnoPAM/Documents/" + file_name + ".txt", eo, delimiter='\t', fmt='%.10e')
 
     print("Hello")

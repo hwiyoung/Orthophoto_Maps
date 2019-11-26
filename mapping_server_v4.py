@@ -11,6 +11,7 @@ from ortho_func.Orthophoto import rectify
 from ortho_func.EoData import convertCoordinateSystem, Rot3D
 from ortho_func.Boundary import pcs2ccs, projection
 import subprocess
+from copy import copy
 
 # For test
 R_CB = np.array(
@@ -22,14 +23,6 @@ data_store = 'C:/innomap_real/dataStore/'  # Have to be defined already
 # data_store = '../map_demo/dataStore/'
 bbox_total = []
 frame_number_check = -1
-
-#########################
-# Client for map viewer #
-#########################
-s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-dest = ("localhost", 57820)
-print("binding...")
 
 
 def load_log(file_path):
@@ -114,9 +107,10 @@ def FRAM(np_image, frame_number):
     # System calibration using gimbal angle
     # Especially in south direction
     print(eo[3:])
-    eo[3] = -(90 + eo[4]) * np.pi / 180  # omega = -(90+pitch)
-    eo[4] = -eo[3] * np.pi / 180  # phi = -roll
-    eo[5] = -eo[5] * np.pi / 180  # kappa = -yaw
+    opk = copy(eo[3:])
+    eo[3] = -(90 + opk[1]) * np.pi / 180  # omega = -(90+pitch)
+    eo[4] = -opk[0] * np.pi / 180  # phi = -roll
+    eo[5] = -opk[2] * np.pi / 180  # kappa = -yaw
     print(eo[3:])
 
     # eo[3:] = eo[3:] * np.pi / 180
