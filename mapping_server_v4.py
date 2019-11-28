@@ -25,6 +25,24 @@ bbox_total = []
 frame_number_check = -1
 
 
+def rot_2d(theta):
+    return np.array([[np.cos(theta), np.sin(theta)],
+                     [-np.sin(theta), np.cos(theta)]])
+
+
+def rpy_to_opk(rpy):
+    x = copy(rpy[0:2])
+    x[0] = 90 + rpy[1]
+    x[1] = rpy[0]
+    # print("x :", x)
+    omega_phi = np.dot(rot_2d(rpy[2] * np.pi / 180), x.reshape(2, 1))
+    kappa = -rpy[2]
+    print("omega: ", float(omega_phi[0]),
+          "phi: ", float(omega_phi[1]),
+          "kappa: ", kappa)
+    return np.array([float(omega_phi[0]), float(omega_phi[1]), kappa])
+
+
 def load_log(file_path):
     df = pd.read_csv(file_path, low_memory=False)
     df = df[df['CAMERA_INFO.recordState'] == 'Starting']
@@ -101,23 +119,23 @@ def FRAM(np_image, frame_number):
         return
 
     frame_number_check = int(frame_number / 90)
-    eo = log_eo[int(frame_number / 3), :]
+    try:
+        eo = log_eo[int(frame_number / 3), :]
+        print(eo)
+    except IndexError:
+        eo = log_eo[len(log_eo)-1, :]
+        print(eo)
 
     tm_eo = convertCoordinateSystem(eo, epsg=3857)
     # System calibration using gimbal angle
-    # Especially in south direction
-    print(eo[3:])
-    opk = copy(eo[3:])
-    eo[3] = -(90 + opk[1]) * np.pi / 180  # omega = -(90+pitch)
-    eo[4] = -opk[0] * np.pi / 180  # phi = -roll
-    eo[5] = -opk[2] * np.pi / 180  # kappa = -yaw
-    print(eo[3:])
+    opk = rpy_to_opk(eo[3:])
+    tm_eo[3:] = opk * np.pi / 180
 
     # eo[3:] = eo[3:] * np.pi / 180
     # OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
     # eo[3:] = OPK
     print('Easting | Northing | Height | Omega | Phi | Kappa')
-    print(eo)
+    print(tm_eo)
 
     ###########################
     # Rectify the given image #
@@ -162,13 +180,17 @@ def INFE(infe_res, cols, rows):
     # infe_res_json = json.loads(infe_res)
     frame_number = infe_res[0]["frame_number"]
 
-    eo = log_eo[int((frame_number - 1) / 3 + 1), :]
+    try:
+        eo = log_eo[int(frame_number / 3), :]
+        print(eo)
+    except IndexError:
+        eo = log_eo[len(log_eo)-1, :]
+        print(eo)
+
     tm_eo = convertCoordinateSystem(eo, epsg=3857)
     # System calibration using gimbal angle
-    # Especially in south direction
-    eo[3] = -(90 + eo[4]) * np.pi / 180     # omega = -(90+pitch)
-    eo[4] = -eo[3] * np.pi / 180            # phi = -roll
-    eo[5] = -eo[5] * np.pi / 180            # kappa = -yaw
+    opk = rpy_to_opk(eo[3:])
+    tm_eo[3:] = opk * np.pi / 180
 
 
     # eo[3:] = eo[3:] * np.pi / 180
