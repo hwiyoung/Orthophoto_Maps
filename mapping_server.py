@@ -13,16 +13,18 @@ from ortho_func.Boundary import pcs2ccs, projection
 import subprocess
 from copy import copy
 
-# For test
-R_CB = np.array(
-    [[0.990635238726878, 0.135295782209043, 0.0183541578119133],
-     [-0.135993334134149, 0.989711806459606, 0.0444561944563446],
-     [-0.0121505910810649, -0.0465359159242159, 0.998842716179817]], dtype=float)
-
 data_store = 'C:/innomap_real/dataStore/'  # Have to be defined already
 # data_store = '../map_demo/dataStore/'
 bbox_total = []
 frame_number_check = -1
+
+#########################
+# Client for map viewer #
+#########################
+s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+dest = ("localhost", 57820)
+print("binding...")
 
 
 def rot_2d(theta):
@@ -37,9 +39,9 @@ def rpy_to_opk(rpy):
     # print("x :", x)
     omega_phi = np.dot(rot_2d(rpy[2] * np.pi / 180), x.reshape(2, 1))
     kappa = -rpy[2]
-    print("omega: ", float(omega_phi[0]),
-          "phi: ", float(omega_phi[1]),
-          "kappa: ", kappa)
+    # print("omega: ", float(omega_phi[0]),
+    #       "phi: ", float(omega_phi[1]),
+    #       "kappa: ", kappa)
     return np.array([float(omega_phi[0]), float(omega_phi[1]), kappa])
 
 
@@ -85,14 +87,27 @@ def create_bbox_json(frame_number, object_id, object_type, boundary):
     bbox_info = {
         "frame_number": frame_number,
         "objects_id": object_id,  # uuid
-        "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
-                    % (boundary[0, 0], boundary[1, 0],
-                       boundary[0, 1], boundary[1, 1],
-                       boundary[0, 2], boundary[1, 2],
-                       boundary[0, 3], boundary[1, 3],
-                       boundary[0, 0], boundary[1, 0]),
         "objects_type": object_type
     }
+
+    wkt_info = "POLYGON (("
+    for i in range(boundary.shape[1]):
+        wkt_info = wkt_info + str(boundary[0, i]) + " " + str(boundary[1, i]) + ", "
+    wkt_info = wkt_info + str(boundary[0, 0]) + " " + str(boundary[1, 0]) + "))"
+    # print("wkt_info: ", wkt_info)
+
+    # for i in range(boundary.shape[1]):
+    #     boundary_wkt = {
+    #         "boundary": "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))"
+    #                     % (boundary[0, 0], boundary[1, 0],
+    #                        boundary[0, 1], boundary[1, 1],
+    #                        boundary[0, 2], boundary[1, 2],
+    #                        boundary[0, 3], boundary[1, 3],
+    #                        boundary[0, 0], boundary[1, 0]),
+    #     }
+    #
+    bbox_info["boundary"] = wkt_info
+    # print("bbox_info: " ,bbox_info)
 
     return bbox_info
 
@@ -121,21 +136,20 @@ def FRAM(np_image, frame_number):
     frame_number_check = int(frame_number / 90)
     try:
         eo = log_eo[int(frame_number / 3), :]
-        print(eo)
+        #print(eo)
     except IndexError:
-        eo = log_eo[len(log_eo)-1, :]
-        print(eo)
+        eo = log_eo[-1, :]
+        #print(eo)
+
+    if eo[4] < -30:
+        return
 
     tm_eo = convertCoordinateSystem(eo, epsg=3857)
     # System calibration using gimbal angle
     opk = rpy_to_opk(eo[3:])
     tm_eo[3:] = opk * np.pi / 180
-
-    # eo[3:] = eo[3:] * np.pi / 180
-    # OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
-    # eo[3:] = OPK
-    print('Easting | Northing | Height | Omega | Phi | Kappa')
-    print(tm_eo)
+    #print('Easting | Northing | Height | Omega | Phi | Kappa')
+    #print(tm_eo)
 
     ###########################
     # Rectify the given image #
@@ -162,7 +176,7 @@ def FRAM(np_image, frame_number):
     del bbox_total[:(count - 1)]
 
     ortho_json["objects"] = bbox_to_add
-    print(ortho_json)
+    #print(ortho_json)
     # https://stackoverflow.com/questions/4547274/convert-a-python-dict-to-a-string-and-back
     str_objects_info = json.dumps(ortho_json)
 
@@ -177,36 +191,32 @@ def FRAM(np_image, frame_number):
 def INFE(infe_res, cols, rows):
     if len(infe_res) == 0:
         return
-    # infe_res_json = json.loads(infe_res)
-    frame_number = infe_res[0]["frame_number"]
+    infe_res_json = json.loads(infe_res)
+    #print(infe_res_json)
+    #print(len(infe_res_json))
+    frame_number = infe_res_json[0]["frame_number"]
 
     try:
         eo = log_eo[int(frame_number / 3), :]
-        print(eo)
     except IndexError:
-        eo = log_eo[len(log_eo)-1, :]
-        print(eo)
+        eo = log_eo[-1, :]
 
     tm_eo = convertCoordinateSystem(eo, epsg=3857)
     # System calibration using gimbal angle
     opk = rpy_to_opk(eo[3:])
     tm_eo[3:] = opk * np.pi / 180
 
-
-    # eo[3:] = eo[3:] * np.pi / 180
-    # OPK = calibrate(eo[3], eo[4], eo[5], R_CB)
-    # eo[3:] = OPK
-
     R_GC = Rot3D(tm_eo)
     R_CG = R_GC.transpose()
-    print('Easting | Northing | Height | Omega | Phi | Kappa')
-    print(eo)
+    # print('Easting | Northing | Height | Omega | Phi | Kappa')
+    # print(tm_eo)
 
-    for i in range(len(infe_res)):
-        object_id = infe_res[i]["objects_id"]
-        object_type = infe_res[i]["objects_type"]
-        bbox = infe_res[i]["boundary"]
+    for i in range(len(infe_res_json)):
+        object_id = infe_res_json[i]["uid"]
+        object_type = infe_res_json[i]["type"]
+        bbox = infe_res_json[i]["objects"]
         bbox_px = np.array(bbox).transpose()
+        # print(bbox_px)
 
         # Convert pixel coordinate system to camera coordinate system
         # input params unit: px, px, px, mm/px, mm
@@ -216,81 +226,84 @@ def INFE(infe_res, cols, rows):
         # Project camera coordinates to ground coordinates
         # input params unit: mm, _, _, m
         bbox_world = projection(bbox_camera, tm_eo, R_CG, 0)  # shape: 2(x, y) x points | np.array
+        # print(bbox_world.shape)
 
         # Create boundary box in type of json for each inference data
         bbox_info = create_bbox_json(frame_number, object_id, object_type, bbox_world)  # dictionary
         bbox_total.append(bbox_info)
-    print(bbox_total)
+    #print(bbox_total)
 
 
-if __name__ == '__main__':
-    while True:
-        ################################
-        # Server for path, frame, bbox #
-        ################################
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind(('localhost', 57810))
-
-        #########################
-        # Client for map viewer #
-        #########################
-        s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        dest = ("localhost", 57820)
-        print("binding...")
-
-        data, addr = s.recvfrom(200)
-
-        header = data[:4]
-        if header == b'PATH':  # header | length | path | video_id(33 for test)
-            length_path = int.from_bytes(data[4:8], "little")
-            path = data[8:8 + length_path].decode()
-            video_id = data[8 + length_path:].decode()
-
-            file_path_wo_ext = path[:-4]
-            # project_path = file_path_wo_ext.split('/')[-1] + '/'
-
-            global uuid
-            uuid = video_id
-            if not (os.path.isdir(data_store + uuid)):
-                os.mkdir(data_store + uuid)
-
-            load_log(path)  # Extract EO
-            load_io(file_path_wo_ext + ".MOV")  # Extract IO
-
-            # e.g. for an inference result for each frame
-            infe_res = [
-                {
-                    "frame_number": 181,
-                    "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c0",
-                    "boundary": [[1469, 129], [1469, 230], [1670, 230], [1670, 129]],
-                    "objects_type": 0
-                },
-                {
-                    "frame_number": 181,
-                    "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c1",
-                    "boundary": [[469, 129], [469, 230], [570, 230], [570, 129]],
-                    "objects_type": 0
-                }
-            ]
-
-            vidcap = cv2.VideoCapture(file_path_wo_ext + ".MOV")
-            count = 0
-            while vidcap.isOpened():
-                ret, np_image = vidcap.read()
-                rows = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                cols = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
-
-                if int(vidcap.get(1)) % 90 == 1:
-                    frame_number = int(vidcap.get(cv2.CAP_PROP_POS_FRAMES))
-                    # mm = np.memmap('frame_image', mode='w+', shape=np_image.shape, dtype=np_image.dtype)
-                    # mm[:] = np_image[:]
-                    # mm.flush()
-                    # del mm
-                    print(np_image.shape)
-
-                    INFE(infe_res, cols, rows)
-                    FRAM(np_image, frame_number)
-
-            print("Hello")
+# if __name__ == '__main__':
+#     while True:
+#         ################################
+#         # Server for path, frame, bbox #
+#         ################################
+#         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#         s.bind(('localhost', 57810))
+#
+#         #########################
+#         # Client for map viewer #
+#         #########################
+#         s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#         dest = ("localhost", 57820)
+#         print("binding...")
+#
+#         data, addr = s.recvfrom(200)
+#
+#         header = data[:4]
+#         if header == b'PATH':  # header | length | path | video_id(33 for test)
+#             length_path = int.from_bytes(data[4:8], "little")
+#             path = data[8:8 + length_path].decode()
+#             video_id = data[8 + length_path:].decode()
+#
+#             file_path_wo_ext = path[:-4]
+#             # project_path = file_path_wo_ext.split('/')[-1] + '/'
+#
+#             global uuid
+#             uuid = video_id
+#             if not (os.path.isdir(data_store + uuid)):
+#                 os.mkdir(data_store + uuid)
+#
+#             load_log(path)  # Extract EO
+#             load_io(file_path_wo_ext + ".MOV")  # Extract IO
+#
+#             # # e.g. for an inference result for each frame
+#             # infe_res = [
+#             #     {
+#             #         "frame_number": 181,
+#             #         "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c0",
+#             #         "boundary": [[1469, 129], [1469, 230], [1670, 230], [1670, 129]],
+#             #         "objects_type": 0
+#             #     },
+#             #     {
+#             #         "frame_number": 181,
+#             #         "objects_id": "85f46f4c-99d9-40da-880e-b943621f32c1",
+#             #         "boundary": [[469, 129], [469, 230], [570, 230], [570, 129]],
+#             #         "objects_type": 0
+#             #     }
+#             # ]
+#             #
+#             # vidcap = cv2.VideoCapture(file_path_wo_ext + ".MOV")
+#             # count = 0
+#             # while vidcap.isOpened():
+#             #     ret, np_image = vidcap.read()
+#             #     rows = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+#             #     cols = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
+#             #
+#             #     if int(vidcap.get(1)) % 90 == 1:
+#             #         frame_number = int(vidcap.get(cv2.CAP_PROP_POS_FRAMES))
+#             #         # mm = np.memmap('frame_image', mode='w+', shape=np_image.shape, dtype=np_image.dtype)
+#             #         # mm[:] = np_image[:]
+#             #         # mm.flush()
+#             #         # del mm
+#             #         print(np_image.shape)
+#             #
+#             #         # INFE(infe_res, cols, rows)
+#             #         # FRAM(np_image, frame_number)
+#             #
+#             #         json_to_map_server(np_image, frame_number, infe_res, cols, rows)
+#             #
+#             # print("Hello")
