@@ -13,11 +13,11 @@ if __name__ == '__main__':
     ground_height = 0  # unit: m
     sensor_width = 17.3  # unit: mm, Inspire2
 
-    dst = './'
+    dst = 'Z:/PM2019005_ndmi/20191125/DJI_0002 (2)_test_result/'
     epsg = 3857
 
     # for root, dirs, files in os.walk('../Data'):
-    for root, dirs, files in os.walk('C:/Users/InnoPAM/Downloads/DJI_0002 (2) (11-21-2019 9-50-10 AM)'):
+    for root, dirs, files in os.walk('Z:/PM2019005_ndmi/20191125/DJI_0002 (2)_test'):
         for file in files:
             early_start_time = time.time()
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
                 # GSD
                 # gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
                 gsd = 0.1
-                print(gsd)
+                print("GSD: ", gsd)
                 # Boundary size
                 boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
                 boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                 # 7. Resample the pixels
                 print('resample')
                 start_time = time.time()
-                b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
+                b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, restored_image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create PNGA
@@ -105,7 +105,7 @@ if __name__ == '__main__':
                 # print("--- %s seconds ---" % (time.time() - start_time))
                 # start_time = time.time()
                 # export_bbox_to_wkt2(bbox, dst + filename)
-                print("--- %s seconds ---" % (time.time() - start_time))
+                # print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')
                 print("--- %s seconds ---" % (time.time() - early_start_time))

@@ -8,7 +8,7 @@ from struct import *
 # path = 'C:/DJI_0030.csv'        # 525c671317165f77b0d31543634093aba
 path = 'C:/DJI_0002 (2).csv'        # 525c671317165f77b0d31543634093abc
 length = len(path)     # 15
-uuid = "525c671317165f77b0d31543634093abc"  # 33
+uuid = "525c671317165f77b0d31543634093abd"  # 33
 
 s0 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s0.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
