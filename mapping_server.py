@@ -12,12 +12,14 @@ from ortho_func.EoData import convertCoordinateSystem, Rot3D
 from ortho_func.Boundary import pcs2ccs, projection
 import subprocess
 from copy import copy
+from rdp import rdp
 
 data_store = 'C:/innomap_real/dataStore/'  # Have to be defined already
 # data_store = '../map_demo/dataStore/'
 bbox_total = []
 frame_number_check = -1
 frame_rate = 60
+rdp_epsilon = 0.5
 
 #########################
 # Client for map viewer #
@@ -47,7 +49,7 @@ def rpy_to_opk(rpy):
 
 
 def load_log(file_path):
-    df = pd.read_csv(file_path, low_memory=False)
+    df = pd.read_csv(file_path, low_memory=False, encoding='latin1')
     df = df[df['CAMERA_INFO.recordState'] == 'Starting']
     df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
              'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
@@ -142,8 +144,8 @@ def FRAM(np_image, frame_number):
         eo = log_eo[-1, :]
         print(eo)
 
-    # if eo[4] > -30:
-    #     return
+    if eo[4] > -29:
+        return
 
     tm_eo = convertCoordinateSystem(eo, epsg=3857)
     # System calibration using gimbal angle
@@ -155,13 +157,13 @@ def FRAM(np_image, frame_number):
     ###########################
     # Rectify the given image #
     ###########################
-    path_orthophoto, bbox_wkt = rectify(data_store, uuid + '/', img=np_image,
-                                        rectified_fname='Rectified_' + str(frame_number), eo=tm_eo,
-                                        ground_height=0, sensor_width=io[0], focal_length=io[1])
-
     # path_orthophoto, bbox_wkt = rectify(data_store, uuid + '/', img=np_image,
-    #                                     rectified_fname='Rectified_' + str(frame_number) + "_" + str(eo[4]), eo=tm_eo,
+    #                                     rectified_fname='Rectified_' + str(frame_number), eo=tm_eo,
     #                                     ground_height=0, sensor_width=io[0], focal_length=io[1])
+
+    path_orthophoto, bbox_wkt = rectify(data_store, uuid + '/', img=np_image,
+                                        rectified_fname='Rectified_' + str(frame_number) + "_" + str(eo[4]), eo=tm_eo,
+                                        ground_height=0, sensor_width=io[0], focal_length=io[1])
 
     ortho_json = {
         "uid": uuid,  # String
@@ -220,8 +222,10 @@ def INFE(infe_res, cols, rows):
     for i in range(len(infe_res_json)):
         object_id = infe_res_json[i]["uid"]
         object_type = infe_res_json[i]["type"]
-        bbox = infe_res_json[i]["objects"]
-        bbox_px = np.array(bbox).transpose()
+        bbox = np.array(infe_res_json[i]["objects"])
+        mask = rdp(bbox, epsilon=rdp_epsilon, algo="iter", return_mask=True)
+        print(bbox.shape[0], np.argwhere(mask==True).shape[0])
+        bbox_px = bbox[mask].transpose()
         # print(bbox_px)
 
         # Convert pixel coordinate system to camera coordinate system
@@ -278,8 +282,10 @@ def INFE(infe_res, cols, rows):
 #             load_io(file_path_wo_ext + ".MOV")  # Extract IO
 #
 #             # e.g. for an inference result for each frame
-#             infe_res = [
-#             ]
+#             # infe_res = [
+#             # ]
+#             with open("bbox2.json") as json_file:
+#                 infe_res = json.load(json_file)
 #
 #             vidcap = cv2.VideoCapture(file_path_wo_ext + ".MOV")
 #             count = 0
@@ -298,7 +304,5 @@ def INFE(infe_res, cols, rows):
 #
 #                     INFE(infe_res, cols, rows)
 #                     FRAM(np_image, frame_number)
-#
-#                     # json_to_map_server(np_image, frame_number, infe_res, cols, rows)
 #
 #             print("Hello")
