@@ -50,12 +50,26 @@ def rpy_to_opk(rpy):
 
 def load_log(file_path):
     df = pd.read_csv(file_path, low_memory=False, encoding='latin1')
+    model = df['CAMERA_INFO.cameraType'][0]
+
     df = df[df['CAMERA_INFO.recordState'] == 'Starting']
     df = df[['OSD.longitude', 'OSD.latitude', 'OSD.height [m]',
              'GIMBAL.roll', 'GIMBAL.pitch', 'GIMBAL.yaw']]
 
     global log_eo
     log_eo = df.to_numpy()
+
+    # model_name, sensor_width(mm), focal_length(mm)
+    io_list = np.array([['FC6310R', 13.2, 8.8],  # Phantom4RTK
+                        ['FC220', 6.3, 4.3],  # Mavic
+                        ['FC6520', 17.3, 15]]  # Inspire2
+                       )
+
+    sensor_width_mm = float(io_list[io_list[:, 0] == model][0, 1])
+    focal_length_mm = float(io_list[io_list[:, 0] == model][0, 2])
+
+    global io
+    io = [sensor_width_mm, focal_length_mm]
 
 
 def load_io(file_path):
@@ -123,8 +137,7 @@ def PATH(path, video_id):
     if not(os.path.isdir(data_store + uuid)):
         os.mkdir(data_store + uuid)
 
-    load_log(file_path_wo_ext + ".csv")  # Extract EO
-    load_io(path)   # Extract IO
+    load_log(file_path_wo_ext + ".csv")  # Extract EO, IO
 
 def FRAM(np_image, frame_number):
     ################################
@@ -224,7 +237,7 @@ def INFE(infe_res, cols, rows):
         object_type = infe_res_json[i]["type"]
         bbox = np.array(infe_res_json[i]["objects"])
         mask = rdp(bbox, epsilon=rdp_epsilon, algo="iter", return_mask=True)
-        print(bbox.shape[0], np.argwhere(mask==True).shape[0])
+        # print(bbox.shape[0], np.argwhere(mask==True).shape[0])
         bbox_px = bbox[mask].transpose()
         # print(bbox_px)
 
@@ -244,65 +257,66 @@ def INFE(infe_res, cols, rows):
     #print(bbox_total)
 
 
-# if __name__ == '__main__':
-#     while True:
-#         ################################
-#         # Server for path, frame, bbox #
-#         ################################
-#         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#         s.bind(('localhost', 57810))
-#
-#         #########################
-#         # Client for map viewer #
-#         #########################
-#         s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#         s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#         dest = ("localhost", 57820)
-#         print("binding...")
-#
-#         data, addr = s.recvfrom(200)
-#
-#         header = data[:4]
-#         if header == b'PATH':  # header | length | path | video_id(33 for test)
-#             print("Received")
-#             length_path = int.from_bytes(data[4:8], "little")
-#             path = data[8:8 + length_path].decode()
-#             video_id = data[8 + length_path:].decode()
-#
-#             file_path_wo_ext = path[:-4]
-#             # project_path = file_path_wo_ext.split('/')[-1] + '/'
-#
-#             global uuid
-#             uuid = video_id
-#             if not (os.path.isdir(data_store + uuid)):
-#                 os.mkdir(data_store + uuid)
-#
-#             load_log(path)  # Extract EO
-#             load_io(file_path_wo_ext + ".MOV")  # Extract IO
-#
-#             # e.g. for an inference result for each frame
-#             # infe_res = [
-#             # ]
-#             with open("bbox2.json") as json_file:
-#                 infe_res = json.load(json_file)
-#
-#             vidcap = cv2.VideoCapture(file_path_wo_ext + ".MOV")
-#             count = 0
-#             while vidcap.isOpened():
-#                 ret, np_image = vidcap.read()
-#                 rows = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-#                 cols = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
-#
-#                 if int(vidcap.get(1)) % frame_rate == 1:
-#                     frame_number = int(vidcap.get(cv2.CAP_PROP_POS_FRAMES))
-#                     # mm = np.memmap('frame_image', mode='w+', shape=np_image.shape, dtype=np_image.dtype)
-#                     # mm[:] = np_image[:]
-#                     # mm.flush()
-#                     # del mm
-#                     # print(np_image.shape)
-#
-#                     INFE(infe_res, cols, rows)
-#                     FRAM(np_image, frame_number)
-#
-#             print("Hello")
+if __name__ == '__main__':
+    while True:
+        ################################
+        # Server for path, frame, bbox #
+        ################################
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind(('localhost', 57810))
+
+        #########################
+        # Client for map viewer #
+        #########################
+        s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        dest = ("localhost", 57820)
+        print("binding...")
+
+        data, addr = s.recvfrom(200)
+
+        header = data[:4]
+        if header == b'PATH':  # header | length | path | video_id(33 for test)
+            print("Received")
+            length_path = int.from_bytes(data[4:8], "little")
+            path = data[8:8 + length_path].decode()
+            video_id = data[8 + length_path:].decode()
+
+            # file_path_wo_ext = path[:-4]
+            file_path_wo_ext = path
+            # project_path = file_path_wo_ext.split('/')[-1] + '/'
+
+            global uuid
+            uuid = video_id
+            if not (os.path.isdir(data_store + uuid)):
+                os.mkdir(data_store + uuid)
+
+            # load_log(path)  # Extract EO
+            load_log(path + ".csv")  # Extract EO ... test
+
+            # e.g. for an inference result for each frame
+            # infe_res = [
+            # ]
+            with open("bbox2.json") as json_file:
+                infe_res = json.load(json_file)
+
+            vidcap = cv2.VideoCapture(file_path_wo_ext + ".MOV")
+            count = 0
+            while vidcap.isOpened():
+                ret, np_image = vidcap.read()
+                rows = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                cols = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
+
+                if int(vidcap.get(1)) % frame_rate == 1:
+                    frame_number = int(vidcap.get(cv2.CAP_PROP_POS_FRAMES))
+                    # mm = np.memmap('frame_image', mode='w+', shape=np_image.shape, dtype=np_image.dtype)
+                    # mm[:] = np_image[:]
+                    # mm.flush()
+                    # del mm
+                    # print(np_image.shape)
+
+                    INFE(infe_res, cols, rows)
+                    FRAM(np_image, frame_number)
+
+            print("Hello")
