@@ -3,8 +3,8 @@ from struct import *
 
 # header | length | path | video_id(34 for test)
 
-# path = 'C:/DJI_0002 (2).csv'
-path = "C:/Users/InnoPAM/Downloads/문서/DJI_0002 (2).csv"
+path = 'C:/DJI_0002 (2).csv'
+# path = "C:/Users/InnoPAM/Downloads/문서/DJI_0002 (2).csv"
 # path = 'C:/DJI_0018.csv'        # 525c671317165f77b0d31543634093abb
 # path = 'C:/DJI_0030.csv'        # 525c671317165f77b0d31543634093aba
 # path = 'Z:/PM2019005_ndmi/data/DJI_0001.csv'        # 525c671317165f77b0d31543634093abc
