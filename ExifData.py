@@ -1,6 +1,6 @@
 import cv2
 from PIL import Image
-from PIL.ExifTags import TAGS, GPSTAGS
+import subprocess
 
 def getExif(path):
     src_image = Image.open(path)
@@ -18,6 +18,29 @@ def getExif(path):
         orientation = 0
 
     return focal_length, orientation
+
+def get_focal_orientation(input_file):
+    # input_file = "C:/DJI_0018.MOV"    # Model - 1929
+    # input_file = "C:/DJI_0114.MOV"  # Model - 1933
+    exe = "exiftool.exe"
+
+    process = subprocess.Popen([exe, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    metadata = process.stdout.read().decode()
+    focal_length_field = metadata.find("Focal Length")
+    orientation_field = metadata.find("Orientation")
+
+    focal_length_value = float(metadata[focal_length_field + 34:focal_length_field + 34 + 6].split(" ")[0]) # mm
+    focal_length = focal_length_value / 1000    # m
+
+    try:
+        orientation_value = metadata[orientation_field + 34:orientation_field + 34 + 20].split(" ")[0]
+        if orientation_value == "Horizontal":
+            orientation = 0
+    except:
+        orientation = 0
+
+    return focal_length, orientation
+
 
 def restoreOrientation(image, orientation):
     if orientation == 8:

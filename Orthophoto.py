@@ -2,7 +2,7 @@ import os
 import numpy as np
 import cv2
 import time
-from ExifData import getExif, restoreOrientation
+from ExifData import *
 from EoData import readEO, latlon2tmcentral, Rot3D
 from Boundary import boundary
 from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
@@ -25,7 +25,8 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path, -1)
 
                 # 1. Extract EXIF data from a image
-                focal_length, orientation = getExif(file_path) # unit: m
+                # focal_length, orientation = getExif(file_path)  # unit: m
+                focal_length, orientation = get_focal_orientation(file_path)  # unit: m, _
 
                 # 2. Restore the image based on orientation information
                 restored_image = restoreOrientation(image, orientation)
