@@ -22,10 +22,14 @@ if __name__ == '__main__':
     # create some rays
     # DJI_0386.JPG in Data
     ray_origins = np.array([[266277.339, 237080.832, 214.9540],
+                            [266277.339, 237080.832, 214.9540],
+                            [266277.339, 237080.832, 214.9540],
                             [266277.339, 237080.832, 214.9540]])
     direction = [1.697624393, - 2.926766149, - 54.16184732]
-    ray_directions = np.array([[0, 0, -1],
-                               [0, 0.5, -1]])
+    ray_directions = np.array([[-3.15, -2.36, -4.73],   # width/2, height/2, focal_length ... direction vector
+                               [-3.15, 2.36, -4.73],
+                               [3.15, -2.36, -4.73],
+                               [3.15, 2.36, -4.73]])
 
     """
     Signature: mesh.ray.intersects_location(ray_origins,
