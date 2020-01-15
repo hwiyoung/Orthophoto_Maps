@@ -21,11 +21,15 @@ if __name__ == '__main__':
     mesh = trimesh.load('./models/DEM_yeosu/34707 - Cloud.obj')
 
     # create some rays
-    # DJI_0386.JPG in Data
-    ray_origins = np.array([[266277.339, 237080.832, 214.9540],
-                            [266277.339, 237080.832, 214.9540],
-                            [266277.339, 237080.832, 214.9540],
-                            [266277.339, 237080.832, 214.9540]])
+    # DJI_0386.JPG
+    # ray_origins = np.array([[266277.339, 237080.832, 214.9540],   # Absolute height
+    #                         [266277.339, 237080.832, 214.9540],
+    #                         [266277.339, 237080.832, 214.9540],
+    #                         [266277.339, 237080.832, 214.9540]])
+    ray_origins = np.array([[266277.339, 237080.832, 149.9540],     # Relative height
+                            [266277.339, 237080.832, 149.9540],
+                            [266277.339, 237080.832, 149.9540],
+                            [266277.339, 237080.832, 149.9540]])
     direction = np.array([1.697624393, -2.926766149, -54.16184732]) * np.pi / 180   # o, p, k
     R = Rot3D([266277.339, 237080.832, 214.9540, direction[0], direction[1], direction[2]]) # Ground to Camera
     # directions(vector) - [x(East/West), y(North/South), z]
@@ -62,6 +66,11 @@ if __name__ == '__main__':
     locations, index_ray, index_tri = mesh.ray.intersects_location(
         ray_origins=ray_origins,
         ray_directions=ray_directions)
+    bbox = np.array([[min(locations[:, 0]), max(locations[:, 1])],  # UL
+                    [min(locations[:, 0]), min(locations[:, 1])],   # UR
+                    [max(locations[:, 0]), max(locations[:, 1])],   # LL
+                    [max(locations[:, 0]), min(locations[:, 1])]])  # LR
+    print(bbox)
 
     # stack rays into line segments for visualization as Path3D
     ray_visualize = trimesh.load_path(np.hstack((
