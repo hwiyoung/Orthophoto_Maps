@@ -19,6 +19,7 @@ if __name__ == '__main__':
     #mesh = trimesh.load('./models/cube.OBJ')
     #mesh = trimesh.load('./models/cube_test.OBJ')
     mesh = trimesh.load('./models/DEM_yeosu/34707 - Cloud.obj')
+    test_mesh = np.array(mesh.vertices)
 
     # create some rays
     # DJI_0386.JPG
@@ -34,11 +35,11 @@ if __name__ == '__main__':
     R = Rot3D([266277.339, 237080.832, 214.9540, direction[0], direction[1], direction[2]]) # Ground to Camera
     # directions(vector) - [x(East/West), y(North/South), z]
     # width/2, height/2, focal_length ... direction vector
-    direction_vectors = np.array([[-3.15, -2.36, -4.73],   # UL
-                               [3.15, -2.36, -4.73],    # UR
-                               [-3.15, 2.36, -4.73],   # LL
-                               [3.15, 2.36, -4.73]])   # LR
-    direction_vectors_rot = np.dot(R.transpose(), direction_vectors.transpose())    # Camera to Groud
+    direction_vectors = np.array([[-3.15, 2.36, -4.73],     # Upper Left
+                                  [-3.15, -2.36, -4.73],    # Lower Left
+                                  [3.15, 2.36, -4.73],      # Upper Right
+                                  [3.15, -2.36, -4.73]])    # Lower Right
+    direction_vectors_rot = np.dot(R.transpose(), direction_vectors.transpose())    # Camera to Ground
     ray_directions = direction_vectors_rot.transpose()
 
     """
@@ -66,10 +67,10 @@ if __name__ == '__main__':
     locations, index_ray, index_tri = mesh.ray.intersects_location(
         ray_origins=ray_origins,
         ray_directions=ray_directions)
-    bbox = np.array([[min(locations[:, 0]), max(locations[:, 1])],  # UL
-                    [min(locations[:, 0]), min(locations[:, 1])],   # UR
-                    [max(locations[:, 0]), max(locations[:, 1])],   # LL
-                    [max(locations[:, 0]), min(locations[:, 1])]])  # LR
+    bbox = np.array([[min(locations[:, 0]), max(locations[:, 1])],  # Upper Left
+                    [min(locations[:, 0]), min(locations[:, 1])],   # Lower Left
+                    [max(locations[:, 0]), max(locations[:, 1])],   # Upper Right
+                    [max(locations[:, 0]), min(locations[:, 1])]])  # Lower Right
     print(bbox)
 
     # stack rays into line segments for visualization as Path3D
