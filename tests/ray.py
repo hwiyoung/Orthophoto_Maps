@@ -35,10 +35,15 @@ if __name__ == '__main__':
     R = Rot3D([266277.339, 237080.832, 214.9540, direction[0], direction[1], direction[2]]) # Ground to Camera
     # directions(vector) - [x(East/West), y(North/South), z]
     # width/2, height/2, focal_length ... direction vector
+    # (1) ------------ (2)
+    #  |     image      |
+    #  |                |
+    # (4) ------------ (3)
     direction_vectors = np.array([[-3.15, 2.36, -4.73],     # Upper Left
-                                  [-3.15, -2.36, -4.73],    # Lower Left
                                   [3.15, 2.36, -4.73],      # Upper Right
-                                  [3.15, -2.36, -4.73]])    # Lower Right
+                                  [3.15, -2.36, -4.73],     # Lower Right
+                                  [-3.15, -2.36, -4.73]])   # Lower Left
+
     direction_vectors_rot = np.dot(R.transpose(), direction_vectors.transpose())    # Camera to Ground
     ray_directions = direction_vectors_rot.transpose()
 
