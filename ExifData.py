@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import subprocess
+import platform
 
 def getExif(path):
     src_image = Image.open(path)
@@ -21,9 +22,11 @@ def getExif(path):
     return focal_length, orientation
 
 def get_focal_orientation(input_file):
-    # input_file = "C:/DJI_0018.MOV"    # Model - 1929
-    # input_file = "C:/DJI_0114.MOV"  # Model - 1933
-    exe = "exiftool.exe"
+    os_name = platform.system()
+    if os_name == "Windows":
+        exe = "exiftool.exe"
+    elif os_name == "Linux":
+        exe = "exiftool"
 
     process = subprocess.Popen([exe, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     metadata = process.stdout.read().decode()
@@ -82,7 +85,11 @@ def rotate(image, angle):
     return rotated_mat
 
 def get_pos_ori(input_file):
-    exe = "exiftool.exe"
+    os_name = platform.system()
+    if os_name == "Windows":
+        exe = "exiftool.exe"
+    elif os_name == "Linux":
+        exe = "exiftool"
     # process = subprocess.Popen([exe, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     """ GPS Longitude """

@@ -1,8 +1,12 @@
 import subprocess
-import os
+import platform
 
 input_file = "./20191011_074853.JPG"
-exe = "exiftool.exe"
+os_name = platform.system()
+if os_name == "Windows":
+    exe = "exiftool.exe"
+elif os_name == "Linux":
+    exe = "exiftool"
 # process = subprocess.Popen([exe, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 """ GPS Longitude """
