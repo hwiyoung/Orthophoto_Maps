@@ -15,15 +15,15 @@ def rot_2d(theta):
 
 
 def rpy_to_opk(rpy):
-    x = copy(rpy[0:2])
-    x[0] = 90 + rpy[1]
+    roll_pitch = copy(rpy[0:2])
+    roll_pitch[0] = 90 + rpy[1]
     if rpy[0] < 0:
-        x[1] = 0
+        roll_pitch[1] = 0
     else:
-        x[1] = rpy[0]
+        roll_pitch[1] = rpy[0]
     # print("x :", x)
-    omega_phi = np.dot(rot_2d(rpy[2] * np.pi / 180), x.reshape(2, 1))
-    kappa = -rpy[2] * np.pi / 180
+    omega_phi = np.dot(rot_2d(rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
+    kappa = -rpy[2]
     # print("omega: ", float(omega_phi[0]),
     #       "phi: ", float(omega_phi[1]),
     #       "kappa: ", kappa)
@@ -67,11 +67,11 @@ if __name__ == '__main__':
                 read_time = end_time - start_time
 
                 print('Read EOP - ' + file)
-                print('Longitude | Latitude | Height | Omega | Phi | Kappa')
+                print('Longitude | Latitude | Height | Gimbal-Roll | Gimbal-Pitch | Gimbal-Yaw')
                 eo = get_pos_ori(file_path)
                 eo = latlon2tmcentral(eo)
                 opk = rpy_to_opk(eo[3:])
-                eo[3:] = opk    # radian
+                eo[3:] = opk * np.pi / 180   # radian
                 R = Rot3D(eo)
 
                 # 4. Extract a projected boundary of the image

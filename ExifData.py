@@ -123,7 +123,7 @@ def get_pos_ori(input_file):
     start = metadata.find(":")
     end = metadata.find("\r")
 
-    alt_value = float(metadata[start + 2:end - 1])
+    alt_value = float(metadata[start + 2:end])
 
     """" Gimbal Roll Degree """
     roll_field = "-gimbalrolldegree"
@@ -133,7 +133,7 @@ def get_pos_ori(input_file):
     start = metadata.find(":")
     end = metadata.find("\r")
 
-    roll_value = float(metadata[start + 2:end - 1])
+    roll_value = float(metadata[start + 2:end])
 
     """" Gimbal Pitch Degree """
     pitch_field = "-gimbalpitchdegree"
@@ -143,7 +143,7 @@ def get_pos_ori(input_file):
     start = metadata.find(":")
     end = metadata.find("\r")
 
-    pitch_value = float(metadata[start + 2:end - 1])
+    pitch_value = float(metadata[start + 2:end])
 
     """" Gimbal Yaw Degree """
     yaw_field = "-gimbalyawdegree"
@@ -153,7 +153,7 @@ def get_pos_ori(input_file):
     start = metadata.find(":")
     end = metadata.find("\r")
 
-    yaw_value = float(metadata[start + 2:end - 1])
+    yaw_value = float(metadata[start + 2:end])
 
     eo = np.array([lon_value, lat_value, alt_value, roll_value, pitch_value, yaw_value])
     print(eo)
