@@ -19,7 +19,7 @@ if __name__ == '__main__':
     #mesh = trimesh.load('./models/cube.OBJ')
     #mesh = trimesh.load('./models/cube_test.OBJ')
     mesh = trimesh.load('./models/DEM_yeosu/34707 - Cloud.obj')
-    test_mesh = np.array(mesh.vertices)
+    vertices = np.array(mesh.vertices)
 
     # create some rays
     # DJI_0386.JPG
@@ -77,6 +77,21 @@ if __name__ == '__main__':
                     [max(locations[:, 0]), max(locations[:, 1])],   # Upper Right
                     [max(locations[:, 0]), min(locations[:, 1])]])  # Lower Right
     print(bbox)
+
+    idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[0]) ** 2, axis=1)))
+    idx_ll = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[1]) ** 2, axis=1)))
+    idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[2]) ** 2, axis=1)))
+    idx_lr = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[3]) ** 2, axis=1)))
+
+    coord_ul_mesh = vertices[idx_ul]
+    coord_ll_mesh = vertices[idx_ll]
+    coord_ur_mesh = vertices[idx_ur]
+    coord_lr_mesh = vertices[idx_lr]
+
+    dem = vertices[((vertices[:, 0] >= coord_ul_mesh[0]) & (vertices[:, 0] <= coord_ur_mesh[0])) &
+                   ((vertices[:, 1] >= coord_ll_mesh[1]) & (vertices[:, 1] <= coord_ul_mesh[1]))]
+
+    dem_output = dem.transpose()
 
     # stack rays into line segments for visualization as Path3D
     ray_visualize = trimesh.load_path(np.hstack((
