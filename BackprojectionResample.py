@@ -27,7 +27,7 @@ def backProjection(coord, R, focal_length, pixel_size, image_size):
 
     return coord_out
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def resample(coord, boundary_rows, boundary_cols, image):
     # Define channels of an orthophoto
     b = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)

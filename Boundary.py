@@ -1,4 +1,5 @@
 import numpy as np
+import trimesh
 
 def boundary(image, eo, R, dem, pixel_size, focal_length):
     inverse_R = R.transpose()
@@ -58,3 +59,46 @@ def pcs2ccs(bbox_px, rows, cols, pixel_size, focal_length):
     bbox_camera[2, :] = -focal_length
 
     return bbox_camera
+
+def ray_tracing(image, eo, R, dem, pixel_size, focal_length):
+    vertices = np.array(dem.vertices)
+
+    # create some rays
+    ray_origins = np.empty(shape=(4, 3))
+    ray_origins[:, 0] = eo[0]
+    ray_origins[:, 1] = eo[1]
+    ray_origins[:, 2] = eo[2]
+
+    # (1) ------------ (2)
+    #  |     image      |
+    #  |                |
+    # (4) ------------ (3)
+    image_vertex = getVertices(image, pixel_size, focal_length)  # shape: 3 x 4
+    direction_vectors = image_vertex.transpose()    # shape: 4 x 3
+    direction_vectors_rot = np.dot(R.transpose(), direction_vectors.transpose())  # Camera to Ground
+    ray_directions = direction_vectors_rot.transpose()
+
+    # run the mesh- ray test
+    locations, index_ray, index_tri = dem.ray.intersects_location(
+        ray_origins=ray_origins,
+        ray_directions=ray_directions)
+    bbox = np.array([[min(locations[:, 0]), max(locations[:, 1])],  # Upper Left
+                     [max(locations[:, 0]), max(locations[:, 1])],  # Upper Right
+                     [max(locations[:, 0]), min(locations[:, 1])],  # Lower Right
+                     [min(locations[:, 0]), min(locations[:, 1])]]) # Lower Left
+    print(bbox)
+
+    idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[0]) ** 2, axis=1)))
+    idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[1]) ** 2, axis=1)))
+    idx_lr = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[2]) ** 2, axis=1)))
+    idx_ll = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[3]) ** 2, axis=1)))
+
+    coord_ul_mesh = vertices[idx_ul]
+    coord_ur_mesh = vertices[idx_ur]
+    coord_lr_mesh = vertices[idx_lr]
+    coord_ll_mesh = vertices[idx_ll]
+
+    dem_extracted = vertices[((vertices[:, 0] >= coord_ul_mesh[0]) & (vertices[:, 0] <= coord_ur_mesh[0])) &
+                             ((vertices[:, 1] >= coord_ll_mesh[1]) & (vertices[:, 1] <= coord_ul_mesh[1]))]
+    dem_output = dem_extracted.transpose()
+    return bbox, dem_output
