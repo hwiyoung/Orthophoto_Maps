@@ -101,4 +101,7 @@ def ray_tracing(image, eo, R, dem, pixel_size, focal_length):
     dem_extracted = vertices[((vertices[:, 0] >= coord_ul_mesh[0]) & (vertices[:, 0] <= coord_ur_mesh[0])) &
                              ((vertices[:, 1] >= coord_ll_mesh[1]) & (vertices[:, 1] <= coord_ul_mesh[1]))]
     dem_output = dem_extracted.transpose()
+    dem_output[0] -= eo[0]
+    dem_output[1] -= eo[1]
+    dem_output[2] -= eo[2]
     return bbox, dem_output
