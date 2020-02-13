@@ -104,4 +104,23 @@ def ray_tracing(image, eo, R, dem, pixel_size, focal_length):
     dem_output[0] -= eo[0]
     dem_output[1] -= eo[1]
     dem_output[2] -= eo[2]
+
+    # ### Check for boundary
+    # # stack rays into line segments for visualization as Path3D
+    # ray_visualize = trimesh.load_path(np.hstack((
+    #     ray_origins,
+    #     ray_origins + ray_directions)).reshape(-1, 2, 3))
+    #
+    # # make mesh transparent- ish
+    # dem.visual.face_colors = [100, 100, 100, 100]
+    #
+    # # create a visualization scene with rays, hits, and mesh
+    # scene = trimesh.Scene([
+    #     dem,
+    #     ray_visualize,
+    #     trimesh.points.PointCloud(locations)])
+    #
+    # # display the scene
+    # scene.show()
+
     return bbox, dem_output
