@@ -5,9 +5,10 @@ import time
 from ExifData import *
 from EoData import latlon2tmcentral, Rot3D
 from Boundary import boundary, ray_tracing
-from BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
+from BackprojectionResample import *
 from copy import copy
 import trimesh
+from scipy.interpolate import Rbf, griddata
 
 
 def rot_2d(theta):
@@ -35,6 +36,7 @@ if __name__ == '__main__':
     mode = "average_ground"
     # mode = "dem"
     dem = trimesh.load('./tests/models/DEM_Yangpyeong/DEM_Yangpyeong_drone.obj')
+    dem_gsd = 0.152  # unit: m
 
     for root, dirs, files in os.walk('./tests/query_images'):
         for file in files:
@@ -105,7 +107,6 @@ if __name__ == '__main__':
                     b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
                     print("--- %s seconds ---" % (time.time() - start_time))
                 elif mode == "dem":
-                    ## TODO: Have to deal with the problem from the difference of the number of points
                     # 3. Extract ROI on dem of the image
                     bbox, extracted_dem = ray_tracing(restored_image, eo, R, dem, pixel_size, focal_length)
                     print("--- %s seconds ---" % (time.time() - start_time))
@@ -129,7 +130,17 @@ if __name__ == '__main__':
                     # 7. Resample the pixels
                     print('resample')
                     start_time = time.time()
-                    b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
+                    # Boundary size
+                    dem_cols = int((bbox[1, 0] - bbox[0, 0]) / dem_gsd)
+                    dem_rows = int((bbox[0, 1] - bbox[2, 1]) / dem_gsd)
+                    # Step size
+                    step = dem_gsd / gsd
+                    # TODO: Check the dimension of output(b, g, r, a)
+                    # Resampling for generating source data
+                    b, g, r, a = resample_src(backProj_coords, dem_rows, dem_cols, image, step)
+                    # Interpolation
+                    grid_x, grid_y = np.mgrid[0:1:(boundary_cols * 1j), 0:1:(boundary_rows * 1j)]
+                    grid_b = griddata(backProj_coords.T, b, (grid_x, grid_y), method='nearest')
                     print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff

@@ -86,7 +86,7 @@ def ray_tracing(image, eo, R, dem, pixel_size, focal_length):
                      [max(locations[:, 0]), max(locations[:, 1])],  # Upper Right
                      [max(locations[:, 0]), min(locations[:, 1])],  # Lower Right
                      [min(locations[:, 0]), min(locations[:, 1])]]) # Lower Left
-    print(bbox)
+    # print(bbox)
 
     idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[0]) ** 2, axis=1)))
     idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[1]) ** 2, axis=1)))
