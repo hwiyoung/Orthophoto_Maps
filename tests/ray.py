@@ -9,7 +9,7 @@ same API with a roughly 50x speedup.
 
 import trimesh
 import numpy as np
-from EoData import Rot3D
+from module.EoData import Rot3D
 
 if __name__ == '__main__':
 

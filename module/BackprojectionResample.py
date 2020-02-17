@@ -119,31 +119,3 @@ def createGeoTiffThermal(grey, boundary, gsd, rows, cols, dst):
 
     dst_ds.FlushCache()  # write to disk
     dst_ds = None
-
-# @jit(nopython=True)
-def resample_src(coord, dem_rows, dem_cols, image, step):
-    # Define channels of an orthophoto
-    b = np.zeros(shape=(dem_rows, dem_cols), dtype=np.uint8)
-    g = np.zeros(shape=(dem_rows, dem_cols), dtype=np.uint8)
-    r = np.zeros(shape=(dem_rows, dem_cols), dtype=np.uint8)
-    a = np.zeros(shape=(dem_rows, dem_cols), dtype=np.uint8)
-
-    rows = np.reshape(coord[1], (dem_rows, dem_cols))
-    cols = np.reshape(coord[0], (dem_rows, dem_cols))
-
-    rows = rows.astype(np.int16)
-    cols = cols.astype(np.int16)
-
-    for row in range(0, dem_rows, step=step):
-        for col in range(0, dem_cols, step=step):
-            if cols[row, col] < 0 or cols[row, col] >= image.shape[1]:
-                continue
-            elif rows[row, col] < 0 or rows[row, col] >= image.shape[0]:
-                continue
-            else:
-                b[row, col] = image[rows[row, col], cols[row, col]][0]
-                g[row, col] = image[rows[row, col], cols[row, col]][1]
-                r[row, col] = image[rows[row, col], cols[row, col]][2]
-                a[row, col] = 255
-
-    return b, g, r, a

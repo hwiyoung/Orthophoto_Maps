@@ -163,7 +163,6 @@ def get_pos_ori(input_file):
     yaw_value = float(metadata[start + 2:end])
 
     eo = np.array([lon_value, lat_value, alt_value, roll_value, pitch_value, yaw_value])
-    print(eo)
 
     return eo
 

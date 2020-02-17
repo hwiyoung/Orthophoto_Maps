@@ -32,13 +32,20 @@ def rpy_to_opk(gimbal_rpy):
 
 
 if __name__ == '__main__':
+    print("Read DEM")
+    start_time = time.time()
     ground_height = 0   # unit: m
     sensor_width = 6.3  # unit: mm
-    dem = trimesh.load('../DEM_Yangpyeong/dem2point_crop2_15_2 - Cloud.obj')
+    dem = trimesh.load('../DEM_Yangpyeong/dem2point_DJI_0361.obj')
+    vertices = np.array(dem.vertices)
+    ind = np.lexsort((vertices[:, 0], -vertices[:, 1]))
+    vertices = vertices[ind]
     dem_gsd = 0.152  # unit: m
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     for root, dirs, files in os.walk('./tests/query_images'):
         for file in files:
+            file = "DJI_0361.JPG"
             image_start_time = time.time()
             start_time = time.time()
 
@@ -64,7 +71,7 @@ if __name__ == '__main__':
                 pixel_size = pixel_size / 1000  # unit: m/px
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                print('Read EOP - ' + file)
+                print('Read EOP')
                 start_time = time.time()
                 eo = get_pos_ori(file_path)
                 print(tabulate([['Longitude', eo[0]], ['Latitude', eo[1]], ['Altitude', eo[2]],
@@ -76,10 +83,12 @@ if __name__ == '__main__':
                 opk = rpy_to_opk(eo[3:])
                 eo[3:] = opk * np.pi / 180   # degree to radian
                 R = Rot3D(eo)
-
-                # 3. Extract ROI on dem of the image
-                bbox, extracted_dem = ray_tracing(restored_image, eo, R, dem, pixel_size, focal_length)
                 print("--- %s seconds ---" % (time.time() - start_time))
+
+                print('Ray-tracing & Compute GSD')
+                start_time = time.time()
+                # 3. Extract ROI on dem of the image
+                bbox, extracted_dem = ray_tracing(restored_image, eo, R, dem, vertices, pixel_size, focal_length)
 
                 # 4. Compute GSD & Boundary size
                 # GSD
@@ -90,6 +99,7 @@ if __name__ == '__main__':
 
                 # Image size
                 image_size = np.reshape(restored_image.shape[0:2], (2, 1))
+                print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 6. Back-projection into camera coordinate system
                 print('backProjection')
@@ -101,13 +111,23 @@ if __name__ == '__main__':
                 print('resample')
                 start_time = time.time()
                 # Boundary size
-                # dem_cols = int((bbox[1, 0] - bbox[0, 0]) / dem_gsd)
-                # dem_rows = int((bbox[0, 1] - bbox[2, 1]) / dem_gsd)
-                dem_cols = 1298
-                dem_rows = 1340
                 # TODO: Check the dimension of output(b, g, r, a)
+                dem_cols = int((bbox[1, 0] - bbox[0, 0]) / dem_gsd)
+                dem_rows = int((bbox[3, 0] - bbox[2, 0]) / dem_gsd)
+                # dem_cols = 1298
+                # dem_rows = 1340
+                if backProj_coords.shape[1] % dem_cols == 0:
+                    continue
+                else:
+                    if backProj_coords.shape[1] % (dem_cols + 1) == 0:
+                        dem_cols = dem_cols + 1
+                        dem_rows = int(backProj_coords.shape[1] / dem_cols)
+                    else:
+                        dem_cols = dem_cols - 1
+                        dem_rows = int(backProj_coords.shape[1] / dem_cols)
+
                 # Resampling for generating source data
-                b, g, r, a, backproj_rows, backproj_cols = resample_src(backProj_coords, dem_rows, dem_cols, image)
+                b, g, r, a = resample(backProj_coords, dem_rows, dem_cols, image)
 
                 # ti_col = np.linspace(start=0, stop=boundary_cols-1, num=boundary_cols)
                 # ti_row = np.linspace(start=0, stop=boundary_rows-1, num=boundary_rows)

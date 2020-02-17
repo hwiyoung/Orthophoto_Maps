@@ -60,8 +60,10 @@ def pcs2ccs(bbox_px, rows, cols, pixel_size, focal_length):
 
     return bbox_camera
 
-def ray_tracing(image, eo, R, dem, pixel_size, focal_length):
-    vertices = np.array(dem.vertices)
+def ray_tracing(image, eo, R, dem, vertices, pixel_size, focal_length):
+    # vertices = np.array(dem.vertices)
+    # ind = np.lexsort((vertices[:, 0], -vertices[:, 1]))
+    # vertices = vertices[ind]
 
     # create some rays
     ray_origins = np.empty(shape=(4, 3))
@@ -82,16 +84,17 @@ def ray_tracing(image, eo, R, dem, pixel_size, focal_length):
     locations, index_ray, index_tri = dem.ray.intersects_location(
         ray_origins=ray_origins,
         ray_directions=ray_directions)
-    bbox = np.array([[min(locations[:, 0]), max(locations[:, 1])],  # Upper Left
-                     [max(locations[:, 0]), max(locations[:, 1])],  # Upper Right
-                     [max(locations[:, 0]), min(locations[:, 1])],  # Lower Right
-                     [min(locations[:, 0]), min(locations[:, 1])]]) # Lower Left
+    bbox = np.empty(shape=(4, 1))
+    bbox[0] = min(locations[:, 0])  # X min
+    bbox[1] = max(locations[:, 0])  # X max
+    bbox[2] = min(locations[:, 1])  # Y min
+    bbox[3] = max(locations[:, 1])  # Y max
     # print(bbox)
 
-    idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[0]) ** 2, axis=1)))
-    idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[1]) ** 2, axis=1)))
-    idx_lr = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[2]) ** 2, axis=1)))
-    idx_ll = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[3]) ** 2, axis=1)))
+    idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[0, 0], bbox[3, 0]])) ** 2, axis=1)))
+    idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[1, 0], bbox[3, 0]])) ** 2, axis=1)))
+    idx_lr = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[1, 0], bbox[2, 0]])) ** 2, axis=1)))
+    idx_ll = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[0, 0], bbox[2, 0]])) ** 2, axis=1)))
 
     coord_ul_mesh = vertices[idx_ul]
     coord_ur_mesh = vertices[idx_ur]
