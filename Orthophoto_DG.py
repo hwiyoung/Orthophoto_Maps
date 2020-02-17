@@ -2,13 +2,11 @@ import os
 import numpy as np
 import cv2
 import time
-from ExifData import *
-from EoData import latlon2tmcentral, Rot3D
-from Boundary import boundary, ray_tracing
-from BackprojectionResample import *
+from module.ExifData import *
+from module.EoData import latlon2tmcentral, Rot3D
+from module.Boundary import boundary, ray_tracing
+from module.BackprojectionResample import *
 from copy import copy
-import trimesh
-from scipy.interpolate import Rbf, griddata
 
 
 def rot_2d(theta):
@@ -33,10 +31,6 @@ def rpy_to_opk(gimbal_rpy):
 if __name__ == '__main__':
     ground_height = 0   # unit: m
     sensor_width = 6.3  # unit: mm
-    mode = "average_ground"
-    # mode = "dem"
-    dem = trimesh.load('./tests/models/DEM_Yangpyeong/DEM_Yangpyeong_drone.obj')
-    dem_gsd = 0.152  # unit: m
 
     for root, dirs, files in os.walk('./tests/query_images'):
         for file in files:
@@ -74,74 +68,37 @@ if __name__ == '__main__':
                 eo[3:] = opk * np.pi / 180   # degree to radian
                 R = Rot3D(eo)
 
-                if mode == "average_ground":
-                    # 3. Extract a projected boundary of the image
-                    bbox = boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
-                    print("--- %s seconds ---" % (time.time() - start_time))
+                # 3. Extract a projected boundary of the image
+                bbox = boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
+                print("--- %s seconds ---" % (time.time() - start_time))
 
-                    # 4. Compute GSD & Boundary size
-                    # GSD
-                    gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
-                    # Boundary size
-                    boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
-                    boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
+                # 4. Compute GSD & Boundary size
+                # GSD
+                gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
+                # Boundary size
+                boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
+                boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
 
-                    # 5. Compute coordinates of the projected boundary(Generate a virtual DEM)
-                    print('projectedCoord')
-                    start_time = time.time()
-                    proj_coords = projectedCoord(bbox, boundary_rows, boundary_cols, gsd, eo, ground_height)
-                    print("--- %s seconds ---" % (time.time() - start_time))
+                # 5. Compute coordinates of the projected boundary(Generate a virtual DEM)
+                print('projectedCoord')
+                start_time = time.time()
+                proj_coords = projectedCoord(bbox, boundary_rows, boundary_cols, gsd, eo, ground_height)
+                print("--- %s seconds ---" % (time.time() - start_time))
 
-                    # Image size
-                    image_size = np.reshape(restored_image.shape[0:2], (2, 1))
+                # Image size
+                image_size = np.reshape(restored_image.shape[0:2], (2, 1))
 
-                    # 6. Back-projection into camera coordinate system
-                    print('backProjection')
-                    start_time = time.time()
-                    backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)
-                    print("--- %s seconds ---" % (time.time() - start_time))
+                # 6. Back-projection into camera coordinate system
+                print('backProjection')
+                start_time = time.time()
+                backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)
+                print("--- %s seconds ---" % (time.time() - start_time))
 
-                    # 7. Resample the pixels
-                    print('resample')
-                    start_time = time.time()
-                    b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
-                    print("--- %s seconds ---" % (time.time() - start_time))
-                elif mode == "dem":
-                    # 3. Extract ROI on dem of the image
-                    bbox, extracted_dem = ray_tracing(restored_image, eo, R, dem, pixel_size, focal_length)
-                    print("--- %s seconds ---" % (time.time() - start_time))
-
-                    # 4. Compute GSD & Boundary size
-                    # GSD
-                    gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
-                    # Boundary size
-                    boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
-                    boundary_rows = int((bbox[0, 1] - bbox[2, 1]) / gsd)
-
-                    # Image size
-                    image_size = np.reshape(restored_image.shape[0:2], (2, 1))
-
-                    # 6. Back-projection into camera coordinate system
-                    print('backProjection')
-                    start_time = time.time()
-                    backProj_coords = backProjection(extracted_dem, R, focal_length, pixel_size, image_size)
-                    print("--- %s seconds ---" % (time.time() - start_time))
-
-                    # 7. Resample the pixels
-                    print('resample')
-                    start_time = time.time()
-                    # Boundary size
-                    dem_cols = int((bbox[1, 0] - bbox[0, 0]) / dem_gsd)
-                    dem_rows = int((bbox[0, 1] - bbox[2, 1]) / dem_gsd)
-                    # Step size
-                    step = dem_gsd / gsd
-                    # TODO: Check the dimension of output(b, g, r, a)
-                    # Resampling for generating source data
-                    b, g, r, a = resample_src(backProj_coords, dem_rows, dem_cols, image, step)
-                    # Interpolation
-                    grid_x, grid_y = np.mgrid[0:1:(boundary_cols * 1j), 0:1:(boundary_rows * 1j)]
-                    grid_b = griddata(backProj_coords.T, b, (grid_x, grid_y), method='nearest')
-                    print("--- %s seconds ---" % (time.time() - start_time))
+                # 7. Resample the pixels
+                print('resample')
+                start_time = time.time()
+                b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
+                print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff
                 print('Save the image in GeoTiff')
