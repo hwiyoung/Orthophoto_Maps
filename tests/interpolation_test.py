@@ -8,7 +8,10 @@ def func(x, y):
 
 
 grid_x, grid_y = np.mgrid[0:1:100j, 0:1:200j]
-points = np.random.rand(1000, 2)
+# points = np.random.rand(1000, 2)
+test_x, test_y = np.mgrid[0:10, 0:10] / 10
+points = np.vstack((np.ravel(test_x), np.ravel(test_y)))
+points = points.T
 values = func(points[:,0], points[:,1])
 
 grid_z0 = griddata(points, values, (grid_x, grid_y), method='nearest')
