@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from osgeo.osr import SpatialReference, CoordinateTransformation
+from copy import copy
 
 def readEO(path):
     eo_line = np.genfromtxt(path, delimiter='\t',
@@ -100,3 +101,20 @@ def Rot3D(eo):
     R = np.dot(Rzy, Rx)
 
     return R
+
+def rot_2d(theta):
+    # Convert the coordinate system not coordinates
+    return np.array([[np.cos(theta), np.sin(theta)],
+                     [-np.sin(theta), np.cos(theta)]])
+
+def rpy_to_opk(gimbal_rpy):
+    roll_pitch = copy(gimbal_rpy[0:2])
+    roll_pitch[0] = 90 + gimbal_rpy[1]
+    if gimbal_rpy[0] < 0:
+        roll_pitch[1] = 0
+    else:
+        roll_pitch[1] = gimbal_rpy[0]
+
+    omega_phi = np.dot(rot_2d(gimbal_rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
+    kappa = -gimbal_rpy[2]
+    return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])

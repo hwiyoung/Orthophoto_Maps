@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import subprocess
 import platform
+from pyexiv2 import metadata
 
 def getExif(path):
     src_image = Image.open(path)
@@ -20,31 +21,6 @@ def getExif(path):
         orientation = 0
 
     return focal_length, orientation
-
-def get_focal_orientation(input_file):
-    os_name = platform.system()
-    if os_name == "Windows":
-        exe = "exiftool.exe"
-    elif os_name == "Linux":
-        exe = "exiftool"
-
-    process = subprocess.Popen([exe, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    metadata = process.stdout.read().decode()
-    focal_length_field = metadata.find("Focal Length")
-    orientation_field = metadata.find("Orientation")
-
-    focal_length_value = float(metadata[focal_length_field + 34:focal_length_field + 34 + 6].split(" ")[0]) # mm
-    focal_length = focal_length_value / 1000    # m
-
-    try:
-        orientation_value = metadata[orientation_field + 34:orientation_field + 34 + 20].split(" ")[0]
-        if orientation_value == "Horizontal":
-            orientation = 0
-    except:
-        orientation = 0
-
-    return focal_length, orientation
-
 
 def restoreOrientation(image, orientation):
     if orientation == 8:
@@ -84,88 +60,127 @@ def rotate(image, angle):
     rotated_mat = cv2.warpAffine(image, rotation_mat, (bound_w, bound_h))
     return rotated_mat
 
-def get_pos_ori(input_file):
-    os_name = platform.system()
-    if os_name == "Windows":
+def get_metadata(input_file, os_name):
+    if os_name == "Linux":
+        meta = metadata.ImageMetadata(input_file)
+        meta.read()
+
+        focal_length = convert_fractions_to_float(meta['Exif.Photo.FocalLength'].value)
+        orientation = meta['Exif.Image.Orientation'].value
+
+        longitude = convert_dms_to_deg(meta["Exif.GPSInfo.GPSLongitude"].value)
+        latitude = convert_dms_to_deg(meta["Exif.GPSInfo.GPSLatitude"].value)
+
+        if meta["Exif.Image.Make"].raw_value == "DJI":
+            altitude = float(meta['Xmp.drone-dji.RelativeAltitude'].value)
+            roll = float(meta['Xmp.drone-dji.GimbalRollDegree'].value)
+            pitch = float(meta['Xmp.drone-dji.GimbalPitchDegree'].value)
+            yaw = float(meta['Xmp.drone-dji.GimbalYawDegree'].value)
+        else:
+            altitude = 0
+            roll = 0
+            pitch = 0
+            yaw = 0
+
+        eo = np.array([longitude, latitude, altitude, roll, pitch, yaw])
+    else:
         exe = "exiftool.exe"
-    elif os_name == "Linux":
-        exe = "exiftool"
-    # process = subprocess.Popen([exe, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    """ GPS Longitude """
-    longitude_field = "-gpslongitude"
-    process = subprocess.Popen([exe, longitude_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    metadata = process.stdout.read().decode()
+        process = subprocess.Popen([exe, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        meta = process.stdout.read().decode()
+        focal_length_field = meta.find("Focal Length")
+        orientation_field = meta.find("Orientation")
 
-    start = metadata.find(":")
-    deg = metadata.find("deg")
-    min = metadata.find("'")
-    sec = metadata.find("\"")
+        focal_length_value = float(meta[focal_length_field + 34:focal_length_field + 34 + 6].split(" ")[0])  # mm
+        focal_length = focal_length_value / 1000  # m
 
-    lon_deg_value = float(metadata[start + 2:deg - 1])
-    lon_min_value = float(metadata[deg + 4:min])
-    lon_sec_value = float(metadata[min + 2:sec])
-    lon_value = lon_deg_value + lon_min_value / 60 + lon_sec_value / 3600
+        try:
+            orientation_value = meta[orientation_field + 34:orientation_field + 34 + 20].split(" ")[0]
+            if orientation_value == "Horizontal":
+                orientation = 0
+        except:
+            orientation = 0
 
-    """ GPS Latitude """
-    latitude_field = "-gpslatitude"
-    process = subprocess.Popen([exe, latitude_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    metadata = process.stdout.read().decode()
+        """ GPS Longitude """
+        longitude_field = "-gpslongitude"
+        process = subprocess.Popen([exe, longitude_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        meta = process.stdout.read().decode()
 
-    start = metadata.find(":")
-    deg = metadata.find("deg")
-    min = metadata.find("'")
-    sec = metadata.find("\"")
+        start = meta.find(":")
+        deg = meta.find("deg")
+        min = meta.find("'")
+        sec = meta.find("\"")
 
-    lat_deg_value = float(metadata[start + 2:deg - 1])
-    lat_min_value = float(metadata[deg + 4:min])
-    lat_sec_value = float(metadata[min + 2:sec])
-    lat_value = lat_deg_value + lat_min_value / 60 + lat_sec_value / 3600
+        lon_deg_value = float(meta[start + 2:deg - 1])
+        lon_min_value = float(meta[deg + 4:min])
+        lon_sec_value = float(meta[min + 2:sec])
+        lon_value = lon_deg_value + lon_min_value / 60 + lon_sec_value / 3600
 
-    """" GPS Altitude """
-    altitude_field = "-relativealtitude"
-    process = subprocess.Popen([exe, altitude_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    metadata = process.stdout.read().decode()
+        """ GPS Latitude """
+        latitude_field = "-gpslatitude"
+        process = subprocess.Popen([exe, latitude_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        meta = process.stdout.read().decode()
 
-    start = metadata.find(":")
-    end = metadata.find("\r")
+        start = meta.find(":")
+        deg = meta.find("deg")
+        min = meta.find("'")
+        sec = meta.find("\"")
 
-    alt_value = float(metadata[start + 2:end])
+        lat_deg_value = float(meta[start + 2:deg - 1])
+        lat_min_value = float(meta[deg + 4:min])
+        lat_sec_value = float(meta[min + 2:sec])
+        lat_value = lat_deg_value + lat_min_value / 60 + lat_sec_value / 3600
 
-    """" Gimbal Roll Degree """
-    roll_field = "-gimbalrolldegree"
-    process = subprocess.Popen([exe, roll_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    metadata = process.stdout.read().decode()
+        """" GPS Altitude """
+        altitude_field = "-relativealtitude"
+        process = subprocess.Popen([exe, altitude_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        meta = process.stdout.read().decode()
 
-    start = metadata.find(":")
-    end = metadata.find("\r")
+        start = meta.find(":")
+        end = meta.find("\r")
 
-    roll_value = float(metadata[start + 2:end])
+        alt_value = float(meta[start + 2:end])
 
-    """" Gimbal Pitch Degree """
-    pitch_field = "-gimbalpitchdegree"
-    process = subprocess.Popen([exe, pitch_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    metadata = process.stdout.read().decode()
+        """" Gimbal Roll Degree """
+        roll_field = "-gimbalrolldegree"
+        process = subprocess.Popen([exe, roll_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        meta = process.stdout.read().decode()
 
-    start = metadata.find(":")
-    end = metadata.find("\r")
+        start = meta.find(":")
+        end = meta.find("\r")
 
-    pitch_value = float(metadata[start + 2:end])
+        roll_value = float(meta[start + 2:end])
 
-    """" Gimbal Yaw Degree """
-    yaw_field = "-gimbalyawdegree"
-    process = subprocess.Popen([exe, yaw_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    metadata = process.stdout.read().decode()
+        """" Gimbal Pitch Degree """
+        pitch_field = "-gimbalpitchdegree"
+        process = subprocess.Popen([exe, pitch_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        meta = process.stdout.read().decode()
 
-    start = metadata.find(":")
-    end = metadata.find("\r")
+        start = meta.find(":")
+        end = meta.find("\r")
 
-    yaw_value = float(metadata[start + 2:end])
+        pitch_value = float(meta[start + 2:end])
 
-    eo = np.array([lon_value, lat_value, alt_value, roll_value, pitch_value, yaw_value])
+        """" Gimbal Yaw Degree """
+        yaw_field = "-gimbalyawdegree"
+        process = subprocess.Popen([exe, yaw_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        meta = process.stdout.read().decode()
 
-    return eo
+        start = meta.find(":")
+        end = meta.find("\r")
 
-    # eo = [float(eo_line['Longitude']), float(eo_line['Latitude']), float(eo_line['Height']),
-    #       float(eo_line['Omega']), float(eo_line['Phi']), float(eo_line['Kappa'])]
+        yaw_value = float(meta[start + 2:end])
 
+        eo = np.array([lon_value, lat_value, alt_value, roll_value, pitch_value, yaw_value])
+
+    return focal_length, orientation, eo
+
+def convert_fractions_to_float(fraction):
+    return fraction.numerator / fraction.denominator
+
+def convert_dms_to_deg(dms):
+    d = convert_fractions_to_float(dms[0])
+    m = convert_fractions_to_float(dms[1]) / 60
+    s = convert_fractions_to_float(dms[2]) / 3600
+    deg = d + m + s
+    return deg

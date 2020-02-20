@@ -3,39 +3,21 @@ import numpy as np
 import cv2
 import time
 from module.ExifData import *
-from module.EoData import latlon2tmcentral, Rot3D
+from module.EoData import *
 from module.Boundary import boundary, ray_tracing
 from module.BackprojectionResample import *
-from copy import copy
-
-
-def rot_2d(theta):
-    # Convert the coordinate system not coordinates
-    return np.array([[np.cos(theta), np.sin(theta)],
-                     [-np.sin(theta), np.cos(theta)]])
-
-
-def rpy_to_opk(gimbal_rpy):
-    roll_pitch = copy(gimbal_rpy[0:2])
-    roll_pitch[0] = 90 + gimbal_rpy[1]
-    if gimbal_rpy[0] < 0:
-        roll_pitch[1] = 0
-    else:
-        roll_pitch[1] = gimbal_rpy[0]
-
-    omega_phi = np.dot(rot_2d(gimbal_rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
-    kappa = -gimbal_rpy[2]
-    return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])
+from tabulate import tabulate
+import platform
 
 
 if __name__ == '__main__':
     ground_height = 0   # unit: m
     sensor_width = 6.3  # unit: mm
+    os_name = platform.system()
 
     for root, dirs, files in os.walk('./tests/query_images'):
         for file in files:
             image_start_time = time.time()
-            start_time = time.time()
 
             filename = os.path.splitext(file)[0]
             extension = os.path.splitext(file)[1]
@@ -44,10 +26,16 @@ if __name__ == '__main__':
 
             if extension == '.JPG':
                 print('Read the image - ' + file)
+                start_time = time.time()
                 image = cv2.imread(file_path, -1)
 
-                # 1. Extract EXIF data from a image
-                focal_length, orientation = get_focal_orientation(file_path)  # unit: m, _
+                # 1. Extract metadata from a image
+                focal_length, orientation, eo = get_metadata(file_path, os_name)  # unit: m, _, ndarray
+                print(tabulate([['Longitude', eo[0]], ['Latitude', eo[1]], ['Altitude', eo[2]],
+                                ['Gimbal-Roll', eo[3]], ['Gimbal-Pitch', eo[4]], ['Gimbal-Yaw', eo[5]]],
+                               headers=["Field", "Value(deg)"],
+                               tablefmt='orgtbl',
+                               numalign="right"))
 
                 # 2. Restore the image based on orientation information
                 restored_image = restoreOrientation(image, orientation)
@@ -59,18 +47,18 @@ if __name__ == '__main__':
                 pixel_size = pixel_size / 1000  # unit: m/px
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                print('Read EOP - ' + file)
+                print('Construct EOP')
                 start_time = time.time()
-                print('Longitude | Latitude | Altitude | Gimbal-Roll | Gimbal-Pitch | Gimbal-Yaw')
-                eo = get_pos_ori(file_path)
                 eo = latlon2tmcentral(eo)
                 opk = rpy_to_opk(eo[3:])
                 eo[3:] = opk * np.pi / 180   # degree to radian
                 R = Rot3D(eo)
+                print("--- %s seconds ---" % (time.time() - start_time))
 
+                print('boundary & GSD')
+                start_time = time.time()
                 # 3. Extract a projected boundary of the image
                 bbox = boundary(restored_image, eo, R, ground_height, pixel_size, focal_length)
-                print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 4. Compute GSD & Boundary size
                 # GSD
@@ -78,6 +66,7 @@ if __name__ == '__main__':
                 # Boundary size
                 boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
                 boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
+                print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 5. Compute coordinates of the projected boundary(Generate a virtual DEM)
                 print('projectedCoord')
