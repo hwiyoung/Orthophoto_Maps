@@ -65,7 +65,7 @@ def get_metadata(input_file, os_name):
         meta = metadata.ImageMetadata(input_file)
         meta.read()
 
-        focal_length = convert_fractions_to_float(meta['Exif.Photo.FocalLength'].value)
+        focal_length = convert_fractions_to_float(meta['Exif.Photo.FocalLength'].value) / 1000
         orientation = meta['Exif.Image.Orientation'].value
 
         longitude = convert_dms_to_deg(meta["Exif.GPSInfo.GPSLongitude"].value)
