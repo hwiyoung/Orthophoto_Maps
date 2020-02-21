@@ -19,8 +19,8 @@ if __name__ == '__main__':
     print("Read DEM")
     start_time = time.time()
     # --- DEM configuration ---
-    # dem = trimesh.load('../DEM_Yangpyeong/dem2point_whole_15_2 - Cloud.obj')
-    dem = trimesh.load('../DEM_Yangpyeong/dem2point_DJI_0361.ply')
+    dem = trimesh.load('../DEM_Yangpyeong/dem2point_whole_15_2 - Cloud.ply')
+    # dem = trimesh.load('../DEM_Yangpyeong/dem2point_DJI_0361.ply')
     vertices = np.array(dem.vertices)
     ind = np.lexsort((vertices[:, 0], -vertices[:, 1]))
     vertices = vertices[ind]
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     for root, dirs, files in os.walk('./tests/query_images'):
         for file in files:
-            # file = "DJI_0361.JPG"
+            # file = "DJI_0326.JPG"
             image_start_time = time.time()
             start_time = time.time()
 
@@ -45,11 +45,10 @@ if __name__ == '__main__':
 
                 # 1. Extract EXIF data from a image
                 focal_length, orientation, eo = get_metadata(file_path, os_name)  # unit: m, _, ndarray
-                print(tabulate([['Longitude', eo[0]], ['Latitude', eo[1]], ['Altitude', eo[2]],
-                                ['Gimbal-Roll', eo[3]], ['Gimbal-Pitch', eo[4]], ['Gimbal-Yaw', eo[5]]],
-                               headers=["Field", "Value(deg)"],
-                               tablefmt='orgtbl',
-                               numalign="right"))
+                print(tabulate([[eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
+                               headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
+                                        "Gimbal-Roll(deg)", "Gimbal-Pitch(deg)", "Gimbal-Yaw(deg)"],
+                               tablefmt='psql'))
 
                 # 2. Restore the image based on orientation information
                 restored_image = restoreOrientation(image, orientation)
@@ -103,20 +102,24 @@ if __name__ == '__main__':
                 print('resample')
                 start_time = time.time()
                 # Boundary size
-                # TODO: Check the dimension of output(b, g, r, a)
                 dem_cols = int((bbox[1, 0] - bbox[0, 0]) / dem_gsd)
                 dem_rows = int((bbox[3, 0] - bbox[2, 0]) / dem_gsd)
                 # dem_cols = 1298
                 # dem_rows = 1340
                 if backProj_coords.shape[1] % dem_cols == 0:
-                    continue
+                    dem_rows = int(backProj_coords.shape[1] / dem_cols)
+                elif backProj_coords.shape[1] % (dem_cols + 1) == 0:
+                    dem_cols = dem_cols + 1
+                    dem_rows = int(backProj_coords.shape[1] / dem_cols)
+                elif backProj_coords.shape[1] % (dem_cols - 1) == 0:
+                    dem_cols = dem_cols - 1
+                    dem_rows = int(backProj_coords.shape[1] / dem_cols)
+                elif backProj_coords.shape[1] % (dem_cols + 2) == 0:
+                    dem_cols = dem_cols + 2
+                    dem_rows = int(backProj_coords.shape[1] / dem_cols)
                 else:
-                    if backProj_coords.shape[1] % (dem_cols + 1) == 0:
-                        dem_cols = dem_cols + 1
-                        dem_rows = int(backProj_coords.shape[1] / dem_cols)
-                    else:
-                        dem_cols = dem_cols - 1
-                        dem_rows = int(backProj_coords.shape[1] / dem_cols)
+                    dem_cols = dem_cols - 2
+                    dem_rows = int(backProj_coords.shape[1] / dem_cols)
 
                 # Resampling for generating source data
                 b, g, r, a = resample(backProj_coords, dem_rows, dem_cols, image)
@@ -151,8 +154,8 @@ if __name__ == '__main__':
                 # 8. Create GeoTiff
                 print('Save the image in GeoTiff')
                 start_time = time.time()
-                # createGeoTiff(b, g, r, a, bbox, dem_gsd, dem_rows, dem_cols, dst)
-                createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
+                createGeoTiff(b, g, r, a, bbox, dem_gsd, dem_rows, dem_cols, dst)
+                # createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')

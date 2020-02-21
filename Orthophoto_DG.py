@@ -31,11 +31,10 @@ if __name__ == '__main__':
 
                 # 1. Extract metadata from a image
                 focal_length, orientation, eo = get_metadata(file_path, os_name)  # unit: m, _, ndarray
-                print(tabulate([['Longitude', eo[0]], ['Latitude', eo[1]], ['Altitude', eo[2]],
-                                ['Gimbal-Roll', eo[3]], ['Gimbal-Pitch', eo[4]], ['Gimbal-Yaw', eo[5]]],
-                               headers=["Field", "Value(deg)"],
-                               tablefmt='orgtbl',
-                               numalign="right"))
+                print(tabulate([[eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
+                               headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
+                                        "Gimbal-Roll(deg)", "Gimbal-Pitch(deg)", "Gimbal-Yaw(deg)"],
+                               tablefmt='psql'))
 
                 # 2. Restore the image based on orientation information
                 restored_image = restoreOrientation(image, orientation)
