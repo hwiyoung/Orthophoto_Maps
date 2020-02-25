@@ -76,6 +76,11 @@ def get_metadata(input_file, os_name):
             roll = float(meta['Xmp.drone-dji.GimbalRollDegree'].value)
             pitch = float(meta['Xmp.drone-dji.GimbalPitchDegree'].value)
             yaw = float(meta['Xmp.drone-dji.GimbalYawDegree'].value)
+        elif meta["Exif.Image.Make"].raw_value == "samsung":
+            altitude = convert_fractions_to_float(meta['Exif.GPSInfo.GPSAltitude'].value)
+            roll = float(meta['Xmp.DLS.Roll'].value) * 180 / np.pi
+            pitch = float(meta['Xmp.DLS.Pitch'].value) * 180 / np.pi
+            yaw = float(meta['Xmp.DLS.Yaw'].value) * 180 / np.pi
         else:
             altitude = 0
             roll = 0

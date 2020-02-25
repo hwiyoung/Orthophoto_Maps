@@ -118,3 +118,13 @@ def rpy_to_opk(gimbal_rpy):
     omega_phi = np.dot(rot_2d(gimbal_rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
     kappa = -gimbal_rpy[2]
     return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])
+
+def rpy_to_opk_smartphone(smartphone_rpy):
+    roll_pitch = copy(smartphone_rpy[0:2])
+
+    roll_pitch[0] = -smartphone_rpy[1]
+    roll_pitch[1] = -smartphone_rpy[0]
+
+    omega_phi = np.dot(rot_2d(smartphone_rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
+    kappa = -smartphone_rpy[2]-90
+    return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])
