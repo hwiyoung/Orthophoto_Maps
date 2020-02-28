@@ -1,5 +1,6 @@
 import numpy as np
 import trimesh
+import time
 
 def boundary(image, eo, R, dem, pixel_size, focal_length):
     inverse_R = R.transpose()
@@ -91,15 +92,43 @@ def ray_tracing(image, eo, R, dem, vertices, pixel_size, focal_length):
     bbox[3] = max(locations[:, 1])  # Y max
     # print(bbox)
 
-    idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[0, 0], bbox[3, 0]])) ** 2, axis=1)))
-    idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[1, 0], bbox[3, 0]])) ** 2, axis=1)))
-    idx_lr = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[1, 0], bbox[2, 0]])) ** 2, axis=1)))
-    idx_ll = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[0, 0], bbox[2, 0]])) ** 2, axis=1)))
+    # print("Ray-tracing")
+    # start_time = time.time()
+    test_origins = np.array([[bbox[0, 0], bbox[3, 0], eo[2]],   # UL
+                             [bbox[1, 0], bbox[3, 0], eo[2]],   # UR
+                             [bbox[1, 0], bbox[2, 0], eo[2]],   # LR
+                             [bbox[0, 0], bbox[2, 0], eo[2]]])  # LL
+    test_directions = np.array([[0, 0, -1],
+                                [0, 0, -1],
+                                [0, 0, -1],
+                                [0, 0, -1]])
+    test_locations, test_index_ray, test_index_tri = dem.ray.intersects_location(
+        ray_origins=test_origins, ray_directions=test_directions)
+    coord_ul_mesh = test_locations[0]
+    coord_ur_mesh = test_locations[1]
+    coord_lr_mesh = test_locations[2]
+    coord_ll_mesh = test_locations[3]
+    # print("--- %s seconds ---" % (time.time() - start_time))
 
-    coord_ul_mesh = vertices[idx_ul]
-    coord_ur_mesh = vertices[idx_ur]
-    coord_lr_mesh = vertices[idx_lr]
-    coord_ll_mesh = vertices[idx_ll]
+    # print("Array")
+    # start_time = time.time()
+    # idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[0, 0], bbox[3, 0]])) ** 2, axis=1)))
+    # idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[1, 0], bbox[3, 0]])) ** 2, axis=1)))
+    # idx_lr = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[1, 0], bbox[2, 0]])) ** 2, axis=1)))
+    # idx_ll = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[0, 0], bbox[2, 0]])) ** 2, axis=1)))
+    #
+    # coord_ul_mesh = vertices[idx_ul]
+    # coord_ur_mesh = vertices[idx_ur]
+    # coord_lr_mesh = vertices[idx_lr]
+    # coord_ll_mesh = vertices[idx_ll]
+    # print("--- %s seconds ---" % (time.time() - start_time))
+
+    # (closest_points,
+    #  distances,
+    #  triangle_id) = dem.nearest.on_surface(np.array([[bbox[0, 0], bbox[3, 0], 0],
+    #                                                  [bbox[1, 0], bbox[3, 0], 0],
+    #                                                  [bbox[1, 0], bbox[2, 0], 0],
+    #                                                  [bbox[0, 0], bbox[2, 0], 0]]))
 
     dem_extracted = vertices[((vertices[:, 0] >= coord_ul_mesh[0]) & (vertices[:, 0] <= coord_ur_mesh[0])) &
                              ((vertices[:, 1] >= coord_ll_mesh[1]) & (vertices[:, 1] <= coord_ul_mesh[1]))]

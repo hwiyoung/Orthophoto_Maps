@@ -130,9 +130,10 @@ def projectedCoord_test(boundary, boundary_rows, boundary_cols, gsd, eo, dem):
         # print(row)
         # idx_z0 = row * boundary_rows
         for col in range(boundary_cols):
-            proj_coords[0, i] = boundary[0, 0] + col * gsd - eo[0]
-            proj_coords[1, i] = boundary[3, 0] - row * gsd - eo[1]
-            idx_z = np.argmin(np.sqrt(np.sum((dem[0:2, :].T - proj_coords[0:2, i]) ** 2, axis=1)))
-            proj_coords[2, i] = dem[:, idx_z][2]
+            proj_coords[0, i] = boundary[0, 0] + col * gsd
+            proj_coords[1, i] = boundary[3, 0] - row * gsd
+            # idx_z = np.argmin(np.sqrt(np.sum((dem[0:2, :].T - proj_coords[0:2, i]) ** 2, axis=1)))
+            # proj_coords[2, i] = dem[:, idx_z][2]
             i += 1
+    proj_coords[2, :] = dem
     return proj_coords
