@@ -119,21 +119,3 @@ def createGeoTiffThermal(grey, boundary, gsd, rows, cols, dst):
 
     dst_ds.FlushCache()  # write to disk
     dst_ds = None
-
-@jit(nopython=True)
-def projectedCoord_test(boundary, boundary_rows, boundary_cols, gsd, eo, dem):
-    proj_coords = np.empty(shape=(3, boundary_rows * boundary_cols))
-    i = 0
-    # idx_z0 = 0
-    # res = np.empty(shape=(2, 1739320))
-    for row in range(boundary_rows):
-        # print(row)
-        # idx_z0 = row * boundary_rows
-        for col in range(boundary_cols):
-            proj_coords[0, i] = boundary[0, 0] + col * gsd
-            proj_coords[1, i] = boundary[3, 0] - row * gsd
-            # idx_z = np.argmin(np.sqrt(np.sum((dem[0:2, :].T - proj_coords[0:2, i]) ** 2, axis=1)))
-            # proj_coords[2, i] = dem[:, idx_z][2]
-            i += 1
-    proj_coords[2, :] = dem
-    return proj_coords

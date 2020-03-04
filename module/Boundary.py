@@ -62,11 +62,7 @@ def pcs2ccs(bbox_px, rows, cols, pixel_size, focal_length):
     return bbox_camera
 
 def ray_tracing(image, eo, R, dem, vertices, pixel_size, focal_length):
-    # vertices = np.array(dem.vertices)
-    # ind = np.lexsort((vertices[:, 0], -vertices[:, 1]))
-    # vertices = vertices[ind]
-
-    # create some rays
+    # create rays
     ray_origins = np.empty(shape=(4, 3))
     ray_origins[:, 0] = eo[0]
     ray_origins[:, 1] = eo[1]
@@ -90,10 +86,7 @@ def ray_tracing(image, eo, R, dem, vertices, pixel_size, focal_length):
     bbox[1] = max(locations[:, 0])  # X max
     bbox[2] = min(locations[:, 1])  # Y min
     bbox[3] = max(locations[:, 1])  # Y max
-    # print(bbox)
 
-    # print("Ray-tracing")
-    # start_time = time.time()
     test_origins = np.array([[bbox[0, 0], bbox[3, 0], eo[2]],   # UL
                              [bbox[1, 0], bbox[3, 0], eo[2]],   # UR
                              [bbox[1, 0], bbox[2, 0], eo[2]],   # LR
@@ -108,34 +101,13 @@ def ray_tracing(image, eo, R, dem, vertices, pixel_size, focal_length):
     coord_ur_mesh = test_locations[1]
     coord_lr_mesh = test_locations[2]
     coord_ll_mesh = test_locations[3]
-    # print("--- %s seconds ---" % (time.time() - start_time))
-
-    # print("Array")
-    # start_time = time.time()
-    # idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[0, 0], bbox[3, 0]])) ** 2, axis=1)))
-    # idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[1, 0], bbox[3, 0]])) ** 2, axis=1)))
-    # idx_lr = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[1, 0], bbox[2, 0]])) ** 2, axis=1)))
-    # idx_ll = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - np.array([bbox[0, 0], bbox[2, 0]])) ** 2, axis=1)))
-    #
-    # coord_ul_mesh = vertices[idx_ul]
-    # coord_ur_mesh = vertices[idx_ur]
-    # coord_lr_mesh = vertices[idx_lr]
-    # coord_ll_mesh = vertices[idx_ll]
-    # print("--- %s seconds ---" % (time.time() - start_time))
-
-    # (closest_points,
-    #  distances,
-    #  triangle_id) = dem.nearest.on_surface(np.array([[bbox[0, 0], bbox[3, 0], 0],
-    #                                                  [bbox[1, 0], bbox[3, 0], 0],
-    #                                                  [bbox[1, 0], bbox[2, 0], 0],
-    #                                                  [bbox[0, 0], bbox[2, 0], 0]]))
 
     dem_extracted = vertices[((vertices[:, 0] >= coord_ul_mesh[0]) & (vertices[:, 0] <= coord_ur_mesh[0])) &
                              ((vertices[:, 1] >= coord_ll_mesh[1]) & (vertices[:, 1] <= coord_ul_mesh[1]))]
-    dem_output = dem_extracted.transpose()
-    dem_output[0] -= eo[0]
-    dem_output[1] -= eo[1]
-    dem_output[2] -= eo[2]
+
+    dem_extracted[:, 0] -= eo[0]
+    dem_extracted[:, 1] -= eo[1]
+    dem_extracted[:, 2] -= eo[2]
 
     # ### Check for boundary
     # # stack rays into line segments for visualization as Path3D
@@ -155,4 +127,4 @@ def ray_tracing(image, eo, R, dem, vertices, pixel_size, focal_length):
     # # display the scene
     # scene.show()
 
-    return bbox, dem_output
+    return bbox, dem_extracted
