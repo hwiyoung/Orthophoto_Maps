@@ -32,7 +32,7 @@ if __name__ == '__main__':
     os_name = platform.system()
 
     i = 0
-    for root, dirs, files in os.walk('../Smartphone_Image_opk/0225'):
+    for root, dirs, files in os.walk('../00_data/Smartphone_Image_opk/0225'):
         files.sort()
         for file in files:
             image_start_time = time.time()
