@@ -67,6 +67,7 @@ def get_metadata(input_file, os_name):
 
         focal_length = convert_fractions_to_float(meta['Exif.Photo.FocalLength'].value) / 1000
         orientation = meta['Exif.Image.Orientation'].value
+        maker = meta["Exif.Image.Make"].value
 
         longitude = convert_dms_to_deg(meta["Exif.GPSInfo.GPSLongitude"].value)
         latitude = convert_dms_to_deg(meta["Exif.GPSInfo.GPSLatitude"].value)
@@ -178,7 +179,17 @@ def get_metadata(input_file, os_name):
 
         eo = np.array([lon_value, lat_value, alt_value, roll_value, pitch_value, yaw_value])
 
-    return focal_length, orientation, eo
+        """" Make """
+        make_field = "-make"
+        process = subprocess.Popen([exe, make_field, input_file], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        meta = process.stdout.read().decode()
+
+        start = meta.find(":")
+        end = meta.find("\r")
+
+        maker = meta[start + 2:end]
+
+    return focal_length, orientation, eo, maker
 
 def convert_fractions_to_float(fraction):
     return fraction.numerator / fraction.denominator

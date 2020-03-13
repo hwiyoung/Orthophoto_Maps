@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import time
 from module.ExifData import *
-from module.EoData import readEO, latlon2tmcentral, Rot3D
+from module.EoData import readEO, geographic2plane, Rot3D
 from module.Boundary import boundary
 from module.BackprojectionResample import projectedCoord, backProjection, resample, createGeoTiff
 
@@ -25,8 +25,7 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path, -1)
 
                 # 1. Extract EXIF data from a image
-                # focal_length, orientation = getExif(file_path)  # unit: m
-                focal_length, orientation = get_focal_orientation(file_path)  # unit: m, _
+                focal_length, orientation = getExif(file_path)  # unit: m, _
 
                 # 2. Restore the image based on orientation information
                 restored_image = restoreOrientation(image, orientation)
@@ -48,7 +47,7 @@ if __name__ == '__main__':
                 print('Read EOP - ' + file)
                 print('Latitude | Longitude | Height | Omega | Phi | Kappa')
                 eo = readEO(file_path)
-                eo = latlon2tmcentral(eo)
+                eo = geographic2plane(eo)
                 R = Rot3D(eo)
 
                 # 4. Extract a projected boundary of the image

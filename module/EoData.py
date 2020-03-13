@@ -18,19 +18,19 @@ def readEO(path):
 
     return eo
 
-def latlon2tmcentral(eo):
-    # Define the TM central coordinate system (EPSG 5186)
-    epsg5186 = SpatialReference()
-    epsg5186.ImportFromEPSG(5186)
+def geographic2plane(eo, epsg=5186):
+    # Define the Plane Coordinate System (e.g. 5186)
+    plane = SpatialReference()
+    plane.ImportFromEPSG(epsg)
 
     # Define the wgs84 system (EPSG 4326)
-    epsg4326 = SpatialReference()
-    epsg4326.ImportFromEPSG(4326)
+    geographic = SpatialReference()
+    geographic.ImportFromEPSG(4326)
 
-    latlon2tm = CoordinateTransformation(epsg4326, epsg5186)
+    coord_transformation = CoordinateTransformation(geographic, plane)
 
     # Check the transformation for a point close to the centre of the projected grid
-    xy = latlon2tm.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
+    xy = coord_transformation.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
     eo[0:2] = xy[0:2]
 
     return eo
@@ -107,24 +107,24 @@ def rot_2d(theta):
     return np.array([[np.cos(theta), np.sin(theta)],
                      [-np.sin(theta), np.cos(theta)]])
 
-def rpy_to_opk(gimbal_rpy):
-    roll_pitch = copy(gimbal_rpy[0:2])
-    roll_pitch[0] = 90 + gimbal_rpy[1]
-    if gimbal_rpy[0] < 0:
-        roll_pitch[1] = 0
+def rpy_to_opk(rpy, maker=""):
+    if maker == "samsung":
+        roll_pitch = copy(rpy[0:2])
+
+        roll_pitch[0] = -rpy[1]
+        roll_pitch[1] = -rpy[0]
+
+        omega_phi = np.dot(rot_2d(rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
+        kappa = -rpy[2] - 90
+        return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])
     else:
-        roll_pitch[1] = gimbal_rpy[0]
+        roll_pitch = np.empty_like(rpy[0:2])
+        roll_pitch[0] = 90 + rpy[1]
+        if rpy[0] < 0:
+            roll_pitch[1] = 0
+        else:
+            roll_pitch[1] = rpy[0]
 
-    omega_phi = np.dot(rot_2d(gimbal_rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
-    kappa = -gimbal_rpy[2]
-    return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])
-
-def rpy_to_opk_smartphone(smartphone_rpy):
-    roll_pitch = copy(smartphone_rpy[0:2])
-
-    roll_pitch[0] = -smartphone_rpy[1]
-    roll_pitch[1] = -smartphone_rpy[0]
-
-    omega_phi = np.dot(rot_2d(smartphone_rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
-    kappa = -smartphone_rpy[2]-90
-    return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])
+        omega_phi = np.dot(rot_2d(rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
+        kappa = -rpy[2]
+        return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])

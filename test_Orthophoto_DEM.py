@@ -45,7 +45,7 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path, -1)
 
                 # 1. Extract EXIF data from a image
-                focal_length, orientation, eo = get_metadata(file_path, os_name)  # unit: m, _, ndarray
+                focal_length, orientation, eo, maker = get_metadata(file_path, os_name)  # unit: m, _, ndarray
                 print(tabulate([[eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
                                headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
                                         "Gimbal-Roll(deg)", "Gimbal-Pitch(deg)", "Gimbal-Yaw(deg)"],
@@ -63,8 +63,8 @@ if __name__ == '__main__':
 
                 print('Construct EOP')
                 start_time = time.time()
-                eo = latlon2tmcentral(eo)
-                opk = rpy_to_opk(eo[3:])
+                eo = geographic2plane(eo)
+                opk = rpy_to_opk(eo[3:], maker)
                 eo[3:] = opk * np.pi / 180  # degree to radian
                 R = Rot3D(eo)
                 print("--- %s seconds ---" % (time.time() - start_time))

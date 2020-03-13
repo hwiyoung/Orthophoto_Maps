@@ -48,7 +48,7 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path, -1)
 
                 # 1. Extract metadata from a image
-                focal_length, orientation, eo = get_metadata(file_path, os_name)  # unit: m, _, ndarray
+                focal_length, orientation, eo, maker = get_metadata(file_path, os_name)  # unit: m, _, ndarray
                 print(tabulate([[eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
                                headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
                                         "Roll(deg)", "Pitch(deg)", "Azimuth(deg)"],
@@ -66,8 +66,8 @@ if __name__ == '__main__':
 
                 print('Construct EOP')
                 start_time = time.time()
-                eo = latlon2tmcentral(eo)
-                opk = rpy_to_opk_smartphone(eo[3:])
+                eo = geographic2plane(eo)
+                opk = rpy_to_opk(eo[3:], maker)
                 # --- Check initial X, Y ---
                 print(tabulate([[eo[0], eo[1], eo[2], opk[0], opk[1], opk[2]]],
                                headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
