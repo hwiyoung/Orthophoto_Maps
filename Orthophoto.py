@@ -20,7 +20,7 @@ if __name__ == '__main__':
             extension = os.path.splitext(file)[1]
             file_path = root + '/' + file
 
-            if extension == '.JPG':
+            if extension == '.JPG' or extension == '.jpg':
                 print('Read the image - ' + file)
                 image = cv2.imread(file_path, -1)
 

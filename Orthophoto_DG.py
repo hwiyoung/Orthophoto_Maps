@@ -25,7 +25,7 @@ if __name__ == '__main__':
             file_path = root + '/' + file
             dst = './' + filename
 
-            if extension == '.JPG':
+            if extension == '.JPG' or extension == '.jpg':
                 print('Read the image - ' + file)
                 start_time = time.time()
                 image = cv2.imread(file_path, -1)
