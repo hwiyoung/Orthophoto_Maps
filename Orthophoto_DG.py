@@ -12,7 +12,8 @@ import platform
 
 if __name__ == '__main__':
     ground_height = 0   # unit: m
-    sensor_width = 6.3  # unit: mm
+    sensor_width = 6.3  # unit: mm, Mavic
+    # sensor_width = 13.2  # unit: mm, P4RTK
     os_name = platform.system()
     epsg = 5186     # editable
 
@@ -93,6 +94,7 @@ if __name__ == '__main__':
                 print('Save the image in GeoTiff')
                 start_time = time.time()
                 createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
+                # create_pnga_optical(b, g, r, a, bbox, gsd, epsg, dst)   # for test
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')

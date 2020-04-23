@@ -1,7 +1,6 @@
 import numpy as np
 import math
 from osgeo.osr import SpatialReference, CoordinateTransformation
-from copy import copy
 
 def readEO(path):
     eo_line = np.genfromtxt(path, delimiter='\t',
@@ -109,7 +108,7 @@ def rot_2d(theta):
 
 def rpy_to_opk(rpy, maker=""):
     if maker == "samsung":
-        roll_pitch = copy(rpy[0:2])
+        roll_pitch = np.empty_like(rpy[0:2])
 
         roll_pitch[0] = -rpy[1]
         roll_pitch[1] = -rpy[0]
@@ -120,7 +119,7 @@ def rpy_to_opk(rpy, maker=""):
     else:
         roll_pitch = np.empty_like(rpy[0:2])
         roll_pitch[0] = 90 + rpy[1]
-        if rpy[0] < 0:
+        if 180 - abs(rpy[0]) <= 0.1:
             roll_pitch[1] = 0
         else:
             roll_pitch[1] = rpy[0]

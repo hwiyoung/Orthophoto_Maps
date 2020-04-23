@@ -1,18 +1,23 @@
 import os
 import numpy as np
 import cv2
+import os
+import numpy as np
+import cv2
 import time
-from ExifData import getExif, restoreOrientation
-from EoData import readEO, convertCoordinateSystem, Rot3D
-from Boundary import boundary
-from BackprojectionResample import projectedCoord, backProjection,\
-    resampleThermal, createGeoTiffThermal
+from module.ExifData import *
+from module.EoData import *
+from module.Boundary import boundary, ray_tracing
+from module.BackprojectionResample import *
+from tabulate import tabulate
 
 if __name__ == '__main__':
     ground_height = 65  # unit: m
     sensor_width = 10.88  # unit: mm
+    epsg = 5186  # editable
 
-    for root, dirs, files in os.walk('./tests/testData'):
+    for root, dirs, files in os.walk('./tests/thermal_images'):
+        files.sort()
         for file in files:
             image_start_time = time.time()
             start_time = time.time()
@@ -21,7 +26,7 @@ if __name__ == '__main__':
             extension = os.path.splitext(file)[1]
             file_path = root + '/' + file
 
-            if extension == '.tiff' or extension == '.tif':
+            if extension == '.tiff' or extension == '.tif' or extension == ".TIFF":
                 print('Read the image - ' + file)
                 image = cv2.imread(file_path, -1)
 
@@ -51,9 +56,12 @@ if __name__ == '__main__':
 
             else:
                 print('Read EOP - ' + file)
-                print('Longitude | Latitude | Height | Omega | Phi | Kappa')
                 eo = readEO(file_path)
-                eo = convertCoordinateSystem(eo)
+                print(tabulate([[eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
+                               headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
+                                        "Roll(deg)", "Pitch(deg)", "Yaw(deg)"],
+                               tablefmt='psql'))
+                eo = geographic2plane(eo, epsg)
                 R = Rot3D(eo)
 
                 # 4. Extract a projected boundary of the image
@@ -85,7 +93,7 @@ if __name__ == '__main__':
                 # 7. Resample the pixels
                 print('resample')
                 start_time = time.time()
-                gray = resampleThermal(backProj_coords, boundary_rows, boundary_cols, converted_image)
+                gray, a = resampleThermal(backProj_coords, boundary_rows, boundary_cols, converted_image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff
@@ -94,6 +102,13 @@ if __name__ == '__main__':
                 dst = './' + filename
                 createGeoTiffThermal(gray, bbox, gsd, boundary_rows, boundary_cols, dst)
                 print("--- %s seconds ---" % (time.time() - start_time))
+
+                # # 8. Create pnga
+                # print('Save the image in pnga')
+                # start_time = time.time()
+                # dst = './' + filename
+                # create_pnga_thermal(gray, a, bbox, gsd, epsg, dst)
+                # print("--- %s seconds ---" % (time.time() - start_time))
 
                 print('*** Processing time per each image')
                 print("--- %s seconds ---" % (time.time() - image_start_time + read_time))
