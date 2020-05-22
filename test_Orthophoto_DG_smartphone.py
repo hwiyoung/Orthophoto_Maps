@@ -1,6 +1,4 @@
 import os
-import numpy as np
-import cv2
 import time
 from module.ExifData import *
 from module.EoData import *
@@ -29,9 +27,7 @@ def readEO_test(path, seq):
 if __name__ == '__main__':
     ground_height = 35   # unit: m
     sensor_width = 5.75  # unit: mm / Galaxy S10
-    os_name = platform.system()
 
-    i = 0
     for root, dirs, files in os.walk('../00_data/Smartphone_Image_opk/0225'):
         files.sort()
         for file in files:
@@ -48,7 +44,7 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path, -1)
 
                 # 1. Extract metadata from a image
-                focal_length, orientation, eo, maker = get_metadata(file_path, os_name)  # unit: m, _, ndarray
+                focal_length, orientation, eo, maker = get_metadata(file_path)  # unit: m, _, ndarray
                 print(tabulate([[eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
                                headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
                                         "Roll(deg)", "Pitch(deg)", "Azimuth(deg)"],
@@ -124,4 +120,3 @@ if __name__ == '__main__':
 
                 print('*** Processing time per each image')
                 print("--- %s seconds ---" % (time.time() - image_start_time))
-                i = i+1

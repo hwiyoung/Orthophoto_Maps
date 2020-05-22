@@ -1,9 +1,4 @@
 import os
-import numpy as np
-import cv2
-import os
-import numpy as np
-import cv2
 import time
 from module.ExifData import *
 from module.EoData import *

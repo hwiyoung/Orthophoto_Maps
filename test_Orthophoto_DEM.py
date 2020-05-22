@@ -1,6 +1,4 @@
 import os
-import numpy as np
-import cv2
 import time
 from module.ExifData import *
 from module.EoData import *
@@ -15,7 +13,6 @@ import pandas as pd
 if __name__ == '__main__':
     ground_height = 0   # unit: m
     sensor_width = 6.3  # unit: mm
-    os_name = platform.system()
 
     print("Read DEM")
     start_time = time.time()
@@ -45,7 +42,7 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path, -1)
 
                 # 1. Extract EXIF data from a image
-                focal_length, orientation, eo, maker = get_metadata(file_path, os_name)  # unit: m, _, ndarray
+                focal_length, orientation, eo, maker = get_metadata(file_path)  # unit: m, _, ndarray
                 print(tabulate([[eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
                                headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
                                         "Gimbal-Roll(deg)", "Gimbal-Pitch(deg)", "Gimbal-Yaw(deg)"],

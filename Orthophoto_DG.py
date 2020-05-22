@@ -7,14 +7,12 @@ from module.EoData import *
 from module.Boundary import boundary, ray_tracing
 from module.BackprojectionResample import *
 from tabulate import tabulate
-import platform
 
 
 if __name__ == '__main__':
     ground_height = 0   # unit: m
     sensor_width = 6.3  # unit: mm, Mavic
     # sensor_width = 13.2  # unit: mm, P4RTK
-    os_name = platform.system()
     epsg = 5186     # editable
 
     for root, dirs, files in os.walk('./tests/query_images'):
@@ -32,7 +30,7 @@ if __name__ == '__main__':
                 image = cv2.imread(file_path, -1)
 
                 # 1. Extract metadata from a image
-                focal_length, orientation, eo, maker = get_metadata(file_path, os_name)  # unit: m, _, ndarray
+                focal_length, orientation, eo, maker = get_metadata(file_path)  # unit: m, _, ndarray
                 print(tabulate([[eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
                                headers=["Longitude(deg)", "Latitude(deg)", "Altitude(deg)",
                                         "Gimbal-Roll(deg)", "Gimbal-Pitch(deg)", "Gimbal-Yaw(deg)"],
