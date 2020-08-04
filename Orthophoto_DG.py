@@ -11,11 +11,12 @@ from tabulate import tabulate
 
 if __name__ == '__main__':
     ground_height = 0   # unit: m
-    sensor_width = 6.3  # unit: mm, Mavic
+    # sensor_width = 6.3  # unit: mm, Mavic
     # sensor_width = 13.2  # unit: mm, P4RTK
+    sensor_width = 17.3  # unit: mm, Inspire
     epsg = 5186     # editable
 
-    for root, dirs, files in os.walk('./tests/query_images'):
+    for root, dirs, files in os.walk('../00_data/sample_dji'):
         for file in files:
             image_start_time = time.time()
 

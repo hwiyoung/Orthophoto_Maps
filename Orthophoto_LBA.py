@@ -1,19 +1,24 @@
-import os
 import time
 from module.ExifData import *
 from module.EoData import *
 from module.Boundary import boundary
 from module.BackprojectionResample import *
 from tabulate import tabulate
-from module.LocalBA import solve_local_AT
+from module.LocalBA import *
 import glob
+from copy import copy
+from collections import deque
 
 
 if __name__ == '__main__':
     ground_height = 0   # unit: m
-    sensor_width = 6.3  # unit: mm, Mavic
+    # sensor_width = 6.3  # unit: mm, Mavic
     # sensor_width = 13.2  # unit: mm, P4RTK
+    sensor_width = 17.3  # unit: mm, Inspire
     epsg = 5186     # editable
+    # ref_eo = []
+    # https://stackoverflow.com/questions/1931589/python-datatype-for-a-fixed-length-fifo
+    ref_eo = deque([], 5)
 
     image_path = '../00_data/sample_dji'
     images = glob.glob(image_path + "/*.JPG")
@@ -45,6 +50,7 @@ if __name__ == '__main__':
 
         georef_start = time.time()
         if i < 4:
+            ref_eo.append(copy(eo))
             eo = geographic2plane(eo, epsg)
             opk = rpy_to_opk(eo[3:], maker)
             print(tabulate([[image_name, eo[0], eo[1], eo[2], opk[0], opk[1], opk[2]]],
@@ -53,14 +59,34 @@ if __name__ == '__main__':
             eo[3:] = opk * np.pi / 180  # degree to radian
             R = Rot3D(eo)
             georef_time = time.time() - georef_start
-        else:
+        elif i == 4:
+            ref_eo.append(copy(eo))
             images_to_process = images[i-4:i+1]   # not include last number
-            eo = solve_local_AT(images_to_process, "photoscan")
-            eo = geographic2plane(eo, epsg)
-            print(tabulate([[image_name, eo[0], eo[1], eo[2], eo[3], eo[4], eo[5]]],
+            eo, opk = solve_local_AT2(images_to_process, "photoscan", np.array(ref_eo).astype(str), i)
+            ref_eo.append(copy(eo[4]))
+            ref_eo.append(copy(eo[3]))
+            ref_eo.append(copy(eo[2]))
+            ref_eo.append(copy(eo[1]))
+            ref_eo.append(copy(eo[0]))
+            eo = geographic2plane(eo[0], epsg)
+            print(tabulate([[image_name, eo[0], eo[1], eo[2], opk[0], opk[1], opk[2]]],
                            headers=["Name", "X(m)", "Y(m)", "Z(m)", "Omega(deg)", "Phi(deg)", "Kappa(deg)"],
                            tablefmt='psql', floatfmt=".4f"))
-            eo[3:] = eo[3:] * np.pi / 180  # degree to radian
+            eo[3:] = opk * np.pi / 180  # degree to radian
+            R = Rot3D(eo)
+            georef_time = time.time() - georef_start
+        else:
+            eo[4] = eo[4] + 90
+            ref_eo.append(copy(eo))
+            images_to_process = images[i-4:i+1]   # not include last number
+            # eo = solve_local_AT(images_to_process, "photoscan")
+            eo, opk = solve_local_AT3(images_to_process, "photoscan", np.array(ref_eo).astype(str), i)
+            ref_eo[-1] = copy(eo)
+            eo = geographic2plane(eo, epsg)
+            print(tabulate([[image_name, eo[0], eo[1], eo[2], opk[0], opk[1], opk[2]]],
+                           headers=["Name", "X(m)", "Y(m)", "Z(m)", "Omega(deg)", "Phi(deg)", "Kappa(deg)"],
+                           tablefmt='psql', floatfmt=".4f"))
+            eo[3:] = opk * np.pi / 180  # degree to radian
             R = Rot3D(eo)
             georef_time = time.time() - georef_start
 
@@ -87,7 +113,7 @@ if __name__ == '__main__':
         backproj_start = time.time()
         # 6. Back-projection into camera coordinate system
         backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)
-        backproj_time = time.time() - projection_time
+        backproj_time = time.time() - backproj_start
 
         resample_start = time.time()
         # 7. Resample the pixels
