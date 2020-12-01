@@ -1,5 +1,5 @@
 import numpy as np
-import trimesh
+# import trimesh
 import time
 
 def boundary(image, eo, R, dem, pixel_size, focal_length):

@@ -3,6 +3,55 @@ from numba import jit
 from osgeo import gdal, osr
 import cv2
 
+
+def rectify_plane(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height, R, focal_length, pixel_size, image):
+    # 1. projection
+    # 2. back-projection
+    # 3. resample
+
+    # A projected coordinate
+    proj_coords = np.empty(shape=(3, )).reshape((3, 1))
+
+    # Define channels of an orthophoto
+    b = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    g = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    r = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+    a = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
+
+    image_size = np.reshape(image.shape[0:2], (2, 1))
+
+    for row in range(boundary_rows):
+        for col in range(boundary_cols):
+            # 1. projection
+            proj_coords[0] = boundary[0, 0] + col * gsd - eo[0]
+            proj_coords[1] = boundary[3, 0] - row * gsd - eo[1]
+            proj_coords[2] = ground_height - eo[2]
+
+            # 2. back-projection
+            coord_CCS_m = np.dot(R, proj_coords)  # unit: m, 3 x 1, [x, y, z]'
+            scale = (coord_CCS_m[2]) / (-focal_length)  # scalar
+            plane_coord_CCS = coord_CCS_m[0:2] / scale  # 2 x 1
+
+            # Convert CCS to Pixel Coordinate System
+            coord_CCS_px = plane_coord_CCS / pixel_size  # unit: px
+            coord_CCS_px[1] = -coord_CCS_px[1]
+
+            coord_out = image_size[::-1] / 2 + coord_CCS_px  # [col, row]
+
+            # 3. resample
+            if coord_out[0] < 0 or coord_out[0] >= image.shape[1]:      # column
+                continue
+            elif coord_out[1] < 0 or coord_out[1] >= image.shape[0]:    # row
+                continue
+            else:
+                b[row, col] = image[coord_out[1], coord_out[0]][0]
+                g[row, col] = image[coord_out[1], coord_out[0]][1]
+                r[row, col] = image[coord_out[1], coord_out[0]][2]
+                a[row, col] = 255
+
+    return b, g, r, a
+
+
 @jit(nopython=True)
 def projectedCoord(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height):
     proj_coords = np.empty(shape=(3, boundary_rows * boundary_cols))
