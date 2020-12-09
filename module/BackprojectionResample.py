@@ -4,21 +4,23 @@ from osgeo import gdal, osr
 import cv2
 
 
+@jit(nopython=True)
 def rectify_plane(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height, R, focal_length, pixel_size, image):
     # 1. projection
     # 2. back-projection
     # 3. resample
 
-    # A projected coordinate
-    proj_coords = np.empty(shape=(3, )).reshape((3, 1))
+    proj_coords = np.empty(shape=(3,), dtype=np.float64)        # projected coordinates
+    coord_CCS_m = np.empty(shape=(3,), dtype=np.float64)        # meter coordinates
+    plane_coord_CCS = np.empty(shape=(2,), dtype=np.float64)    # plane projected coordinates
+    coord_CCS_px = np.empty(shape=(2,), dtype=np.float64)       # pixel coordinates
+    coord_out = np.empty(shape=(2,), dtype=np.int16)            # output coordinates
 
     # Define channels of an orthophoto
     b = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
     g = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
     r = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
     a = np.zeros(shape=(boundary_rows, boundary_cols), dtype=np.uint8)
-
-    image_size = np.reshape(image.shape[0:2], (2, 1))
 
     for row in range(boundary_rows):
         for col in range(boundary_cols):
@@ -27,16 +29,21 @@ def rectify_plane(boundary, boundary_rows, boundary_cols, gsd, eo, ground_height
             proj_coords[1] = boundary[3, 0] - row * gsd - eo[1]
             proj_coords[2] = ground_height - eo[2]
 
-            # 2. back-projection
-            coord_CCS_m = np.dot(R, proj_coords)  # unit: m, 3 x 1, [x, y, z]'
+            # 2. back-projection - unit: m
+            coord_CCS_m[0] = R[0, 0] * proj_coords[0] + R[0, 1] * proj_coords[1] + R[0, 2] * proj_coords[2]
+            coord_CCS_m[1] = R[1, 0] * proj_coords[0] + R[1, 1] * proj_coords[1] + R[1, 2] * proj_coords[2]
+            coord_CCS_m[2] = R[2, 0] * proj_coords[0] + R[2, 1] * proj_coords[1] + R[2, 2] * proj_coords[2]
+
             scale = (coord_CCS_m[2]) / (-focal_length)  # scalar
-            plane_coord_CCS = coord_CCS_m[0:2] / scale  # 2 x 1
+            plane_coord_CCS[0] = coord_CCS_m[0] / scale
+            plane_coord_CCS[1] = coord_CCS_m[1] / scale
 
-            # Convert CCS to Pixel Coordinate System
-            coord_CCS_px = plane_coord_CCS / pixel_size  # unit: px
-            coord_CCS_px[1] = -coord_CCS_px[1]
+            # Convert CCS to Pixel Coordinate System - unit: px
+            coord_CCS_px[0] = plane_coord_CCS[0] / pixel_size
+            coord_CCS_px[1] = -plane_coord_CCS[1] / pixel_size
 
-            coord_out = image_size[::-1] / 2 + coord_CCS_px  # [col, row]
+            coord_out[0] = image.shape[1] / 2 + coord_CCS_px[0]  # column
+            coord_out[1] = image.shape[0] / 2 + coord_CCS_px[1]  # row
 
             # 3. resample
             if coord_out[0] < 0 or coord_out[0] >= image.shape[1]:      # column
