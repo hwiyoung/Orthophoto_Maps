@@ -68,25 +68,10 @@ if __name__ == '__main__':
                 boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                # 5. Compute coordinates of the projected boundary(Generate a virtual DEM)
-                print('projectedCoord')
+                print('Rectify')
                 start_time = time.time()
-                proj_coords = projectedCoord(bbox, boundary_rows, boundary_cols, gsd, eo, ground_height)
-                print("--- %s seconds ---" % (time.time() - start_time))
-
-                # Image size
-                image_size = np.reshape(restored_image.shape[0:2], (2, 1))
-
-                # 6. Back-projection into camera coordinate system
-                print('backProjection')
-                start_time = time.time()
-                backProj_coords = backProjection(proj_coords, R, focal_length, pixel_size, image_size)
-                print("--- %s seconds ---" % (time.time() - start_time))
-
-                # 7. Resample the pixels
-                print('resample')
-                start_time = time.time()
-                b, g, r, a = resample(backProj_coords, boundary_rows, boundary_cols, image)
+                b, g, r, a = rectify_plane_parallel(bbox, boundary_rows, boundary_cols, gsd, eo, ground_height,
+                                                    R, focal_length, pixel_size, image)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 # 8. Create GeoTiff
