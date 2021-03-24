@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from osgeo.osr import SpatialReference, CoordinateTransformation
+import osgeo
 
 def readEO(path):
     eo_line = np.genfromtxt(path, delimiter='\t',
@@ -29,8 +30,14 @@ def geographic2plane(eo, epsg=5186):
     coord_transformation = CoordinateTransformation(geographic, plane)
 
     # Check the transformation for a point close to the centre of the projected grid
-    xy = coord_transformation.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
-    eo[0:2] = xy[0:2]
+    if int(osgeo.__version__[0]) >= 3:  # version 3.x
+        # Transform(y,x) will return x,y (Easting, Northing)
+        yx = coord_transformation.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
+        eo[0:2] = yx[0:2][::-1]
+    else:  # version 2.x
+        # Transform(x,y) will return x,y (Easting, Northing)
+        xy = coord_transformation.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
+        eo[0:2] = xy[0:2]
 
     return eo
 

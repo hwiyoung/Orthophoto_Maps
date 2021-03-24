@@ -1,25 +1,50 @@
 # Orthophoto_Maps
-Orthophoto_Maps is a mapping software that generate individual maps(orthophotos) from images of drone. Only with images and sensor data, you can generate orthophotos of area of interests.
+A mapping software that generate individual maps(orthophotos) from drone images.
+Only with images(and sensory data), you can generate orthophotos of area of interests.
 
-## Getting Started
-* Run Orthophoto.py with **<u>Data</u>** folder
-* Data folder is constructed with images and each sensor data
+![dg_result](figure/dg_result.gif)
 
-## Input & Output
-* Input - ./Data
-  * Images to rectify
-  * Extrinsic Orientation parameters of each image
-* Output
-  * Individual orthophotos - .tif(GeoTIFF)
+Steps:
+1. Georeferencing: determine **<u>camera pose(position: x, y, z; orientation: $\omega$, $\phi$, $\kappa$)</u>** and **<u>3D coordinates(x, y, z)</u>**
+2. DEM processing
+  -  Option 1: Average height plane
+  -  Option 2: (Generated sparse point clouds, will be added soon)
+3. Geodata generation
+  1. Rectify
+  2. Pixel resampling
 
-## Flow of functions in this module
-1. getExif
-2. restoreOrientation
-3. readEO
-4. convertCoordinateSystem
-5. Rot3D
-6. boundary
-7. projectedCoord
-8. backProjection
-9. resample
-10. createGeoTiff
+## Installation
+I tested it in python 3.8, Ubuntu 18.04
+```
+conda env create -f environment.yaml
+conda activate orthophoto
+```
+
+## Usage
+After installation and set the input path, you can immediately run for direct georeferencing:
+```
+python main_dg.py
+```
+It generates individual orthophotos for each photo
+For now, you have to edit configurations like input path, output path and sensor width in main_dg.py
+They have to be defined in config file
+
+Other codes are in arrangement
+For example, code for local bundle adjustment and thermal image processing will be added soon
+
+### Input & Output
+| Contents | Data | etc. |
+|:----------|:----------|:----------|
+| Input | Drone images | DJI(now) |
+| Output | Individual orthophoto | GeoTIFF |
+
+## Future Work
+- [ ] Ref. bundle adjustment
+- [ ] Ray-tracing
+- [ ] Time table saving
+- [ ] Configurations
+	- [ ] Input path
+	- [ ] Output path
+	- [ ] System calibration
+	- [ ] Ground height
+	- [ ] GSD

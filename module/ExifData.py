@@ -1,25 +1,7 @@
 import cv2
 import numpy as np
-from PIL import Image
-import subprocess
 import pyexiv2
 
-def getExif(path):
-    src_image = Image.open(path)
-    info = src_image._getexif()
-
-    # Focal Length
-    focalLength = info[37386]
-    focal_length = focalLength[0] / focalLength[1] # unit: mm
-    focal_length = focal_length * pow(10, -3) # unit: m
-
-    # Orientation
-    try:
-        orientation = info[274]
-    except:
-        orientation = 0
-
-    return focal_length, orientation
 
 def restoreOrientation(image, orientation):
     if orientation == 8:
