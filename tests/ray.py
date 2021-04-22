@@ -10,6 +10,24 @@ same API with a roughly 50x speedup.
 import trimesh
 import numpy as np
 from module.EoData import Rot3D
+from scipy.interpolate import griddata
+
+
+def interpolate_dem(xyz, gsd, method='linear'):     # only 'inter'polation
+    X_min = np.min(xyz[:, 0])
+    X_max = np.max(xyz[:, 0])
+    Y_min = np.min(xyz[:, 1])
+    Y_max = np.max(xyz[:, 1])
+
+    # grid_x, grid_y = np.mgrid[X_min:X_max:gsd, Y_max:Y_min:-gsd]
+    grid_y, grid_x = np.mgrid[Y_max:Y_min:-gsd, X_min:X_max:gsd]
+    grid_z = griddata(xyz[:, 0:2], xyz[:, 2], (grid_x, grid_y), method=method)
+
+    bbox = np.array([X_min, X_max, Y_min, Y_max])
+
+    return grid_x, grid_y, grid_z, bbox
+
+
 
 if __name__ == '__main__':
 
@@ -18,7 +36,7 @@ if __name__ == '__main__':
     #mesh = trimesh.load('./models/cube_compressed.obj')
     #mesh = trimesh.load('./models/cube.OBJ')
     #mesh = trimesh.load('./models/cube_test.OBJ')
-    mesh = trimesh.load('./models/DEM_yeosu/34707 - Cloud.obj')
+    mesh = trimesh.load('./models/DEM_yeosu/34707 - Cloud.obj')     # GSD: 90m
     vertices = np.array(mesh.vertices)
 
     # create some rays
@@ -78,20 +96,37 @@ if __name__ == '__main__':
                     [max(locations[:, 0]), min(locations[:, 1])]])  # Lower Right
     print(bbox)
 
-    idx_ul = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[0]) ** 2, axis=1)))
-    idx_ll = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[1]) ** 2, axis=1)))
-    idx_ur = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[2]) ** 2, axis=1)))
-    idx_lr = np.argmin(np.sqrt(np.sum((vertices[:, 0:2] - bbox[3]) ** 2, axis=1)))
+    import matplotlib.pyplot as plt
 
-    coord_ul_mesh = vertices[idx_ul]
-    coord_ll_mesh = vertices[idx_ll]
-    coord_ur_mesh = vertices[idx_ur]
-    coord_lr_mesh = vertices[idx_lr]
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111, projection='3d')  # Axe3D object
 
-    dem = vertices[((vertices[:, 0] >= coord_ul_mesh[0]) & (vertices[:, 0] <= coord_ur_mesh[0])) &
-                   ((vertices[:, 1] >= coord_ll_mesh[1]) & (vertices[:, 1] <= coord_ul_mesh[1]))]
+    x = vertices[:, 0]
+    y = vertices[:, 1]
+    z = vertices[:, 2]
+    # ax.scatter(x, y, z, c=z, s=20, alpha=0.5, cmap=plt.cm.Greens, label="first")
+    # ax.scatter(locations[:, 0], locations[:, 1], max(mesh.bounds[:, 2]), c='red', s=50, label="second")
+    ax.scatter(x, y, c='green', s=20, alpha=0.5, label="DEM")
+    ax.scatter(locations[:, 0], locations[:, 1], c='red', s=50, label="boundary")
+    ax.view_init(azim=-90, elev=90)
+    # Labels.
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    plt.axis([min(locations[:, 0]) - 100, max(locations[:, 0]) + 100,
+              min(locations[:, 1]) - 100, max(locations[:, 1]) + 100])
+    plt.title("ax.scatter")
+    plt.legend(loc='upper left')
+    plt.show()
 
-    dem_output = dem.transpose()
+    dem = vertices[((vertices[:, 0] >= bbox[0, 0]) & (vertices[:, 0] <= bbox[2, 0])) &  # x
+                   ((vertices[:, 1] >= bbox[1, 1]) & (vertices[:, 1] <= bbox[0, 1]))]   # y
+
+    # TODO: RBF for extrapolation
+    grid_x, grid_y, grid_z, _ = interpolate_dem(xyz=dem, gsd=0.1)
+    plt.imshow(grid_z)
+    plt.title("interpolated dem")
+    plt.show()
 
     # stack rays into line segments for visualization as Path3D
     ray_visualize = trimesh.load_path(np.hstack((
