@@ -5,13 +5,13 @@ Only with images(and sensory data), you can generate orthophotos of area of inte
 ![dg_result](figure/dg_result.gif)
 
 Steps:
-1. Georeferencing: determine **<u>camera pose(position: x, y, z; orientation: $\omega$, $\phi$, $\kappa$)</u>** and **<u>3D coordinates(x, y, z)</u>**
+1. Georeferencing: determine **<u>camera pose(position: x, y, z; orientation: ω, φ, κ)</u>** and **<u>3D coordinates(x, y, z)</u>**
 2. DEM processing
-  -  Option 1: Average height plane
-  -  Option 2: (Generated sparse point clouds, will be added soon)
+   -  Option 1: Average height plane
+   -  Option 2: (Generated sparse point clouds, will be added soon)
 3. Geodata generation
-  1. Rectify
-  2. Pixel resampling
+   1. Rectify
+   2. Pixel resampling
 
 ## Installation
 I tested it in python 3.8, Ubuntu 18.04
