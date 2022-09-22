@@ -31,9 +31,14 @@ def geographic2plane(eo, epsg=5186):
 
     # Check the transformation for a point close to the centre of the projected grid
     if int(osgeo.__version__[0]) >= 3:  # version 3.x
-        # Transform(y,x) will return x,y (Easting, Northing)
-        yx = coord_transformation.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
-        eo[0:2] = yx[0:2][::-1]
+        if str(epsg).startswith("51"):  # for Korean CRS only (temporarily) ... TODO: for whole CRS
+            # Transform(y,x) will return y, x (Northing, Easting)
+            yx = coord_transformation.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
+            eo[0:2] = yx[0:2][::-1]
+        else:
+            # Transform(y,x) will return x,y (Easting, Northing)
+            xy = coord_transformation.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
+            eo[0:2] = xy[0:2]
     else:  # version 2.x
         # Transform(x,y) will return x,y (Easting, Northing)
         xy = coord_transformation.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat

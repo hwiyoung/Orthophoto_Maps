@@ -176,7 +176,7 @@ def resample(coord, boundary_rows, boundary_cols, image):
 
     return b, g, r, a
 
-def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
+def createGeoTiff(b, g, r, a, boundary, gsd, epsg, rows, cols, dst):
     # https://stackoverflow.com/questions/33537599/how-do-i-write-create-a-geotiff-rgb-image-file-in-python
     geotransform = (boundary[0], gsd, 0, boundary[3], 0, -gsd)
 
@@ -184,9 +184,9 @@ def createGeoTiff(b, g, r, a, boundary, gsd, rows, cols, dst):
     dst_ds = gdal.GetDriverByName('GTiff').Create(dst + '.tif', cols, rows, 4, gdal.GDT_Byte)
     dst_ds.SetGeoTransform(geotransform)  # specify coords
 
-    # Define the TM central coordinate system (EPSG 5186)
+    # Define the projected coordinate system
     srs = osr.SpatialReference()  # establish encoding
-    srs.ImportFromEPSG(5186)
+    srs.ImportFromEPSG(epsg)
 
     dst_ds.SetProjection(srs.ExportToWkt())  # export coords to file
     dst_ds.GetRasterBand(1).WriteArray(r)  # write r-band to the raster

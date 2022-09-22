@@ -196,5 +196,8 @@ venv.bak/
 pyvenv.cfg
 pip-selfcheck.json
 
+### VS Code Artifacts ###
+.vscode/
+
 
 # End of https://www.gitignore.io/api/python,pycharm

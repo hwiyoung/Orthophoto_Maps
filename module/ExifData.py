@@ -54,6 +54,14 @@ def get_metadata(input_file):
     longitude = convert_dms_to_deg(exif["Exif.GPSInfo.GPSLongitude"])
     latitude = convert_dms_to_deg(exif["Exif.GPSInfo.GPSLatitude"])
 
+    lon_ref = exif['Exif.GPSInfo.GPSLongitudeRef']
+    lat_ref = exif['Exif.GPSInfo.GPSLatitudeRef']
+
+    if lon_ref == "W":
+        longitude = -longitude
+    if lat_ref == "S":
+        latitude = -latitude
+
     if exif["Exif.Image.Make"] == "DJI":
         altitude = float(xmp['Xmp.drone-dji.RelativeAltitude'])
         roll = float(xmp['Xmp.drone-dji.GimbalRollDegree'])

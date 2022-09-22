@@ -10,12 +10,13 @@ from rich.table import Table
 
 console = Console()
 
-input_folder = '../00_data/sample_dji'
+input_folder = 'Data'
 ground_height = 0   # unit: m
-# sensor_width = 6.3  # unit: mm, Mavic
+sensor_width = 6.3  # unit: mm, Mavic
 # sensor_width = 13.2  # unit: mm, P4RTK
-sensor_width = 17.3  # unit: mm, Inspire
+# sensor_width = 17.3  # unit: mm, Inspire
 epsg = 5186     # editable
+gsd = 0.1   # unit: m, set 0 to compute automatically
 
 if __name__ == '__main__':
     for root, dirs, files in os.walk(input_folder):
@@ -64,7 +65,8 @@ if __name__ == '__main__':
 
                 # 4. Compute GSD & Boundary size
                 # GSD
-                gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
+                if gsd == 0:
+                    gsd = (pixel_size * (eo[2] - ground_height)) / focal_length  # unit: m/px
                 # Boundary size
                 boundary_cols = int((bbox[1, 0] - bbox[0, 0]) / gsd)
                 boundary_rows = int((bbox[3, 0] - bbox[2, 0]) / gsd)
@@ -83,7 +85,7 @@ if __name__ == '__main__':
                 # 8. Create GeoTiff
                 print('Save the image in GeoTiff')
                 start_time = time.time()
-                createGeoTiff(b, g, r, a, bbox, gsd, boundary_rows, boundary_cols, dst)
+                createGeoTiff(b, g, r, a, bbox, gsd, epsg, boundary_rows, boundary_cols, dst)
                 # create_pnga_optical(b, g, r, a, bbox, gsd, epsg, dst)   # for test
                 write_time = time.time() - start_time
                 console.print(f"Write time: {write_time:.2f} sec", style="blink bold red underline")
