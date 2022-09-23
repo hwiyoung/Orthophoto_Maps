@@ -98,9 +98,6 @@ def get_exif(path_name):
     with exiftool.ExifToolHelper() as et:
         metadata = et.get_metadata(path_name)[0]
 
-    #for tag in metadata:
-    #    print(f'{tag} {metadata[tag]}')
-
     Camera = {}
     Camera['FileName'] = path_name
     if 'File:ImageWidth' in metadata:
@@ -169,6 +166,8 @@ def get_exif(path_name):
 #        roll = 0
 #        pitch = 0
 #        yaw = 0
+    #for tag in metadata:
+    #    print(f'{tag} {metadata[tag]}')
 
     return Camera
     #eo = np.array([longitude, latitude, altitude, roll, pitch, yaw])

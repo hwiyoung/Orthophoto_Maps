@@ -1,7 +1,6 @@
 import numpy as np
 import math
 from osgeo.osr import SpatialReference, CoordinateTransformation
-import osgeo
 
 def readEO(path):
     eo_line = np.genfromtxt(path, delimiter='\t',
@@ -91,17 +90,18 @@ def rot_2d(theta):
     return np.array([[np.cos(theta), np.sin(theta)],
                      [-np.sin(theta), np.cos(theta)]])
 
-def rpy_to_opk(Camera, maker=""):
+def rpy_to_opk(Camera):
     """
     Convert Roll Pitch Yaw from Camera in degrees
     to OPK (Omega Phi Kappa) np.array in radians 
     return the OPK np.array
     """
     rpy = [Camera['Roll'], Camera['Pitch'],Camera['Yaw']]
+    maker = Camera['Make']
 
     roll_pitch = np.empty_like(rpy[0:2])
     
-    if maker == "samsung":
+    if "samsung" in maker:
 
         roll_pitch[0] = -rpy[1]
         roll_pitch[1] = -rpy[0]
@@ -119,4 +119,4 @@ def rpy_to_opk(Camera, maker=""):
         omega_phi = np.dot(rot_2d(rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
         kappa = -rpy[2]
 
-        return np.array(np.radians([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa]))
+    return np.array(np.radians([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa]))
