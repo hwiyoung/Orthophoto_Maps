@@ -18,33 +18,6 @@ def readEO(path):
 
     return eo
 
-def geographic2plane(eo, epsg=5186):
-    # Define the Plane Coordinate System (e.g. 5186)
-    plane = SpatialReference()
-    plane.ImportFromEPSG(epsg)
-
-    # Define the wgs84 system (EPSG 4326)
-    geographic = SpatialReference()
-    geographic.ImportFromEPSG(4326)
-
-    coord_transformation = CoordinateTransformation(geographic, plane)
-
-    # Check the transformation for a point close to the centre of the projected grid
-    if int(osgeo.__version__[0]) >= 3:  # version 3.x
-        if str(epsg).startswith("51"):  # for Korean CRS only (temporarily) ... TODO: for whole CRS
-            # Transform(y,x) will return y, x (Northing, Easting)
-            yx = coord_transformation.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
-            eo[0:2] = yx[0:2][::-1]
-        else:
-            # Transform(y,x) will return x,y (Easting, Northing)
-            xy = coord_transformation.TransformPoint(float(eo[1]), float(eo[0]))  # The order: Lat, Lon
-            eo[0:2] = xy[0:2]
-    else:  # version 2.x
-        # Transform(x,y) will return x,y (Easting, Northing)
-        xy = coord_transformation.TransformPoint(float(eo[0]), float(eo[1]))  # The order: Lon, Lat
-        eo[0:2] = xy[0:2]
-
-    return eo
 
 def tmcentral2latlon(eo):
     # Define the TM central coordinate system (EPSG 5186)
@@ -118,9 +91,17 @@ def rot_2d(theta):
     return np.array([[np.cos(theta), np.sin(theta)],
                      [-np.sin(theta), np.cos(theta)]])
 
-def rpy_to_opk(rpy, maker=""):
+def rpy_to_opk(Camera, maker=""):
+    """
+    Convert Roll Pitch Yaw from Camera in degrees
+    to OPK (Omega Phi Kappa) np.array in radians 
+    return the OPK np.array
+    """
+    rpy = [Camera['Roll'], Camera['Pitch'],Camera['Yaw']]
+
+    roll_pitch = np.empty_like(rpy[0:2])
+    
     if maker == "samsung":
-        roll_pitch = np.empty_like(rpy[0:2])
 
         roll_pitch[0] = -rpy[1]
         roll_pitch[1] = -rpy[0]
@@ -129,7 +110,6 @@ def rpy_to_opk(rpy, maker=""):
         kappa = -rpy[2] - 90
         return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])
     else:
-        roll_pitch = np.empty_like(rpy[0:2])
         roll_pitch[0] = 90 + rpy[1]
         if 180 - abs(rpy[0]) <= 0.1:
             roll_pitch[1] = 0
@@ -138,4 +118,5 @@ def rpy_to_opk(rpy, maker=""):
 
         omega_phi = np.dot(rot_2d(rpy[2] * np.pi / 180), roll_pitch.reshape(2, 1))
         kappa = -rpy[2]
-        return np.array([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa])
+
+        return np.array(np.radians([float(omega_phi[0, 0]), float(omega_phi[1, 0]), kappa]))
