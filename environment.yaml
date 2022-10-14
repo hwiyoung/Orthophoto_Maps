@@ -37,7 +37,7 @@ dependencies:
   - krb5=1.17.2=h926e7f8_0
   - ld_impl_linux-64=2.35.1=hea4e1c9_2
   - libcurl=7.75.0=hc4aaa36_0
-  - libdap4=3.20.6=hd7c4107_1
+  - libdap4=3.20.6=hd7c4107_2
   - libedit=3.1.20191231=he28a2e2_2
   - libev=4.33=h516909a_1
   - libffi=3.3=h58526e2_2
