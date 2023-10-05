@@ -1,0 +1,4 @@
+processes: 8                          # Number of threads to use
+align_orientation_prior: vertical     # horizontal, vertical or no_roll
+use_altitude_tag: yes                 # Use or ignore EXIF altitude tag
+feature_type: ORB                     # Feature type (AKAZE, SURF, SIFT, HAHOG, ORB)

@@ -9,7 +9,7 @@ same API with a roughly 50x speedup.
 
 import trimesh
 import numpy as np
-from module.EoData import Rot3D
+from module.eo import Rot3D
 from scipy.interpolate import griddata
 
 
